@@ -10,6 +10,4 @@ alias goto_sdi_edit="brackets ~/Sites/SDI-1505"
 
 alias goto_webdesignalive="cd ~/Sites/webdesignalive"
 
-alias c="clear"
-
-source ~/.profile
+#source ~/.profile
