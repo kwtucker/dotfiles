@@ -2,6 +2,7 @@
 Intstallation:
 
   cd ~
+  
   git clone git@github.com:kwtucker/dotfiles.git
   
 
@@ -18,4 +19,3 @@ Create symlinks
   ln -s ~/dotfiles/.vim ~/.vim
   
   ln -s ~/dotfiles/.gitconfig ~/.gitconfig
-  git 
