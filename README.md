@@ -1,12 +1,11 @@
-
-Intstallation:
+###Intstallation:
 
   cd ~
   
   git clone git@github.com:kwtucker/dotfiles.git
   
 
-Create symlinks
+###Create symlinks
 
   ln -s ~/dotfiles/.vimrc ~/.vimrc
   
