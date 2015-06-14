@@ -32,10 +32,6 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
  
 
-"execute pathogen#infect()
-"syntax on
-"filetype plugin indent on
-
 set number     "always shows line numbers
 set hlsearch   "highlight search terms
 set incsearch  "show search matches as you type
