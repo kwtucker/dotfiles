@@ -19,4 +19,4 @@
   
   ln -s ~/dotfiles/.gitconfig ~/.gitconfig
 
-![Image of Prompt](github.com/kwtucker/dotfiles/bashPrompt/myPrompt.png)
+![Image of Prompt](https://github.com/kwtucker/dotfiles/blob/master/bashPrompt/myPrompt.png)
