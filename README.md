@@ -1,12 +1,14 @@
 ###Intstallation:
-
+```
   cd ~
   
   git clone git@github.com:kwtucker/dotfiles.git
-  
+
+``` 
 
 ###Create symlinks
 
+```
   ln -s ~/doBLACKtfiles/.vimrc ~/.vimrc
   
   ln -s ~/dotfiles/.bash_profile ~/.bash_profile
@@ -19,12 +21,11 @@
   
   ln -s ~/dotfiles/.gitconfig ~/.gitconfig
 
+```
 
 ####This is the prompt at the home directory.
 
 ![Image of Prompt](https://github.com/kwtucker/dotfiles/blob/master/bashPrompt/myPrompt.png)
-
-
 
 
 ####This is the prompt when you are in a git repo.
