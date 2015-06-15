@@ -3,13 +3,12 @@
   cd ~
   
   git clone git@github.com:kwtucker/dotfiles.git
-
 ``` 
 
 ###Create symlinks
 
 ```
-  ln -s ~/doBLACKtfiles/.vimrc ~/.vimrc
+  ln -s ~/dotfiles/.vimrc ~/.vimrc
   
   ln -s ~/dotfiles/.bash_profile ~/.bash_profile
   
@@ -20,7 +19,6 @@
   ln -s ~/dotfiles/.vim ~/.vim
   
   ln -s ~/dotfiles/.gitconfig ~/.gitconfig
-
 ```
 
 ####This is the prompt at the home directory.
