@@ -30,7 +30,7 @@ export CLICOLOR='Yes'
 export LSCOLORS=gxfxbEaEBxxEhEhBaDaCaD
 
 # This is what you edit to customize the prompt
-export PS1=$LIGHT_GRAY" __{ 👾:rage2:  }\h--[\W] ∆ "'$(
+export PS1=$LIGHT_GRAY" __{ 👾 }\h--[\W] ∆ "'$(
     if [[ $(__git_ps1) =~ \*\)$ ]]
     # a file has been modified but not added
     then echo "'$YELLOW'"$(__git_ps1 " (%s)")
