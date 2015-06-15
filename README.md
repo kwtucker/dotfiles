@@ -21,10 +21,20 @@
   ln -s ~/dotfiles/.gitconfig ~/.gitconfig
 ```
 
+#####Set up [Vundle]:
+```
+   $ git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+```
+#####Then you must install your plugins:
+```
+  $ vim 
+  :PluginInstall
+  :q 
+```
+
 ####This is the prompt at the home directory.
 
 ![Image of Prompt](https://github.com/kwtucker/dotfiles/blob/master/bashPrompt/myPrompt.png)
-
 
 ####This is the prompt when you are in a git repo.
 
