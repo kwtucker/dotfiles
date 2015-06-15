@@ -14,6 +14,8 @@ Plugin 'tpope/vim-fugitive'
  
 Plugin 'scrooloose/nerdtree'
 
+Plugin 'scrooloose/syntastic'
+
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 
 " All of your Plugins must be added before the following line
@@ -36,4 +38,8 @@ set number     "always shows line numbers
 set hlsearch   "highlight search terms
 set incsearch  "show search matches as you type
 set showmatch  "set show matching parenthesis
+
+" Insert new line without going into insert mode
+noremap oo o<Esc>
+noremap OO O<Esc>
 
