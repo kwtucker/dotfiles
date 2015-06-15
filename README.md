@@ -33,5 +33,5 @@ The status is colored based on the status. This can all be changed.
 
 If you add changes it will show (master*). If you stage it for a commit it will show (master+). 
 
-![Image of PromptGit](https://github.com/kwtucker/dotfiles/blob/master/bashPrompt/myPrompt.png)
+![Image of PromptGit](https://github.com/kwtucker/dotfiles/blob/master/bashPrompt/promptGit.png)
 
