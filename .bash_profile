@@ -32,4 +32,4 @@ export PS1=$LIGHT_GRAY" __{ 👾  }\h--[\W] ∆ "'$(
     then echo "'$MAGENTA'"$(__git_ps1 " (%s)")
     # the state is clean, changes are commited
     else echo "'$CYAN'"$(__git_ps1 " (%s)")
-    fi)'"\n"$LIGHT_GRAY"|""\n"$LIGHT_GRAY"|__"$BLUE"$"$BLACK" "
+    fi)'"\n"$LIGHT_GRAY"|""\n"$LIGHT_GRAY"|__"$BLUE"🔵 "$BLACK" "
