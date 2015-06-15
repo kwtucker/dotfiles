@@ -8,9 +8,15 @@ alias goto_webdesignalive="cd ~/Sites/webdesignalive"
 
 #!/bin/bash
 
+# Sources
 source ~/.git-completion.bash
 source ~/.git-prompt.sh
 
+# Prompt Start
+
+	# For the prompt to work, you must have the .gitprompt.sh in the home directory.
+
+# Colors for prompt
 MAGENTA="\[\033[0;35m\]"
 YELLOW="\[\033[0;33m\]"
 BLUE="\[\033[34m\]"
@@ -23,6 +29,7 @@ export LS_OPTIONS='--color=auto'
 export CLICOLOR='Yes'
 export LSCOLORS=gxfxbEaEBxxEhEhBaDaCaD
 
+# This is what you edit to customize the prompt
 export PS1=$LIGHT_GRAY" __{ 👾  }\h--[\W] ∆ "'$(
     if [[ $(__git_ps1) =~ \*\)$ ]]
     # a file has been modified but not added
@@ -33,3 +40,5 @@ export PS1=$LIGHT_GRAY" __{ 👾  }\h--[\W] ∆ "'$(
     # the state is clean, changes are commited
     else echo "'$CYAN'"$(__git_ps1 " (%s)")
     fi)'"\n"$LIGHT_GRAY"|""\n"$LIGHT_GRAY"|__"$BLUE"🔵 "$BLACK" "
+
+# Prompt End
