@@ -1,3 +1,7 @@
+#Dotfiles
+
+##These are my settings, so if you are wanting any of my setting be sure to review all files. The ".git-prompt.sh" is tied to the ".bash_profile".
+
 ###Intstallation:
 ```
   cd ~
