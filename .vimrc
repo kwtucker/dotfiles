@@ -1,6 +1,6 @@
 set nocompatible              " be iMproved, required
 filetype off                  " required
-
+syntax on
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -14,9 +14,13 @@ Plugin 'tpope/vim-fugitive'
  
 Plugin 'scrooloose/nerdtree'
 
+Plugin 'flazz/vim-colorschemes'
+
 Plugin 'scrooloose/syntastic'
 
 Plugin 'Xuyuanp/nerdtree-git-plugin'
+
+Plugin 'fatih/vim-go'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -33,7 +37,7 @@ filetype plugin indent on    " required
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
  
-
+colorscheme candycode
 set number     "always shows line numbers
 set hlsearch   "highlight search terms
 set incsearch  "show search matches as you type

@@ -1,20 +1,19 @@
-alias goto_whale="cd ~/Sites/CraftyWhale/ghost-0.6.2/content/themes/ghost-theme-whale"
-
-alias goto_sdi="cd ~/Sites/SDI-1505"
-
-alias goto_dws1="cd ~/Sites/dws1"
-
-alias goto_webdesignalive="cd ~/Sites/webdesignalive"
-
 #!/bin/bash
 
 # Sources
 source ~/.git-completion.bash
 source ~/.git-prompt.sh
-
 # Prompt Start
 
 	# For the prompt to work, you must have the .gitprompt.sh in the home directory.
+
+# Golang
+export GOPATH=$HOME/golang/
+export GOROOT=/usr/local/opt/go/libexec/
+export PATH=$PATH:$GOPATH/bin
+export PATH=$PATH:$GOROOT/bin
+# End Golang
+
 
 # Colors for prompt
 MAGENTA="\[\033[0;35m\]"
