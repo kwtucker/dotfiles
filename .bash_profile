@@ -6,7 +6,7 @@ source ~/.git-prompt.sh
 # Prompt Start
 
 	# For the prompt to work, you must have the .gitprompt.sh in the home directory.
-
+export PATH=/usr/local/bin:$PATH
 # Golang
 export GOPATH=$HOME/golang/
 export GOROOT=/usr/local/opt/go/libexec/
@@ -14,6 +14,8 @@ export PATH=$PATH:$GOPATH/bin
 export PATH=$PATH:$GOROOT/bin
 # End Golang
 
+export MONGO_PATH=/usr/local/mongodb  
+export PATH=$PATH:$MONGO_PATH/bin
 
 # Colors for prompt
 MAGENTA="\[\033[0;35m\]"
@@ -41,3 +43,5 @@ export PS1=$LIGHT_GRAY" __{ 👾  }\h--[\W] ∆ "'$(
     fi)'"\n"$LIGHT_GRAY"|""\n"$LIGHT_GRAY"|__"$BLUE"🔵 "$LIGHT_GRAY" "
 
 # Prompt End
+# Added by install_latest_perl_osx.pl
+[ -r /Users/kevintucker/.bashrc ] && source /Users/kevintucker/.bashrc

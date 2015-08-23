@@ -1,5 +1,5 @@
 [core]
-	excludesfile = /Users/kevintucker/.gitignore
+	excludesfile = /Users/kevintucker/.gitignore_global
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 
@@ -25,5 +25,8 @@ df = diff
 dfc = diff --cached
 
 co = checkout
+br = branch
 
 
+[url "https://"]
+	insteadOf = git://
