@@ -1,26 +1,24 @@
 set nocompatible              " be iMproved, required
 filetype off                  " required
 syntax on
-" set the runtime path to include Vundle and initialize
+"set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
+"alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
-"
-" let Vundle manage Vundle, required
+
+"let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
- 
 Plugin 'tpope/vim-fugitive'
- 
 Plugin 'scrooloose/nerdtree'
-
 Plugin 'flazz/vim-colorschemes'
-
 Plugin 'scrooloose/syntastic'
-
 Plugin 'Xuyuanp/nerdtree-git-plugin'
-
 Plugin 'fatih/vim-go'
+Plugin 'ctrlp.vim'
+Plugin 'surround.vim'
+Plugin 'snipMate'
+Plugin 'mattn/emmet-vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -38,12 +36,12 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
  
 colorscheme candycode
-set number     "always shows line numbers
+
 set hlsearch   "highlight search terms
 set incsearch  "show search matches as you type
 set showmatch  "set show matching parenthesis
+set number 
 
-" Insert new line without going into insert mode
+"Insert new line without going into insert mode
 noremap oo o<Esc>
 noremap OO O<Esc>
-
