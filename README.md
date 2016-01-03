@@ -20,8 +20,6 @@ For the prompt you can also reference: http://neverstopbuilding.com/gitpro
   
   ln -s ~/dotfiles/.git-completion.bash ~/.git-completion.bash
   
-  ln -s ~/dotfiles/.git-prompt.sh ~/.git-prompt.sh
-  
   ln -s ~/dotfiles/.vim ~/.vim
   
   ln -s ~/dotfiles/.gitconfig ~/.gitconfig
