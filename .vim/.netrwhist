@@ -1,4 +1,7 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =2
-let g:netrw_dirhist_1='/Users/kevintucker/Sites/bitBucket'
-let g:netrw_dirhist_2='/Users/kevintucker/Sites/bitBucket/kevinwtucker'
+let g:netrw_dirhist_cnt =5
+let g:netrw_dirhist_1='/Users/kevintucker/.ionic'
+let g:netrw_dirhist_2='/Users/kevintucker/.local'
+let g:netrw_dirhist_3='/Users/kevintucker/.node-gyp'
+let g:netrw_dirhist_4='/Users/kevintucker/.subversion'
+let g:netrw_dirhist_5='/Users/kevintucker/dotfiles'
