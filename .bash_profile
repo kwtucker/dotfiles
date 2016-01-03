@@ -1,5 +1,5 @@
 #!/bin/bash
-
+source ~/.git-completion.bash
 export PATH=/usr/local/bin:$PATH
 
 # Golang
