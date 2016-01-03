@@ -14,6 +14,8 @@ export PATH=$PATH:$MONGO_PATH/bin
 export CUSTOM_SCRIPTS=/Users/kevintucker/scripts
 export PATH=$CUSTOM_SCRIPTS:$PATH
 
+export PS1='\n\h › \W => '
+
 alias gitignore='echo "node_modules/\nbower_components/" >> .gitignore'
 
 # Added by install_latest_perl_osx.pl
