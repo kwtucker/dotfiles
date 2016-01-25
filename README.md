@@ -1,8 +1,5 @@
 #Dotfiles
 
-
-For the prompt you can also reference: http://neverstopbuilding.com/gitpro 
-
 ###Intstallation:
 ```
   cd ~
