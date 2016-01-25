@@ -1,7 +1,6 @@
 #!/bin/bash
-source ~/.git-completion.bash
+#source ~/.git-completion.bash
 export PATH=/usr/local/bin:$PATH
-
 # Golang
 export GOPATH=$HOME/golang/
 export GOROOT=/usr/local/go/

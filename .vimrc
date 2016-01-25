@@ -16,10 +16,12 @@ Plugin 'scrooloose/syntastic'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'fatih/vim-go'
 Plugin 'ctrlp.vim'
-Plugin 'surround.vim'
 Plugin 'snipMate'
 Plugin 'mattn/emmet-vim'
-
+Plugin 'myusuf3/numbers.vim'
+Plugin 'tpope/vim-surround'
+Plugin 'davidhalter/jedi-vim'
+Plugin 'elzr/vim-json'
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -45,3 +47,13 @@ set number
 "Insert new line without going into insert mode
 noremap oo o<Esc>
 noremap OO O<Esc>
+noremap <Up> <NOP>
+noremap <Down> <NOP>
+noremap <Left> <NOP>
+noremap <Right> <NOP>
+
+" Quick ESC
+imap jj <ESC>
+
+
+

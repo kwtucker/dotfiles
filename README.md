@@ -23,6 +23,8 @@ For the prompt you can also reference: http://neverstopbuilding.com/gitpro
   ln -s ~/dotfiles/.vim ~/.vim
   
   ln -s ~/dotfiles/.gitconfig ~/.gitconfig
+  
+  ln -s ~/dotfiles/.tmux.conf ~/.tmux.conf
 ```
 
 #####Set up [Vundle] (in the home directory):
