@@ -1,6 +1,0 @@
-let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =4
-let g:netrw_dirhist_1='/Users/kevintucker/Desktop/day5form'
-let g:netrw_dirhist_2='/Users/kevintucker/.plugman'
-let g:netrw_dirhist_3='/Users/kevintucker/.Trash'
-let g:netrw_dirhist_4='/Users/kevintucker/Dropbox/Full_Sail/FS_Class/Web_Standards_Project_(WSP)/wsp-team-1'

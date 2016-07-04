@@ -14,7 +14,6 @@ Plugin 'scrooloose/nerdtree'
 Plugin 'flazz/vim-colorschemes'
 Plugin 'scrooloose/syntastic'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
-Plugin 'fatih/vim-go'
 Plugin 'ctrlp.vim'
 Plugin 'snipMate'
 Plugin 'mattn/emmet-vim'
@@ -22,27 +21,29 @@ Plugin 'myusuf3/numbers.vim'
 Plugin 'tpope/vim-surround'
 Plugin 'davidhalter/jedi-vim'
 Plugin 'elzr/vim-json'
+Plugin 'christoomey/vim-tmux-navigator'
+Plugin 'fatih/vim-go'
+"Plugin 'vim-airline/vim-airline'
+"Plugin 'vim-airline/vim-airline-themes'
+Plugin 'majutsushi/tagbar'
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
- 
 colorscheme candycode
 
 set hlsearch   "highlight search terms
 set incsearch  "show search matches as you type
 set showmatch  "set show matching parenthesis
-set number 
+set number
+set tabstop=2
+
+let mapleader=","
+let g:airline_powerline_fonts = 1
+set t_Co=256
+set laststatus=2
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
 
 "Insert new line without going into insert mode
 noremap oo o<Esc>
@@ -54,6 +55,43 @@ noremap <Right> <NOP>
 
 " Quick ESC
 imap jj <ESC>
+map <C-n> :NERDTreeToggle<CR>
 
+"Syntax Highlighting Go-vim
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_interfaces = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
 
-
+"Go TagBar
+au BufRead,BufNewFile *.go set filetype=go
+nmap <C-t> :TagbarToggle<CR>
+let g:tagbar_type_go = {
+    \ 'ctagstype' : 'go',
+    \ 'kinds'     : [
+        \ 'p:package',
+        \ 'i:imports:1',
+        \ 'c:constants',
+        \ 'v:variables',
+        \ 't:types',
+        \ 'n:interfaces',
+        \ 'w:fields',
+        \ 'e:embedded',
+        \ 'm:methods',
+        \ 'r:constructor',
+        \ 'f:functions'
+    \ ],
+    \ 'sro' : '.',
+    \ 'kind2scope' : {
+        \ 't' : 'ctype',
+        \ 'n' : 'ntype'
+    \ },
+    \ 'scope2kind' : {
+        \ 'ctype' : 't',
+        \ 'ntype' : 'n'
+    \ },
+    \ 'ctagsbin'  : 'gotags',
+    \ 'ctagsargs' : '-sort -silent'
+	\ }
