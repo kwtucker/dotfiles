@@ -9,6 +9,8 @@ call vundle#begin()
 
 "let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
 Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/nerdtree'
 Plugin 'flazz/vim-colorschemes'
