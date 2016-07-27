@@ -60,9 +60,11 @@ export MANPATH="/usr/local/man:$MANPATH"
 source $ZSH/oh-my-zsh.sh
 
 export GOPATH=$HOME/golang/
-export GOROOT=/usr/local/go/
-export PATH=$PATH:$GOROOT/bin
 export PATH=$PATH:$GOPATH/bin
+# Only need to set goroot if go is installed in a custom location
+#export GOROOT=/usr/local/go/
+#export PATH=$PATH:$GOROOT/bin
+
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
