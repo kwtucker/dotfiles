@@ -90,8 +90,7 @@ export NVM_DIR="$HOME/.nvm"
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
 alias zshconfig="vim ~/.zshrc"
-alias ls='mc ls'
-alias cp='mc cp'
-alias cat='mc cat'
-alias mkdir='mc mb'
-#alias python='python3'
+#alias ls='mc ls'
+#alias cp='mc cp'
+#alias cat='mc cat'
+#alias mkdir='mc mb'
