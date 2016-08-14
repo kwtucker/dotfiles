@@ -9,15 +9,13 @@ call vundle#begin()
 
 "let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
 Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/nerdtree'
-Plugin 'flazz/vim-colorschemes'
+"Plugin 'flazz/vim-colorschemes'
 Plugin 'scrooloose/syntastic'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'ctrlp.vim'
-Plugin 'snipMate'
+"Plugin 'snipMate'
 Plugin 'mattn/emmet-vim'
 Plugin 'myusuf3/numbers.vim'
 Plugin 'tpope/vim-surround'
@@ -25,19 +23,25 @@ Plugin 'davidhalter/jedi-vim'
 Plugin 'elzr/vim-json'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'fatih/vim-go'
-"Plugin 'vim-airline/vim-airline'
-"Plugin 'vim-airline/vim-airline-themes'
+Plugin 'bling/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+Plugin 'tyrannicaltoucan/vim-deep-space'
 Plugin 'majutsushi/tagbar'
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
-colorscheme candycode
+"colorscheme candycode
 
 set hlsearch   "highlight search terms
 set incsearch  "show search matches as you type
 set showmatch  "set show matching parenthesis
 set number
 set tabstop=2
+
+set background=dark
+colorscheme deep-space
+let g:airline_theme='deep_space'
+
 
 let mapleader=","
 let g:airline_powerline_fonts = 1
@@ -47,16 +51,20 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 
-"Insert new line without going into insert mode
-noremap oo o<Esc>
-noremap OO O<Esc>
-noremap <Up> <NOP>
-noremap <Down> <NOP>
-noremap <Left> <NOP>
-noremap <Right> <NOP>
+" Disables the arrow keys
+nnoremap <up>    <nop>
+nnoremap <down>  <nop>
+nnoremap <left>  <nop>
+nnoremap <right> <nop>
+inoremap <up>    <nop>
+inoremap <down>  <nop>
+inoremap <left>  <nop>
+inoremap <right> <nop>
 
 " Quick ESC
 imap jj <ESC>
+
+" Sets the nerd tree toggle to control n
 map <C-n> :NERDTreeToggle<CR>
 
 "Syntax Highlighting Go-vim
