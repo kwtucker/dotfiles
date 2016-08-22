@@ -48,7 +48,7 @@ HIST_STAMPS="mm/dd/yyyy"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git colored-man colorize github vagrant virtualenv pip python brew osx zsh-syntax-highlighting golang)
+plugins=(git github virtualenv pip python brew osx zsh-syntax-highlighting golang)
 
 
 # User configuration
@@ -73,8 +73,10 @@ export PATH=$PATH:$GOPATH/bin
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
 else
-  export EDITOR='mvim'
+  export EDITOR='vim'
 fi
+
+
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
