@@ -14,8 +14,10 @@
 ```
 
 ##### 3. Create a parent directory .vim and sub-directory bundle in the Home directory.
+```
  .vim
   |_ bundle
+```
 
 ##### 4. Create symlinks
 
