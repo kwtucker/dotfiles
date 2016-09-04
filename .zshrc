@@ -97,11 +97,13 @@ alias zshrc="vim ~/dotfiles/.zshrc"
 # for the better man pages
 alias mana="tldr"
 
-# Navigation
 alias Home="cd ~ && ls -la | awk '{print \$9}'"
 alias Desktop="cd ~/Desktop && ls -la | awk '{print \$9}'"
 alias up="cd .. && ls -la |  awk '{print \$9}'"
+alias c='clear'
 
 # goLang alias
 alias gohome="cd ~/golang/src/github.com/kwtucker/ && ls -la | awk '{print \$9}'"
 
+#dotfile git push
+alias gitdot='git add -A && git commit -m "update" && git push origin master"'
