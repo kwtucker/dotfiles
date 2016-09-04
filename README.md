@@ -15,6 +15,10 @@
 
 ##### 3. Create a parent directory .vim and sub-directory bundle in the Home directory.
 ```
+mkdir ~/.vim/bundle
+```
+
+```
  .vim
   |_ bundle
 ```
