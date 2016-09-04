@@ -44,7 +44,9 @@ mkdir ~/.vim/bundle
 ##### 6. Then you must install your plugins.
 In the home directory enter the following:
 ```
-  vim
+	$ vim
+
+  -In vim enter these commands
   :PluginInstall
   :q
 ```
