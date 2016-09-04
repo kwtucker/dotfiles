@@ -2,7 +2,6 @@
 	excludesfile = /Users/kevintucker/.gitignore_global
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path =
 [mergetool "sourcetree"]
 	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
@@ -10,23 +9,16 @@
 	name = Kevin Tucker
 	email = kwtucker4@gmail.com
 [alias]
-
-#General
-s = status
-ci = commit -m
-
-pu = push
-pl = pull
-
-a = add
-aa = add --all
-
-df = diff
-dfc = diff --cached
-
-co = checkout
-br = branch
-
+; gs=git status
+; gci=git commit -m
+; gpu=git push
+; gpl=git pull
+; ga=git add
+; gaa=git add --all
+; gdf=git diff
+; gdfc=git diff --cached
+; gco=git checkout
+; gbr=git branch
 
 [url "https://"]
 	insteadOf = git://

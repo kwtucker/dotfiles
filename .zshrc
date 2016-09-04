@@ -90,9 +90,18 @@ export NVM_DIR="$HOME/.nvm"
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
+
 # For a full list of active aliases, run `alias`.
-alias zshconfig="vim ~/.zshrc"
-#alias ls='mc ls'
-#alias cp='mc cp'
-#alias cat='mc cat'
-#alias mkdir='mc mb'
+alias zshrc="vim ~/dotfiles/.zshrc"
+
+# for the better man pages
+alias mana="tldr"
+
+# Navigation
+alias Home="cd ~ && ls -la | awk '{print \$9}'"
+alias Desktop="cd ~/Desktop && ls -la | awk '{print \$9}'"
+alias up="cd .. && ls -la |  awk '{print \$9}'"
+
+# goLang alias
+alias gohome="cd ~/golang/src/github.com/kwtucker/ && ls -la | awk '{print \$9}'"
+
