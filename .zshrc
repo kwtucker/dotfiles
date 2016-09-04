@@ -106,4 +106,4 @@ alias c='clear'
 alias gohome="cd ~/golang/src/github.com/kwtucker/ && ls -la | awk '{print \$9}'"
 
 #dotfile git push
-alias gitdot='pwd=$(pwd) && cd ~/dotfiles && git add -A && sleep 2 &&  git commit -m "update dotfiles" && sleep 2 &&  git push origin master && sleep 8 &&  cd $pwd'
+alias gitdot='pwd=$(pwd) && cd ~/dotfiles && git add -A && sleep 2 &&  git commit -m "update dotfiles" && sleep 2 &&  git push origin master && sleep 6 &&  cd $pwd'
