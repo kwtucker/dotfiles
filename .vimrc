@@ -9,6 +9,7 @@ call vundle#begin()
 
 "let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
+Plugin 'rizzatti/dash.vim'
 "Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/nerdcommenter'
@@ -38,7 +39,9 @@ set hlsearch   "highlight search terms
 set incsearch  "show search matches as you type
 set showmatch  "set show matching parenthesis
 set number
-set tabstop=2
+set tabstop=4
+set shiftwidth=4
+set pastetoggle=<f2>
 
 " Theme of work area and tabline
 set background=dark
@@ -123,6 +126,9 @@ let g:tagbar_type_go = {
 nmap <Leader>s :w <ENTER>
 nmap <Leader>ss :wq <ENTER>
 nmap <C-t> :TagbarToggle<CR>
+
+nnoremap / /\v
+vnoremap / /\v
 
 " Quick ESC
 imap jj <ESC>

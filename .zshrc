@@ -63,10 +63,11 @@ source $ZSH/oh-my-zsh.sh
 export GOPATH=$HOME/golang/
 export PATH=$PATH:$GOPATH/bin
 # Only need to set goroot if go is installed in a custom location
-#export GOROOT=/usr/local/go/
-#export PATH=$PATH:$GOROOT/bin
+export GOROOT=/usr/local/go/
+export PATH=$PATH:$GOROOT/bin
+export PATH=$HOME/go_appengine:$PATH
 
-
+export CDPATH=~/golang/src/
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
@@ -77,6 +78,7 @@ else
   export EDITOR='vim'
 fi
 
+set pastetoggle=<f5>
 
 
 # Compilation flags
@@ -107,6 +109,7 @@ alias c='clear'
 # goLang alias
 alias gohome="cd ~/golang/src/github.com/kwtucker/ && ls -la | awk '{print \$9}'"
 
+alias composer="php /usr/local/bin/composer.phar"
 
 #dotfile git push
 alias gitdot='pwd=$(pwd) && cd ~/dotfiles && git add -A && sleep 2 &&  git commit -m "update dotfiles" && sleep 2 && git push origin master && sleep 6 &&  cd $pwd'
