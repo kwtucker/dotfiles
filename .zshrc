@@ -1,6 +1,7 @@
 # Path to your oh-my-zsh installation.
 export ZSH=/Users/kevintucker/.oh-my-zsh
 export EDITOR=vim
+export EVENT_NOKQUEUE=1
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -78,11 +79,6 @@ else
   export EDITOR='vim'
 fi
 
-set pastetoggle=<f5>
-
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
 
 export PATH="/usr/local/sbin:$PATH"
 export PATH=/usr/local/bin:$PATH
@@ -101,8 +97,6 @@ alias zshrc="vim ~/dotfiles/.zshrc"
 alias mana="tldr"
 
 
-alias Home="cd ~ && ls -la | awk '{print \$9}'"
-alias Desktop="cd ~/Desktop && ls -la | awk '{print \$9}'"
 alias up="cd .. && ls -la |  awk '{print \$9}'"
 alias c='clear'
 
