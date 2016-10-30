@@ -9,16 +9,6 @@
 	name = Kevin Tucker
 	email = kwtucker4@gmail.com
 [alias]
-; gs=git status
-; gci=git commit -m
-; gpu=git push
-; gpl=git pull
-; ga=git add
-; gaa=git add --all
-; gdf=git diff
-; gdfc=git diff --cached
-; gco=git checkout
-; gbr=git branch
 
 [url "https://"]
 	insteadOf = git://
