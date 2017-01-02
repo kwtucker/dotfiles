@@ -10,12 +10,12 @@ call vundle#begin()
 "let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
 Plugin 'rizzatti/dash.vim'
-"Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/nerdcommenter'
 "Plugin 'flazz/vim-colorschemes'
 Plugin 'scrooloose/syntastic'
-"Plugin 'Xuyuanp/nerdtree-git-plugin'
+Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'ctrlp.vim'
 "Plugin 'snipMate'
 Plugin 'mattn/emmet-vim'
@@ -42,6 +42,7 @@ set number
 set tabstop=4
 set shiftwidth=4
 set pastetoggle=<f2>
+set statusline=%{fugitive#statusline()}
 
 " Theme of work area and tabline
 set background=dark
@@ -55,8 +56,10 @@ set laststatus=2
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
+
 " Add spaces after comment delimiters by default
 let g:NERDSpaceDelims = 1
+let NERDTreeShowHidden=1
 
 " Leader is now ,
 let mapleader=','
@@ -127,11 +130,13 @@ nmap <Leader>s :w <ENTER>
 nmap <Leader>ss :wq <ENTER>
 nmap <C-t> :TagbarToggle<CR>
 
+" Very magic mode
 nnoremap / /\v
 vnoremap / /\v
 
 " Quick ESC
 imap jj <ESC>
+nmap oo o<Esc>k
 
 " Disables the arrow keys
 nnoremap <up>    <nop>

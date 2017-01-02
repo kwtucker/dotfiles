@@ -1,7 +1,20 @@
 # Path to your oh-my-zsh installation.
 export ZSH=/Users/kevintucker/.oh-my-zsh
-export EDITOR=vim
+export EDITOR=vv
 export EVENT_NOKQUEUE=1
+
+# Python virtualenv wrapper
+export WORKON_HOME=$HOME/.virtualenvs
+export PROJECT_HOME=$HOME/python_dev
+source /usr/local/bin/virtualenvwrapper.sh
+# By running the virtualenv_info it will show th current env if activated
+function virtualenv_info { [ $VIRTUAL_ENV ] && echo '('`basename $VIRTUAL_ENV`') ' }
+
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+
+# autoload bashcompinit
+# bashcompinit
+# source /Users/kevintucker/scripts/wp-completion.bash
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -9,49 +22,19 @@ export EVENT_NOKQUEUE=1
 # time that oh-my-zsh is loaded.
 ZSH_THEME="pygmalion"
 
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion. Case
-# sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
-
 # Uncomment the following line to change how often to auto-update (in days).
 export UPDATE_ZSH_DAYS=13
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 HIST_STAMPS="mm/dd/yyyy"
 
-
-
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git github virtualenv pip python brew osx zsh-syntax-highlighting golang)
-
 
 # User configuration
 export PATH="/Users/kevintucker/scripts:/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local/go//bin:/Users/kevintucker/golang//bin:/usr/local/mongodb/bin"
@@ -61,14 +44,16 @@ export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
 
-export GOPATH=$HOME/golang/
+export GOPATH=$HOME/go/
 export PATH=$PATH:$GOPATH/bin
 # Only need to set goroot if go is installed in a custom location
 export GOROOT=/usr/local/go/
 export PATH=$PATH:$GOROOT/bin
+export CDPATH=~/go/src/
 export PATH=$HOME/go_appengine:$PATH
 
-export CDPATH=~/golang/src/
+export PATH=$PATH:/usr/local/share/dotnet
+
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
@@ -79,13 +64,12 @@ else
   export EDITOR='vim'
 fi
 
-
 export PATH="/usr/local/sbin:$PATH"
 export PATH=/usr/local/bin:$PATH
-# ssh
-# export SSH_KEY_PATH="~/.ssh/dsa_id"
+
 export NVM_DIR="$HOME/.nvm"
   . "$(brew --prefix nvm)/nvm.sh"
+
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
@@ -95,7 +79,7 @@ alias zshrc="vim ~/dotfiles/.zshrc"
 
 # for the better man pages
 alias mana="tldr"
-
+alias v=/usr/local/Cellar/vim/8.0.0054/bin/vim
 
 alias up="cd .. && ls -la |  awk '{print \$9}'"
 alias c='clear'
@@ -104,6 +88,12 @@ alias c='clear'
 alias gohome="cd ~/golang/src/github.com/kwtucker/ && ls -la | awk '{print \$9}'"
 
 alias composer="php /usr/local/bin/composer.phar"
+
+# ---- C# ----
+alias dn="dotnet"
+alias dnr="dotnet run"
+alias dnbr="dotnet build ; dnr"
+alias dnb="dotnet build"
 
 #dotfile git push
 alias gitdot='pwd=$(pwd) && cd ~/dotfiles && git add -A && sleep 2 &&  git commit -m "update dotfiles" && sleep 2 && git push origin master && sleep 6 &&  cd $pwd'
