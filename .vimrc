@@ -129,8 +129,10 @@ let g:tagbar_type_go = {
 nmap <Leader>s :w <ENTER>
 nmap <Leader>ss :wq <ENTER>
 nmap <C-t> :TagbarToggle<CR>
+nmap <Leader>nh :nohlsearch <ENTER>
 
 " Very magic mode
+"
 nnoremap / /\v
 vnoremap / /\v
 

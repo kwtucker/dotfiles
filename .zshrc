@@ -45,10 +45,10 @@ export MANPATH="/usr/local/man:$MANPATH"
 source $ZSH/oh-my-zsh.sh
 
 export GOPATH=$HOME/go/
-export PATH=$PATH:$GOPATH/bin
+#export PATH=$PATH:$GOPATH/bin
 # Only need to set goroot if go is installed in a custom location
-export GOROOT=/usr/local/go/
-export PATH=$PATH:$GOROOT/bin
+#export GOROOT=/usr/local/go/
+#export PATH=$PATH:$GOROOT/bin
 export CDPATH=~/go/src/
 export PATH=$HOME/go_appengine:$PATH
 
