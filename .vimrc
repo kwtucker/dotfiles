@@ -129,10 +129,14 @@ let g:tagbar_type_go = {
 nmap <Leader>s :w <ENTER>
 nmap <Leader>ss :wq <ENTER>
 nmap <C-t> :TagbarToggle<CR>
+
+" Will un highlight the search results
 nmap <Leader>nh :nohlsearch <ENTER>
 
+nmap <Leader>< :20winc < <ENTER>
+nmap <Leader>> :20winc > <ENTER>
+
 " Very magic mode
-"
 nnoremap / /\v
 vnoremap / /\v
 
