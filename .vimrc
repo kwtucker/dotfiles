@@ -133,6 +133,7 @@ nmap <C-t> :TagbarToggle<CR>
 " Will un highlight the search results
 nmap <Leader>nh :nohlsearch <ENTER>
 
+" Adjust the split view
 nmap <Leader>< :20winc < <ENTER>
 nmap <Leader>> :20winc > <ENTER>
 
