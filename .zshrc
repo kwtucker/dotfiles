@@ -3,7 +3,7 @@ export ZSH=/Users/kevintucker/.oh-my-zsh
 export EDITOR=vv
 export EVENT_NOKQUEUE=1
 
-# Python virtualenv wrapper
+ #Python virtualenv wrapper
 export WORKON_HOME=$HOME/.virtualenvs
 export PROJECT_HOME=$HOME/python_dev
 source /usr/local/bin/virtualenvwrapper.sh

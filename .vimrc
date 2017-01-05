@@ -130,6 +130,8 @@ nmap <Leader>s :w <ENTER>
 nmap <Leader>ss :wq <ENTER>
 nmap <C-t> :TagbarToggle<CR>
 
+set clipboard=unnamed
+
 " Will un highlight the search results
 nmap <Leader>nh :nohlsearch <ENTER>
 
