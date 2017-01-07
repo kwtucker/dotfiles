@@ -1,6 +1,6 @@
 # Path to your oh-my-zsh installation.
 export ZSH=/Users/kevintucker/.oh-my-zsh
-export EDITOR=vv
+export EDITOR=v
 export EVENT_NOKQUEUE=1
 
  #Python virtualenv wrapper
@@ -54,15 +54,15 @@ export PATH=$HOME/go_appengine:$PATH
 
 export PATH=$PATH:/usr/local/share/dotnet
 
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
+  export EDITOR='v'
 else
-  export EDITOR='vim'
+  export EDITOR='v'
 fi
+
+# Sets the terminal to act like vim with Normal and Insert modes.
+#set -o vi
 
 export PATH="/usr/local/sbin:$PATH"
 export PATH=/usr/local/bin:$PATH
@@ -70,9 +70,11 @@ export PATH=/usr/local/bin:$PATH
 export NVM_DIR="$HOME/.nvm"
   . "$(brew --prefix nvm)/nvm.sh"
 
+
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
+export ZSH_CUSTOM="~/.zsh_custom/.alias"
 
 # For a full list of active aliases, run `alias`.
 alias zshrc="vim ~/dotfiles/.zshrc"

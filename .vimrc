@@ -7,8 +7,10 @@ call vundle#begin()
 "alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
 
+
 "let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
+Plugin 'airblade/vim-gitgutter'
 Plugin 'rizzatti/dash.vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/nerdtree'
@@ -43,6 +45,8 @@ set tabstop=4
 set shiftwidth=4
 set pastetoggle=<f2>
 set statusline=%{fugitive#statusline()}
+" Update time for vim gutter
+set updatetime=250
 
 " Theme of work area and tabline
 set background=dark
