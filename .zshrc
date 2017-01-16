@@ -47,8 +47,8 @@ source $ZSH/oh-my-zsh.sh
 export GOPATH=$HOME/go/
 #export PATH=$PATH:$GOPATH/bin
 # Only need to set goroot if go is installed in a custom location
-#export GOROOT=/usr/local/go/
-#export PATH=$PATH:$GOROOT/bin
+export GOROOT=/usr/local/go/
+export PATH=$PATH:$GOROOT/bin
 export CDPATH=~/go/src/
 export PATH=$HOME/go_appengine:$PATH
 
@@ -75,6 +75,9 @@ export NVM_DIR="$HOME/.nvm"
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 export ZSH_CUSTOM="~/.zsh_custom/.alias"
+
+# For composer PSR 1 and 2 code style PHP
+export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 # For a full list of active aliases, run `alias`.
 alias zshrc="vim ~/dotfiles/.zshrc"
