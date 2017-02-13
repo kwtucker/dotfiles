@@ -1,6 +1,6 @@
 # Path to your oh-my-zsh installation.
 export ZSH=/Users/kevintucker/.oh-my-zsh
-export EDITOR=v
+export EDITOR=vim
 export EVENT_NOKQUEUE=1
 
  #Python virtualenv wrapper
@@ -56,19 +56,20 @@ export PATH=$PATH:/usr/local/share/dotnet
 
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='v'
+  export EDITOR='vim'
 else
-  export EDITOR='v'
+  export EDITOR='vim'
 fi
 
 # Sets the terminal to act like vim with Normal and Insert modes.
-#set -o vi
+# set -o vi
 
 export PATH="/usr/local/sbin:$PATH"
 export PATH=/usr/local/bin:$PATH
 
 export NVM_DIR="$HOME/.nvm"
-  . "$(brew --prefix nvm)/nvm.sh"
+  # . "$(brew --prefix nvm)/nvm.sh"
+  source $(brew --prefix nvm)/nvm.sh
 
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
@@ -99,6 +100,7 @@ alias dn="dotnet"
 alias dnr="dotnet run"
 alias dnbr="dotnet build ; dnr"
 alias dnb="dotnet build"
+alias n="vim  -c "NERDTree" ~/notes/info.txt"
 
 #dotfile git push
 alias gitdot='pwd=$(pwd) && cd ~/dotfiles && git add -A && sleep 2 &&  git commit -m "update dotfiles" && sleep 2 && git push origin master && sleep 6 &&  cd $pwd'
