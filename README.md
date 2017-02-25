@@ -61,9 +61,9 @@ mkdir ~/.vim/bundle
 ##### 6. Then you must install your plugins.
 In the home directory enter the following:
 ```
-	$ vim
+	$ nv
 
-  -In vim enter these commands
+  -In neovim  enter these commands
   :PluginInstall
   :q
 ```
