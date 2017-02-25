@@ -1,6 +1,6 @@
 # Path to your oh-my-zsh installation.
 export ZSH=/Users/kevintucker/.oh-my-zsh
-export EDITOR=vim
+export EDITOR=nvim
 export EVENT_NOKQUEUE=1
 
 ZSH_THEME="pygmalion"
@@ -68,14 +68,14 @@ export PATH="$PATH:$HOME/.composer/vendor/bin"
 # -------------------------------------------------------------------
 # Alias 
 # -------------------------------------------------------------------
-alias zshrc="vim ~/dotfiles/.zshrc"
-
-# for the better man pages
+# # for the better man pages
 alias mana="tldr"
-alias v=/usr/local/Cellar/vim/8.0.0054/bin/vim
 
+alias v=/usr/local/Cellar/vim/8.0.0054/bin/vim
+alias nv='nvim'
 alias up="cd .. && ls -la |  awk '{print \$9}'"
 alias c='clear'
+alias zshrc="nvim ~/dotfiles/.zshrc"
 
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker/ && ls -la | awk '{print \$9}'"
