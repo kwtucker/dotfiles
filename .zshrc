@@ -88,7 +88,9 @@ alias dn="dotnet"
 alias dnr="dotnet run"
 alias dnbr="dotnet build ; dnr"
 alias dnb="dotnet build"
-alias n="vim  -c "NERDTree" ~/notes/info.txt"
+
+alias n='nvim  -c "NERDTree ~/notes/" "~/notes/info.txt"'
+alias nn='function _newNote(){ nvim -c "NERDTree ~/notes/general/" "~/notes/general/$1"; };_newNote'
 
 # ---- dotfile git push ----
 alias gitdot='pwd=$(pwd) && cd ~/dotfiles && git add -A && sleep 2 &&  git commit -m "update dotfiles" && sleep 2 && git push origin master && sleep 6 &&  cd $pwd'
