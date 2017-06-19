@@ -1,6 +1,6 @@
 # Path to your oh-my-zsh installation.
-export ZSH=/Users/kevintucker/.oh-my-zsh
-export EDITOR=nvim
+export ZSH=/Users/ktucke214/.oh-my-zsh
+export EDITOR=vim
 export EVENT_NOKQUEUE=1
 
 ZSH_THEME="pygmalion"
@@ -16,7 +16,7 @@ HIST_STAMPS="mm/dd/yyyy"
 plugins=(git gitignore brew osx zsh-syntax-highlighting golang)
 
 # User configuration
-export PATH="/Users/kevintucker/scripts:/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local/go//bin:/Users/kevintucker/golang//bin:/usr/local/mongodb/bin"
+export PATH="/Users/ktucke214/scripts:/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local/go//bin:/Users/ktucke214/golang//bin:/usr/local/mongodb/bin"
 
 
 # -------------------------------------------------------------------
@@ -33,12 +33,12 @@ source $ZSH/oh-my-zsh.sh
 # Python 
 # -------------------------------------------------------------------
  #Python virtualenv wrapper
-export WORKON_HOME=$HOME/.virtualenvs
-export PROJECT_HOME=$HOME/python_dev
-source /usr/local/bin/virtualenvwrapper.sh
-# By running the virtualenv_info it will show th current env if activated
-function virtualenv_info { [ $VIRTUAL_ENV ] && echo '('`basename $VIRTUAL_ENV`') ' }
-export VIRTUAL_ENV_DISABLE_PROMPT=1
+# export WORKON_HOME=$HOME/.virtualenvs
+# export PROJECT_HOME=$HOME/python_dev
+# source /usr/local/bin/virtualenvwrapper.sh
+# # By running the virtualenv_info it will show th current env if activated
+# function virtualenv_info { [ $VIRTUAL_ENV ] && echo '('`basename $VIRTUAL_ENV`') ' }
+# export VIRTUAL_ENV_DISABLE_PROMPT=1
 
 
 # -------------------------------------------------------------------
@@ -54,15 +54,15 @@ export CDPATH=~/go/src/
 # -------------------------------------------------------------------
 # Node 
 # -------------------------------------------------------------------
-export NVM_DIR="$HOME/.nvm"
-source $(brew --prefix nvm)/nvm.sh
+# export NVM_DIR="$HOME/.nvm"
+# source $(brew --prefix nvm)/nvm.sh
 
 
 # -------------------------------------------------------------------
 # PHP 
 # -------------------------------------------------------------------
 # For composer PSR 1 and 2 code style PHP
-export PATH="$PATH:$HOME/.composer/vendor/bin"
+# export PATH="$PATH:$HOME/.composer/vendor/bin"
 
 
 # -------------------------------------------------------------------
@@ -75,7 +75,7 @@ alias v=/usr/local/Cellar/vim/8.0.0054/bin/vim
 alias nv='nvim'
 alias up="cd .. && ls -la |  awk '{print \$9}'"
 alias c='clear'
-alias zshrc="nvim ~/dotfiles/.zshrc"
+alias zshrc="vim ~/dotfiles/.zshrc"
 
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker/ && ls -la | awk '{print \$9}'"
@@ -89,11 +89,11 @@ alias dnr="dotnet run"
 alias dnbr="dotnet build ; dnr"
 alias dnb="dotnet build"
 
-alias n='nvim  -c "NERDTree ~/notes/" "~/notes/info.txt"'
-alias nn='function _newNote(){ nvim -c "NERDTree ~/notes/general/" "~/notes/general/$1"; };_newNote'
+alias n='vim  -c "NERDTree ~/notes/" "~/notes/info.txt"'
+alias nn='function _newNote(){ vim -c "NERDTree ~/notes/general/" "~/notes/general/$1"; };_newNote'
 
 # ---- dotfile git push ----
-alias gitdot='pwd=$(pwd) && cd ~/dotfiles && git add -A && sleep 2 &&  git commit -m "update dotfiles" && sleep 2 && git push origin master && sleep 6 &&  cd $pwd'
+alias gitdot='pwd=`pwd` && cd ~/dotfiles && gaa && sleep 2 &&  gcmsg "update dotfiles" && sleep 2 && git push origin master && sleep 6 &&  cd $pwd'
 
 
 # -------------------------------------------------------------------
@@ -111,4 +111,15 @@ function myip() {
   ifconfig en0 | grep 'inet6 ' | sed -e 's/ / /' | awk '{print "en0 (IPv6): " $2 " " $3 " " $4 " " $5 " " $6}'
   ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1 (IPv4): " $2 " " $3 " " $4 " " $5 " " $6}'
   ifconfig en1 | grep 'inet6 ' | sed -e 's/ / /' | awk '{print "en1 (IPv6): " $2 " " $3 " " $4 " " $5 " " $6}'
+}
+
+# Will commit backup for quiver notes. Pass the version in like "quiverB mm/dd/yy"
+function quiverB() {
+	pw=`pwd`
+	if [ ${#1} -ne 0 ]; then
+		cd ~/quiver_notes && gaa && sleep 2 &&  gcmsg "backup $1" && sleep 2 && git push origin master && sleep 6
+   	else
+		cd ~/quiver_notes && gaa && sleep 2 &&  gcmsg "backup" && sleep 2 && git push origin master && sleep 6
+   	fi
+	cd $pw
 }

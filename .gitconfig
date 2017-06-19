@@ -6,8 +6,8 @@
 	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
 [user]
-	name = Kevin Tucker
-	email = kwtucker4@gmail.com
+	name = kevin_tucker2 
+	email = kevin_tucker2@comcast.com 
 [alias]
 
 [url "https://"]
