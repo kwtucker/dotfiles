@@ -15,14 +15,16 @@ HIST_STAMPS="mm/dd/yyyy"
 
 plugins=(git gitignore brew osx zsh-syntax-highlighting golang)
 
+export PATH="/usr/local/Cellar"
+export PATH="/Users/ktucke214/scripts"
 # User configuration
-export PATH="/Users/ktucke214/scripts:/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local/go//bin:/Users/ktucke214/golang//bin:/usr/local/mongodb/bin"
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/ktucke214/go/bin:/usr/local/mongodb/bin"
 
 
 # -------------------------------------------------------------------
 # General 
 # -------------------------------------------------------------------
-export PATH=$PATH:/usr/local/share/dotnet
+#export PATH=$PATH:/usr/local/share/dotnet
 export PATH="/usr/local/sbin:$PATH"
 export PATH=/usr/local/bin:$PATH
 export MANPATH="/usr/local/man:$MANPATH"
@@ -46,7 +48,7 @@ source $ZSH/oh-my-zsh.sh
 # -------------------------------------------------------------------
 export GOPATH=$HOME/go/
 export PATH=$PATH:$GOPATH/bin
-export PATH=$PATH:$GOROOT/bin
+#export PATH=$PATH:$GOROOT/bin
 export CDPATH=~/go/src/
 # export PATH=$HOME/go_appengine:$PATH
 
@@ -70,24 +72,25 @@ export CDPATH=~/go/src/
 # -------------------------------------------------------------------
 # # for the better man pages
 alias mana="tldr"
-
-alias v=/usr/local/Cellar/vim/8.0.0054/bin/vim
-alias nv='nvim'
+alias v=/usr/local/Cellar/vim/8.0.0647/bin/vim
 alias up="cd .. && ls -la |  awk '{print \$9}'"
 alias c='clear'
 alias zshrc="vim ~/dotfiles/.zshrc"
 
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker/ && ls -la | awk '{print \$9}'"
+alias gowork="cd ~/go/src/bitbucket.org/cts-rmm/rmm"
+alias gowcore="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-notifier.json"
+alias gowui="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmui && go build && ./rmmui"
 
 # ---- PHP ----
 alias composer="php /usr/local/bin/composer.phar"
 
 # ---- C# ----
-alias dn="dotnet"
-alias dnr="dotnet run"
-alias dnbr="dotnet build ; dnr"
-alias dnb="dotnet build"
+# alias dn="dotnet"
+# alias dnr="dotnet run"
+# alias dnbr="dotnet build ; dnr"
+# alias dnb="dotnet build"
 
 alias n='vim  -c "NERDTree ~/notes/" "~/notes/info.txt"'
 alias nn='function _newNote(){ vim -c "NERDTree ~/notes/general/" "~/notes/general/$1"; };_newNote'
