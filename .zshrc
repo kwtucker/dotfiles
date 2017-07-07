@@ -30,6 +30,7 @@ export PATH=/usr/local/bin:$PATH
 export MANPATH="/usr/local/man:$MANPATH"
 source $ZSH/oh-my-zsh.sh
 
+export PATH=$HOME/Documents/Kevin/scripts/:$PATH
 
 # -------------------------------------------------------------------
 # Python 
@@ -81,7 +82,9 @@ alias zshrc="vim ~/dotfiles/.zshrc"
 alias gohome="cd ~/go/src/github.com/kwtucker/ && ls -la | awk '{print \$9}'"
 alias gowork="cd ~/go/src/bitbucket.org/cts-rmm/rmm"
 alias gowcore="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-notifier.json"
+alias gowcores="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-uisplit-notifier.json"
 alias gowui="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmui && go build && ./rmmui"
+alias goworka="gowork && atom ."
 
 # ---- PHP ----
 alias composer="php /usr/local/bin/composer.phar"
