@@ -83,8 +83,9 @@ alias gohome="cd ~/go/src/github.com/kwtucker/ && ls -la | awk '{print \$9}'"
 alias gowork="cd ~/go/src/bitbucket.org/cts-rmm/rmm"
 alias gowcore="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-notifier.json"
 alias gowcores="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-uisplit-notifier.json"
+alias gowcoresr="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-receiver.json"
 alias gowui="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmui && go build && ./rmmui"
-alias goworka="gowork && atom ."
+
 
 # ---- PHP ----
 alias composer="php /usr/local/bin/composer.phar"
@@ -128,4 +129,19 @@ function quiverB() {
 		cd ~/quiver_notes && gaa && sleep 2 &&  gcmsg "backup" && sleep 2 && git push origin master && sleep 6
    	fi
 	cd $pw
+}
+
+# Will open 3 terminal window and run:
+# ->  port forward to db passed in.
+# ->  gowui, This will start the rmmui.
+# ->  gowcoresr, This will start the rmm dev receiver.
+# ->  gowcores, This will start the rmm dev split notifier.
+# Example: rmmuiSplit zorig
+function rmmuiSplit() {
+	if [ ${#1} -ne 0 ]; then
+		cd ~/Library/Application\ Support/iTerm2/Scripts && db=$1 osascript rmmUISplit.scpt
+   	else
+		cd ~/Library/Application\ Support/iTerm2/Scripts && db=zorig osascript rmmUISplit.scpt
+   	fi
+	exit
 }
