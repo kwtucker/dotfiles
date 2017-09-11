@@ -1,5 +1,5 @@
 # Path to your oh-my-zsh installation.
-export ZSH=/Users/ktucke214/.oh-my-zsh
+export ZSH=/Users/$USER/.oh-my-zsh
 export EDITOR=vim
 export EVENT_NOKQUEUE=1
 
@@ -16,9 +16,9 @@ HIST_STAMPS="mm/dd/yyyy"
 plugins=(git gitignore brew osx zsh-syntax-highlighting golang)
 
 export PATH="/usr/local/Cellar"
-export PATH="/Users/ktucke214/scripts"
+export PATH="/Users/$USER/scripts"
 # User configuration
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/ktucke214/go/bin:/usr/local/mongodb/bin"
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/$USER/go/bin:/usr/local/mongodb/bin"
 
 
 # -------------------------------------------------------------------
