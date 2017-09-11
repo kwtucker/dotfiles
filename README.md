@@ -1,6 +1,6 @@
-#Dotfiles
+# Dotfiles
 
-###Intstallation:
+### Intstallation:
 
 ##### Install Brew ( Mac OS ) & Oh My ZSH
 Link to the brew command - [Brew](https://brew.sh/)
