@@ -5,9 +5,11 @@
 ##### Install Brew ( Mac OS ) & Oh My ZSH
 Link to the brew command - [Brew](https://brew.sh/)
 
-Install [neovimi](https://github.com/neovim/neovim/wiki/Installing-Neovim)
+Brew Install
 ```
- brew install neovim/neovim/neovim
+ brew update
+ brew cask install hyper
+ brew install httpie tldr vim tmux git ctags asciinema
 ```
 
 Install [Oh My ZSH](https://github.com/robbyrussell/oh-my-zsh)
@@ -49,9 +51,7 @@ mkdir ~/.vim/bundle
 
   ln -s ~/dotfiles/.zshrc ~/.zshrc
   
-  ln -s ~/.vim ~/.config/nvim
-
-  ln -s ~/.vimrc ~/.config/nvim/init.vim
+  ln -s ~/dotfiles/.hyper.js ~/.hyper.js
 ```
 
 ##### 5. Set up [Vundle] (in the home directory):
@@ -60,10 +60,9 @@ mkdir ~/.vim/bundle
 ```
 ##### 6. Then you must install your plugins.
 In the home directory enter the following:
-```
-	$ nv
+```shell
+  $ vim
 
-  -In neovim  enter these commands
   :PluginInstall
   :q
 ```

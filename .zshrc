@@ -30,7 +30,7 @@ export PATH=/usr/local/bin:$PATH
 export MANPATH="/usr/local/man:$MANPATH"
 source $ZSH/oh-my-zsh.sh
 
-export PATH=$HOME/Documents/Kevin/scripts/:$PATH
+export PATH=$HOME/Documents/Kevin/scripts:$PATH
 
 # -------------------------------------------------------------------
 # Python 
@@ -137,7 +137,7 @@ function quiverB() {
 # ->  gowcoresr, This will start the rmm dev receiver.
 # ->  gowcores, This will start the rmm dev split notifier.
 # Example: rmmuiSplit zorig
-function rmmuiSplit() {
+function rmmsplit() {
 	if [ ${#1} -ne 0 ]; then
 		cd ~/Library/Application\ Support/iTerm2/Scripts && db=$1 osascript rmmUISplit.scpt
    	else
