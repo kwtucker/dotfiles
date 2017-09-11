@@ -49,9 +49,7 @@ export PATH=$HOME/Documents/Kevin/scripts:$PATH
 # -------------------------------------------------------------------
 export GOPATH=$HOME/go/
 export PATH=$PATH:$GOPATH/bin
-#export PATH=$PATH:$GOROOT/bin
 export CDPATH=~/go/src/
-# export PATH=$HOME/go_appengine:$PATH
 
 
 # -------------------------------------------------------------------
@@ -96,8 +94,8 @@ alias composer="php /usr/local/bin/composer.phar"
 # alias dnbr="dotnet build ; dnr"
 # alias dnb="dotnet build"
 
-alias n='vim  -c "NERDTree ~/notes/" "~/notes/info.txt"'
-alias nn='function _newNote(){ vim -c "NERDTree ~/notes/general/" "~/notes/general/$1"; };_newNote'
+# alias n='vim  -c "NERDTree ~/notes/" "~/notes/info.txt"'
+# alias nn='function _newNote(){ vim -c "NERDTree ~/notes/general/" "~/notes/general/$1"; };_newNote'
 
 # ---- dotfile git push ----
 alias gitdot='pwd=`pwd` && cd ~/dotfiles && gaa && sleep 2 &&  gcmsg "update dotfiles" && sleep 2 && git push origin master && sleep 6 &&  cd $pwd'
@@ -124,9 +122,9 @@ function myip() {
 function quiverB() {
 	pw=`pwd`
 	if [ ${#1} -ne 0 ]; then
-		cd ~/quiver_notes && gaa && sleep 2 &&  gcmsg "backup $1" && sleep 2 && git push origin master && sleep 6
+		cd ~/Documents/Kevin/Notes/quiver_notes && gaa && sleep 2 &&  gcmsg "backup $1" && sleep 2 && git push origin master && sleep 6
    	else
-		cd ~/quiver_notes && gaa && sleep 2 &&  gcmsg "backup" && sleep 2 && git push origin master && sleep 6
+		cd ~/Documents/Kevin/Notes/quiver_notes && gaa && sleep 2 &&  gcmsg "backup" && sleep 2 && git push origin master && sleep 6
    	fi
 	cd $pw
 }
