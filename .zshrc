@@ -84,6 +84,12 @@ alias gowcores="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmcore && go build && ./r
 alias gowcoresr="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-receiver.json"
 alias gowui="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmui && go build && ./rmmui"
 
+# Frontier Indemand FileUpload Repo
+alias gowfontier="cd ~/go/src/bitbucket.org/cts-rmm/frontier-indemand-fileupload"
+alias gowfcore="cd ~/go/src/bitbucket.org/cts-rmm/frontier-indemand-fileupload/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-notifier.json"
+alias gowfcores="cd ~/go/src/bitbucket.org/cts-rmm/frontier-indemand-fileupload/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-uisplit-notifier.json"
+alias gowfcoresr="cd ~/go/src/bitbucket.org/cts-rmm/frontier-indemand-fileupload/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-receiver.json"
+alias gowfui="cd ~/go/src/bitbucket.org/cts-rmm/frontier-indemand-fileupload/rmmui && go build && ./rmmui"
 
 # ---- PHP ----
 alias composer="php /usr/local/bin/composer.phar"
