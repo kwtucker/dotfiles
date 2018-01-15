@@ -1,0 +1,22 @@
+
+# -------------------------------------------------------------------
+# Alias 
+# -------------------------------------------------------------------
+
+# for the better man pages
+alias mana="tldr"
+alias up="cd .. && ls -la |  awk '{print \$9}'"
+alias c='clear'
+alias zshrc="vim ~/dotfiles/.zshrc"
+
+# ---- GO ----
+alias gohome="cd ~/go/src/github.com/kwtucker/ && ls -la | awk '{print \$9}'"
+alias gowork="cd ~/go/src/bitbucket.org/cts-rmm/rmm"
+
+# ---- PHP ----
+alias composer="php /usr/local/bin/composer.phar"
+
+
+# ---- dotfile git push ----
+alias gitdot='pwd=`pwd` && cd ~/dotfiles && gaa && sleep 2 &&  gcmsg "update dotfiles" && sleep 2 && git push origin master && sleep 6 &&  cd $pwd'
+

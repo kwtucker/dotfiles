@@ -1,0 +1,46 @@
+# -------------------------------------------------------------------
+# Functions 
+# -------------------------------------------------------------------
+
+# turn hidden files on/off in Finder
+function hiddenOn() { defaults write com.apple.Finder AppleShowAllFiles YES ; }
+function hiddenOff() { defaults write com.apple.Finder AppleShowAllFiles NO ; }
+
+# myIP address
+function myip() {
+  ifconfig lo0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "lo0       : " $2}'
+  ifconfig en0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en0 (IPv4): " $2 " " $3 " " $4 " " $5 " " $6}'
+  ifconfig en0 | grep 'inet6 ' | sed -e 's/ / /' | awk '{print "en0 (IPv6): " $2 " " $3 " " $4 " " $5 " " $6}'
+  ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1 (IPv4): " $2 " " $3 " " $4 " " $5 " " $6}'
+  ifconfig en1 | grep 'inet6 ' | sed -e 's/ / /' | awk '{print "en1 (IPv6): " $2 " " $3 " " $4 " " $5 " " $6}'
+}
+
+# Will commit backup for quiver notes. Pass the version in like "quiverB mm/dd/yy"
+function quiverB() {
+	pw=`pwd`
+	if [ ${#1} -ne 0 ]; then
+		cd ~/Documents/Kevin/Notes/quiver_notes && gaa && sleep 2 &&  gcmsg "backup $1" && sleep 2 && git push origin master && sleep 6
+   	else
+		cd ~/Documents/Kevin/Notes/quiver_notes && gaa && sleep 2 &&  gcmsg "backup" && sleep 2 && git push origin master && sleep 6
+   	fi
+	cd $pw
+}
+
+# Will open 3 terminal window and run:
+# ->  port forward to db passed in.
+# ->  gowui, This will start the rmmui.
+# ->  gowcoresr, This will start the rmm dev receiver.
+# ->  gowcores, This will start the rmm dev split notifier.
+# Example: rmmuiSplit zorig
+function rmmsplit() {
+	if [ ${#1} -ne 0 ]; then
+		cd ~/Library/Application\ Support/iTerm2/Scripts && db=$1 osascript rmmUISplit.scpt
+   	else
+		cd ~/Library/Application\ Support/iTerm2/Scripts && db=zorig osascript rmmUISplit.scpt
+   	fi
+	exit
+}
+
+function movetag() {
+	git push origin :$1 && git tag -fa -m "moving tag $1" $1 && git push origin master $1
+}

@@ -15,22 +15,27 @@ HIST_STAMPS="mm/dd/yyyy"
 
 plugins=(git gitignore brew osx zsh-syntax-highlighting golang)
 
-export PATH="/usr/local/Cellar"
-export PATH="/Users/$USER/scripts"
-# User configuration
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/$USER/go/bin:/usr/local/mongodb/bin"
+export BREW_PATH="/usr/local/Cellar"
+export SCRIPTS_PATH="/Users/$USER/scripts"
+export GOROOT="/usr/local/go/bin"
+export NATIVE_PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export MANPATH="/usr/local/man"
+export GOPATH="$HOME/go"
+export CDPATH="~/go/src"
+export NVM_DIR="$HOME/.nvm"
 
+export PATH="\
+$BREW_PATH:\
+$SCRIPTS_PATH:\
+$GOROOT:\
+$MANPATH:\
+$GOPATH:\
+$CDPATH:\
+$NVM_DIR:\
+$NATIVE_PATH"
 
-# -------------------------------------------------------------------
-# General 
-# -------------------------------------------------------------------
-#export PATH=$PATH:/usr/local/share/dotnet
-export PATH="/usr/local/sbin:$PATH"
-export PATH=/usr/local/bin:$PATH
-export MANPATH="/usr/local/man:$MANPATH"
 source $ZSH/oh-my-zsh.sh
 
-export PATH=$HOME/Documents/Kevin/scripts:$PATH
 
 # -------------------------------------------------------------------
 # Python 
@@ -45,113 +50,13 @@ export PATH=$HOME/Documents/Kevin/scripts:$PATH
 
 
 # -------------------------------------------------------------------
-# Golang 
-# -------------------------------------------------------------------
-export GOPATH=$HOME/go/
-export PATH=$PATH:$GOPATH/bin
-export CDPATH=~/go/src/
-
-
-# -------------------------------------------------------------------
-# Node 
-# -------------------------------------------------------------------
-export NVM_DIR="$HOME/.nvm"
-# source $(brew --prefix nvm)/nvm.sh
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
-
-# -------------------------------------------------------------------
 # PHP 
 # -------------------------------------------------------------------
 # For composer PSR 1 and 2 code style PHP
 # export PATH="$PATH:$HOME/.composer/vendor/bin"
 
+. ~/.zsh_aliases
+. ~/.zsh_functions
 
-# -------------------------------------------------------------------
-# Alias 
-# -------------------------------------------------------------------
-# # for the better man pages
-alias mana="tldr"
-alias v=/usr/local/Cellar/vim/8.0.0647/bin/vim
-alias up="cd .. && ls -la |  awk '{print \$9}'"
-alias c='clear'
-alias zshrc="vim ~/dotfiles/.zshrc"
-
-# ---- GO ----
-alias gohome="cd ~/go/src/github.com/kwtucker/ && ls -la | awk '{print \$10}'"
-alias gowork="cd ~/go/src/bitbucket.org/cts-rmm/rmm"
-alias gowcore="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-notifier.json"
-alias gowcores="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-uisplit-notifier.json"
-alias gowcoresr="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-receiver.json"
-alias gowui="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmui && go build && ./rmmui"
-
-# Frontier Indemand FileUpload Repo
-alias gowfontier="cd ~/go/src/bitbucket.org/cts-rmm/frontier-indemand-fileupload"
-alias gowfcore="cd ~/go/src/bitbucket.org/cts-rmm/frontier-indemand-fileupload/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-notifier.json"
-alias gowfcores="cd ~/go/src/bitbucket.org/cts-rmm/frontier-indemand-fileupload/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-uisplit-notifier.json"
-alias gowfcoresr="cd ~/go/src/bitbucket.org/cts-rmm/frontier-indemand-fileupload/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-receiver.json"
-alias gowfui="cd ~/go/src/bitbucket.org/cts-rmm/frontier-indemand-fileupload/rmmui && go build && ./rmmui"
-
-# ---- PHP ----
-alias composer="php /usr/local/bin/composer.phar"
-
-# ---- C# ----
-# alias dn="dotnet"
-# alias dnr="dotnet run"
-# alias dnbr="dotnet build ; dnr"
-# alias dnb="dotnet build"
-
-# alias n='vim  -c "NERDTree ~/notes/" "~/notes/info.txt"'
-# alias nn='function _newNote(){ vim -c "NERDTree ~/notes/general/" "~/notes/general/$1"; };_newNote'
-
-# ---- dotfile git push ----
-alias gitdot='pwd=`pwd` && cd ~/dotfiles && gaa && sleep 2 &&  gcmsg "update dotfiles" && sleep 2 && git push origin master && sleep 6 &&  cd $pwd'
-
-
-# -------------------------------------------------------------------
-# Functions 
-# -------------------------------------------------------------------
-
-# turn hidden files on/off in Finder
-function hiddenOn() { defaults write com.apple.Finder AppleShowAllFiles YES ; }
-function hiddenOff() { defaults write com.apple.Finder AppleShowAllFiles NO ; }
-
-# myIP address
-function myip() {
-  ifconfig lo0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "lo0       : " $2}'
-  ifconfig en0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en0 (IPv4): " $2 " " $3 " " $4 " " $5 " " $6}'
-  ifconfig en0 | grep 'inet6 ' | sed -e 's/ / /' | awk '{print "en0 (IPv6): " $2 " " $3 " " $4 " " $5 " " $6}'
-  ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1 (IPv4): " $2 " " $3 " " $4 " " $5 " " $6}'
-  ifconfig en1 | grep 'inet6 ' | sed -e 's/ / /' | awk '{print "en1 (IPv6): " $2 " " $3 " " $4 " " $5 " " $6}'
-}
-
-# Will commit backup for quiver notes. Pass the version in like "quiverB mm/dd/yy"
-function quiverB() {
-	pw=`pwd`
-	if [ ${#1} -ne 0 ]; then
-		cd ~/Documents/Kevin/Notes/quiver_notes && gaa && sleep 2 &&  gcmsg "backup $1" && sleep 2 && git push origin master && sleep 6
-   	else
-		cd ~/Documents/Kevin/Notes/quiver_notes && gaa && sleep 2 &&  gcmsg "backup" && sleep 2 && git push origin master && sleep 6
-   	fi
-	cd $pw
-}
-
-# Will open 3 terminal window and run:
-# ->  port forward to db passed in.
-# ->  gowui, This will start the rmmui.
-# ->  gowcoresr, This will start the rmm dev receiver.
-# ->  gowcores, This will start the rmm dev split notifier.
-# Example: rmmuiSplit zorig
-function rmmsplit() {
-	if [ ${#1} -ne 0 ]; then
-		cd ~/Library/Application\ Support/iTerm2/Scripts && db=$1 osascript rmmUISplit.scpt
-   	else
-		cd ~/Library/Application\ Support/iTerm2/Scripts && db=zorig osascript rmmUISplit.scpt
-   	fi
-	exit
-}
-
-function movetag() {
-	git push origin :$1 && git tag -fa -m "moving tag $1" $1 && git push origin master $1
-}
-
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

@@ -8,7 +8,6 @@ Link to the brew command - [Brew](https://brew.sh/)
 Brew Install
 ```
  brew update
- brew cask install hyper
  brew install httpie tldr vim tmux git ctags asciinema
 ```
 
@@ -50,8 +49,10 @@ mkdir ~/.vim/bundle
   ln -s ~/dotfiles/.tmux.conf ~/.tmux.conf
 
   ln -s ~/dotfiles/.zshrc ~/.zshrc
-  
-  ln -s ~/dotfiles/.hyper.js ~/.hyper.js
+
+  ln -s ~/dotfiles/.zsh_functions ~/.zsh_functions
+
+  ln -s ~/dotfiles/.zsh_aliases ~/.zsh_aliases
 ```
 
 ##### 5. Set up [Vundle] (in the home directory):
