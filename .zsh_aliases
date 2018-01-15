@@ -5,12 +5,12 @@
 
 # for the better man pages
 alias mana="tldr"
-alias up="cd .. && ls -la |  awk '{print \$9}'"
+alias up="cd .. && ls -la |  awk '{print \$9,\$10}'"
 alias c='clear'
 alias zshrc="vim ~/dotfiles/.zshrc"
 
 # ---- GO ----
-alias gohome="cd ~/go/src/github.com/kwtucker/ && ls -la | awk '{print \$9}'"
+alias gohome="cd ~/go/src/github.com/kwtucker/ && ls -la | awk '{print \$9,\$10}'"
 alias gowork="cd ~/go/src/bitbucket.org/cts-rmm/rmm"
 
 # ---- PHP ----
