@@ -24,15 +24,16 @@ export GOPATH="$HOME/go"
 export CDPATH="~/go/src"
 export NVM_DIR="$HOME/.nvm"
 
-export PATH="\
-$BREW_PATH:\
-$SCRIPTS_PATH:\
-$GOROOT:\
-$MANPATH:\
-$GOPATH:\
-$CDPATH:\
-$NVM_DIR:\
-$NATIVE_PATH"
+
+export PATH="$BREW_PATH:"
+export PATH="$PATH:$SCRIPTS_PATH"
+export PATH="$PATH:$GOROOT:"
+export PATH="$PATH:$GOPATH:"
+export PATH="$PATH:$MANPATH:"
+export PATH="$PATH:$CDPATH:"
+export PATH="$PATH:$NVM_DIR:"
+export PATH="$PATH:$NATIVE_PATH"
+
 
 source $ZSH/oh-my-zsh.sh
 

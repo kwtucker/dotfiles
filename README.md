@@ -8,7 +8,10 @@ Link to the brew command - [Brew](https://brew.sh/)
 Brew Install
 ```
  brew update
- brew install httpie tldr vim tmux git ctags asciinema
+ brew install httpie tldr vim tmux git ctags asciinema mongodb mariadb nvm tree yarn
+ brew tap homebrew/services
+ brew services start mariadb
+ brew services start mongodb
 ```
 
 Install [Oh My ZSH](https://github.com/robbyrussell/oh-my-zsh)
