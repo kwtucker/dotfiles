@@ -18,5 +18,9 @@ alias composer="php /usr/local/bin/composer.phar"
 
 
 # ---- dotfile git push ----
-alias gitdot='pwd=`pwd` && cd ~/dotfiles && gaa && sleep 2 &&  gcmsg "update dotfiles" && sleep 2 && git push origin master && sleep 6 &&  cd $pwd'
+alias gitdotpush='pwd=`pwd` && cd ~/dotfiles && gaa && sleep 2 &&  gcmsg "update dotfiles" && sleep 2 && git push origin master && sleep 6 &&  cd $pwd'
+
+
+# ---- dotfile git pull ----
+alias gitdotpull='pwd=`pwd` && cd ~/dotfiles && git pull && sleep 6 && cd $pwd'
 
