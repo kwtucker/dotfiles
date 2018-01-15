@@ -55,9 +55,9 @@ export CDPATH=~/go/src/
 # -------------------------------------------------------------------
 # Node 
 # -------------------------------------------------------------------
-# export NVM_DIR="$HOME/.nvm"
+export NVM_DIR="$HOME/.nvm"
 # source $(brew --prefix nvm)/nvm.sh
-
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
 
 # -------------------------------------------------------------------
 # PHP 
@@ -77,7 +77,7 @@ alias c='clear'
 alias zshrc="vim ~/dotfiles/.zshrc"
 
 # ---- GO ----
-alias gohome="cd ~/go/src/github.com/kwtucker/ && ls -la | awk '{print \$9}'"
+alias gohome="cd ~/go/src/github.com/kwtucker/ && ls -la | awk '{print \$10}'"
 alias gowork="cd ~/go/src/bitbucket.org/cts-rmm/rmm"
 alias gowcore="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-notifier.json"
 alias gowcores="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmcore && go build && ./rmmcore -config ./nobuild/rmmcore-dev-uisplit-notifier.json"
@@ -149,3 +149,9 @@ function rmmsplit() {
    	fi
 	exit
 }
+
+function movetag() {
+	git push origin :$1 && git tag -fa -m "moving tag $1" $1 && git push origin master $1
+}
+
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
