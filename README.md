@@ -12,6 +12,7 @@ Brew Install
  brew tap homebrew/services
  brew services start mariadb
  brew services start mongodb
+ brew services list
 ```
 
 Install [Oh My ZSH](https://github.com/robbyrussell/oh-my-zsh)
@@ -28,6 +29,7 @@ Install [Oh My ZSH](https://github.com/robbyrussell/oh-my-zsh)
 ```
 
   git clone git@github.com:kwtucker/dotfiles.git
+  git clone git@github.com:kwtucker/scripts.git
 ```
 
 ##### 3. Create a parent directory .vim and sub-directory bundle in the Home directory.
