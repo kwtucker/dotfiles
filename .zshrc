@@ -59,7 +59,8 @@ source $ZSH/oh-my-zsh.sh
 
 . ~/.zsh_aliases
 . ~/.zsh_functions
-. "/usr/local/opt/nvm/nvm.sh"
+
+#. "/usr/local/opt/nvm/nvm.sh"
 
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
