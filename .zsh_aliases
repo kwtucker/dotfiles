@@ -12,6 +12,8 @@ alias zshrc="vim ~/dotfiles/.zshrc"
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker/ && ls -la | awk '{print \$9,\$10}'"
 alias gowork="cd ~/go/src/bitbucket.org/cts-rmm/rmm"
+alias gowui="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmui && go build && ./rmmui"
+
 
 # ---- PHP ----
 alias composer="php /usr/local/bin/composer.phar"
