@@ -17,10 +17,9 @@ plugins=(git gitignore brew osx zsh-syntax-highlighting golang)
 
 export BREW_PATH="/usr/local/Cellar"
 export SCRIPTS_PATH="/Users/$USER/scripts"
-export GOROOT="/usr/local/go/bin"
 export MANPATH="/usr/local/man"
-export GOPATH="$HOME/go"
 export CDPATH="~/go/src"
+export GOPATH="$HOME/go"
 export NVM_DIR="$HOME/.nvm"
 export NATIVE_PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
@@ -28,10 +27,9 @@ export NATIVE_PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 export PATH="$BREW_PATH:"
 export PATH="$PATH:$SCRIPTS_PATH"
-export PATH="$PATH:$GOROOT:"
-export PATH="$PATH:$GOPATH:"
 export PATH="$PATH:$MANPATH:"
 export PATH="$PATH:$CDPATH:"
+export PATH="$PATH:$GOPATH:"
 export PATH="$PATH:$NVM_DIR:"
 export PATH="$PATH:$NATIVE_PATH"
 
