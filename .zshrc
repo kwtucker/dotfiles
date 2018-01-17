@@ -15,22 +15,25 @@ HIST_STAMPS="mm/dd/yyyy"
 
 plugins=(git gitignore brew osx zsh-syntax-highlighting golang)
 
-export BREW_PATH="/usr/local/Cellar"
-export SCRIPTS_PATH="/Users/$USER/scripts"
-export MANPATH="/usr/local/man"
-export CDPATH="~/go/src"
-export GOPATH="$HOME/go"
-export NVM_DIR="$HOME/.nvm"
+# -------------------------------------------------------------------
+# ENV 
+# -------------------------------------------------------------------
+export BREW_PATH=/usr/local/Cellar
+export SCRIPTS_PATH=/Users/$USER/scripts
+export MANPATH=/usr/local/man
+export CDPATH=~/go/src
+export GOPATH=$HOME/go
+export NVM_DIR=$HOME/.nvm
 export NATIVE_PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
-
-
-export PATH="$BREW_PATH:"
+# -------------------------------------------------------------------
+# PATH 
+# -------------------------------------------------------------------
+export PATH="$BREW_PATH"
 export PATH="$PATH:$SCRIPTS_PATH"
-export PATH="$PATH:$MANPATH:"
-export PATH="$PATH:$CDPATH:"
-export PATH="$PATH:$GOPATH:"
-export PATH="$PATH:$NVM_DIR:"
+export PATH="$PATH:$MANPATH"
+export PATH="$PATH:$GOPATH"
+export PATH="$PATH:$NVM_DIR"
 export PATH="$PATH:$NATIVE_PATH"
 
 
