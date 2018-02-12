@@ -13,7 +13,7 @@ export UPDATE_ZSH_DAYS=13
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 HIST_STAMPS="mm/dd/yyyy"
 
-plugins=(git gitignore brew osx zsh-syntax-highlighting golang)
+plugins=(extract pip git gitignore brew osx zsh-syntax-highlighting golang)
 
 # -------------------------------------------------------------------
 # ENV 
