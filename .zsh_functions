@@ -45,7 +45,8 @@ function movetag() {
 	git push origin :$1 && git tag -fa -m "moving tag $1" $1 && git push origin master $1
 }
 
-# movetagcommit 2.0.4 ad243ff stageMaster
+# 				TAG   COMMIT
+# movetagcommit 2.0.4 ad243ff <BRANCH_NAME>
 function movetagcommit() {
 	git push origin :$1 && git tag -fa -m "moving tag $1 to commit $2" $1 $2 && git push origin $3 $1
 }
