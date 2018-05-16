@@ -10,9 +10,9 @@ alias c='clear'
 alias zshrc="vim ~/dotfiles/.zshrc"
 
 # ---- GO ----
-alias gohome="cd ~/go/src/github.com/kwtucker/ && ls -la | tree -L 1"
-alias gowork="cd ~/go/src/bitbucket.org/cts-rmm/rmm"
-alias gowui="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmui && go build && ./rmmui"
+alias gohome="cd ~/go/src/github.com/kwtucker/ && tree -L 1"
+alias gowork="cd ~/go/src/bitbucket.org/cts-rmm/rmm && tree -L 1"
+alias gowui="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmui && tree -L 1 && go build && ./rmmui"
 
 
 # ---- PHP ----
