@@ -4,14 +4,14 @@
 # -------------------------------------------------------------------
 
 # for the better man pages
-alias mana="tldr"
+alias m="tldr"
 alias up="cd .. && ls -la |  awk '{print \$9,\$10}'"
 alias c='clear'
 alias zshrc="vim ~/dotfiles/.zshrc"
 
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker/ && tree -L 1"
-alias gowork="cd ~/go/src/bitbucket.org/cts-rmm/rmm && tree -L 1"
+alias gowork="cd ~/go/src/bitbucket.org/cts-rmm && tree -L 1"
 alias gowui="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmui && go build && ./rmmui"
 
 
