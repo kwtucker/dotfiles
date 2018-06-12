@@ -26,21 +26,6 @@ function quiverB() {
 	cd $pw
 }
 
-# Will open 3 terminal window and run:
-# ->  port forward to db passed in.
-# ->  gowui, This will start the rmmui.
-# ->  gowcoresr, This will start the rmm dev receiver.
-# ->  gowcores, This will start the rmm dev split notifier.
-# Example: rmmuiSplit zorig
-function rmmsplit() {
-	if [ ${#1} -ne 0 ]; then
-		cd ~/Library/Application\ Support/iTerm2/Scripts && db=$1 osascript rmmUISplit.scpt
-   	else
-		cd ~/Library/Application\ Support/iTerm2/Scripts && db=zorig osascript rmmUISplit.scpt
-   	fi
-	exit
-}
-
 function movetag() {
 	git push origin :$1 && git tag -fa -m "moving tag $1" $1 && git push origin master $1
 }
