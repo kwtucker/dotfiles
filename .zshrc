@@ -57,6 +57,11 @@ source $ZSH/oh-my-zsh.sh
 # -------------------------------------------------------------------
 # For composer PSR 1 and 2 code style PHP
 # export PATH="$PATH:$HOME/.composer/vendor/bin"
+#
+
+if [ $commands[kubectl] ]; then
+  source <(kubectl completion zsh)
+fi
 
 . ~/.zsh_aliases
 . ~/.zsh_functions

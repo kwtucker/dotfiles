@@ -11,7 +11,7 @@
 [alias]
 
 ; [url "https://"]
-; insteadOf = git://
+	; insteadOf = git://
 
 [filter "lfs"]
 	clean = git-lfs clean -- %f
