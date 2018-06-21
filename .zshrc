@@ -2,8 +2,7 @@
 export ZSH=/Users/$USER/.oh-my-zsh
 export EDITOR=vim
 export EVENT_NOKQUEUE=1
-
-ZSH_THEME="pygmalion"
+export ZSH_THEME="pygmalion"
 
 # Uncomment the following line to change how often to auto-update (in days).
 export UPDATE_ZSH_DAYS=13
@@ -11,7 +10,7 @@ export UPDATE_ZSH_DAYS=13
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-HIST_STAMPS="mm/dd/yyyy"
+export HIST_STAMPS="mm/dd/yyyy"
 
 plugins=(extract pip git gitignore brew osx zsh-syntax-highlighting golang)
 
