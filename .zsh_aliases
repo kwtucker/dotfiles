@@ -11,8 +11,8 @@ alias zshrc="vim ~/dotfiles/.zshrc"
 
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker/ && tree -L 1"
-alias gowork="cd ~/go/src/bitbucket.org/cts-rmm && tree -L 1"
-alias gowui="cd ~/go/src/bitbucket.org/cts-rmm/rmm/rmmui && go build && ./rmmui"
+alias gowork="cd ~/go/src/github.comcast.com/lrm && tree -L 1"
+alias gowui="cd ~/go/src/github.comcast.com/lrm/ui && go build && ./ui"
 
 
 # ---- PHP ----
