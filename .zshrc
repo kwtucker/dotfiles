@@ -11,8 +11,8 @@ export UPDATE_ZSH_DAYS=13
 # stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 export HIST_STAMPS="mm/dd/yyyy"
-
-plugins=(extract docker pip git gitignore brew osx zsh-syntax-highlighting golang)
+fpath=(/usr/local/share/zsh-completions $fpath)
+plugins=(kubectl extract docker pip git gitignore brew osx zsh-syntax-highlighting golang)
 
 # -------------------------------------------------------------------
 # ENV 
