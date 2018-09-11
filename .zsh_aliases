@@ -11,7 +11,7 @@ alias c='clear'
 alias v='vim'
 alias zshrc="vim ~/dotfiles/.zshrc"
 alias kc='kubectl'
-
+alias goland='/usr/local/bin/goland'
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker/ && tree -L 1"
 alias gowork="cd ~/go/src/github.comcast.com/lrm && tree -L 1"

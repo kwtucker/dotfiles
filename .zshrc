@@ -23,7 +23,7 @@ export MANPATH=/usr/local/man
 export CDPATH=~/go/src
 export GOPATH=$HOME/go
 export NVM_DIR=$HOME/.nvm
-export NATIVE_PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export NATIVE_PATH="/usr/local/go/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 # -------------------------------------------------------------------
 # PATH 
@@ -34,7 +34,6 @@ export PATH="$PATH:$MANPATH"
 export PATH="$PATH:$GOPATH"
 export PATH="$PATH:$NVM_DIR"
 export PATH="$PATH:$NATIVE_PATH"
-
 
 source $ZSH/oh-my-zsh.sh
 
@@ -69,3 +68,4 @@ fi
 
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+export PATH="/usr/local/opt/go@1.10/bin:$PATH"
