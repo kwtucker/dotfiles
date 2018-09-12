@@ -16,7 +16,7 @@ alias goland='/usr/local/bin/goland'
 alias gohome="cd ~/go/src/github.com/kwtucker/ && tree -L 1"
 alias gowork="cd ~/go/src/github.comcast.com/lrm && tree -L 1"
 alias gowui="cd ~/go/src/github.comcast.com/lrm/ui && go build && ./ui"
-
+alias work="cd ~/go/src/github.comcast.com/lrm && code lrm.code-workspace && open -a 'Google Chrome' http:/localhost:8080"
 
 # ---- PHP ----
 alias composer="php /usr/local/bin/composer.phar"
