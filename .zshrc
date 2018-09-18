@@ -12,7 +12,7 @@ export UPDATE_ZSH_DAYS=13
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 export HIST_STAMPS="mm/dd/yyyy"
 fpath=(/usr/local/share/zsh-completions $fpath)
-plugins=(kubectl extract docker pip git gitignore brew osx zsh-syntax-highlighting golang)
+plugins=(git osx zsh-syntax-highlighting)
 
 # -------------------------------------------------------------------
 # ENV 
@@ -64,8 +64,5 @@ fi
 . ~/.zsh_aliases
 . ~/.zsh_functions
 
-#. "/usr/local/opt/nvm/nvm.sh"
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-export PATH="/usr/local/opt/go@1.10/bin:$PATH"

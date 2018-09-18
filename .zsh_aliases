@@ -16,7 +16,7 @@ alias goland='/usr/local/bin/goland'
 alias gohome="cd ~/go/src/github.com/kwtucker/ && tree -L 1"
 alias gowork="cd ~/go/src/github.comcast.com/lrm && tree -L 1"
 alias gowui="cd ~/go/src/github.comcast.com/lrm/ui && go build && ./ui"
-alias work="cd ~/go/src/github.comcast.com/lrm && code lrm.code-workspace && open -a 'Google Chrome' http:/localhost:8080 https://tpjira.corp.theplatform.com/secure/RapidBoard.jspa?rapidView=469 https://github.comcast.com/lrm/ui"
+alias work="cd ~/go/src/github.comcast.com/lrm/ui && code . && open -a 'Quiver' && open -a 'Slack' && open -a 'Microsoft Outlook' && open -a 'Spotify' && open -a 'Google Chrome' http:/localhost:8080 https://tpjira.corp.theplatform.com/secure/RapidBoard.jspa?rapidView=469 https://github.comcast.com/lrm/ui"
 
 # ---- PHP ----
 alias composer="php /usr/local/bin/composer.phar"
@@ -31,8 +31,10 @@ alias dotpull='pwd=`pwd` && cd ~/dotfiles && git pull && sleep 6 && cd $pwd'
 
 
 # ---- dotfile cd ----
-alias dot='cd ~/dotfiles'
+alias dot='cd ~/dotfiles && vim .'
 
 alias docker_rm_all="docker rm \`docker ps -a -q\`"
 alias docker_rmi_all="docker rmi \`docker images -q\`"
 alias docker_rmi_dangling="docker rmi \`docker images -qa -f 'dangling=true'\`"
+
+alias loadnvm='[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
