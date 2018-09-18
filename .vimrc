@@ -78,7 +78,6 @@ let g:go_highlight_build_constraints = 1
 "Go TagBar
 au BufRead,BufNewFile *.go set filetype=go
 let g:go_def_mapping_enabled=0
-set tags=./tags;,tags;
 nmap <C-t> :TagbarToggle<CR>
 
 " let g:tagbar_type_go = {
