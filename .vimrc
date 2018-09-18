@@ -28,7 +28,6 @@ Plugin 'tyrannicaltoucan/vim-deep-space'
 Plugin 'majutsushi/tagbar'
 Plugin 'joonty/vdebug'
 Plugin 'tpope/vim-unimpaired'
-Plugin 'takac/vim-hardtime'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -60,11 +59,6 @@ set laststatus=2
 " Add spaces after comment delimiters by default
 let g:NERDSpaceDelims = 1
 let NERDTreeShowHidden=1
-
-
-"Hard Time
-let g:hardtime_default_on = 1
-let g:hardtime_maxcount = 2
 
 " Leader is now ,
 let mapleader=','
