@@ -15,7 +15,7 @@ Plugin 'scrooloose/syntastic'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'ctrlp.vim'
 Plugin 'mattn/emmet-vim'
-Plugin 'myusuf3/numbers.vim'
+" Plugin 'myusuf3/numbers.vim'
 Plugin 'tpope/vim-surround'
 Plugin 'davidhalter/jedi-vim'
 Plugin 'elzr/vim-json'
@@ -40,8 +40,8 @@ set hlsearch   "highlight search terms
 set incsearch  "show search matches as you type
 set showmatch  "set show matching parenthesis
 set number
-set tabstop=4
-set shiftwidth=4
+set tabstop=2
+set shiftwidth=2
 set pastetoggle=<f2>
 set statusline=%{fugitive#statusline()}
 " Update time for vim gutter
