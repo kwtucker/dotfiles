@@ -13,7 +13,7 @@ export UPDATE_ZSH_DAYS=13
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 export HIST_STAMPS="mm/dd/yyyy"
 fpath=(/usr/local/share/zsh-completions $fpath)
-plugins=(git osx zsh-syntax-highlighting)
+plugins=(golang git osx zsh-syntax-highlighting)
 
 # -------------------------------------------------------------------
 # ENV 

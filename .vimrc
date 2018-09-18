@@ -27,6 +27,7 @@ Plugin 'vim-airline/vim-airline-themes'
 Plugin 'tyrannicaltoucan/vim-deep-space'
 Plugin 'majutsushi/tagbar'
 Plugin 'joonty/vdebug'
+Plugin 'tpope/vim-unimpaired'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
