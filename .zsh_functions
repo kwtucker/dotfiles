@@ -41,3 +41,10 @@ function deletetag() {
 function movetagcommit() {
 	git push origin :$1 && git tag -fa -m "moving tag $1 to commit $2" $1 $2 && git push origin $3 $1
 }
+
+function loadkubectl() {
+	if [ $commands[kubectl] ]; then 
+		source <(kubectl completion zsh) 
+	fi
+}
+

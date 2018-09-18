@@ -2,7 +2,8 @@
 export ZSH=/Users/$USER/.oh-my-zsh
 export EDITOR=vim
 export EVENT_NOKQUEUE=1
-export ZSH_THEME="pygmalion"
+# export ZSH_THEME="pygmalion"
+export ZSH_THEME="agnoster"
 
 # Uncomment the following line to change how often to auto-update (in days).
 export UPDATE_ZSH_DAYS=13
@@ -56,10 +57,6 @@ source $ZSH/oh-my-zsh.sh
 # For composer PSR 1 and 2 code style PHP
 # export PATH="$PATH:$HOME/.composer/vendor/bin"
 #
-
-if [ $commands[kubectl] ]; then
-  source <(kubectl completion zsh)
-fi
 
 . ~/.zsh_aliases
 . ~/.zsh_functions
