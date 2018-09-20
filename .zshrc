@@ -24,6 +24,7 @@ export MANPATH=/usr/local/man
 export CDPATH=~/go/src
 export GOPATH=$HOME/go
 export NVM_DIR=$HOME/.nvm
+export JAVA_HOME=$(/usr/libexec/java_home)
 export NATIVE_PATH="/usr/local/go/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 # -------------------------------------------------------------------
@@ -34,6 +35,7 @@ export PATH="$PATH:$SCRIPTS_PATH"
 export PATH="$PATH:$MANPATH"
 export PATH="$PATH:$GOPATH"
 export PATH="$PATH:$NVM_DIR"
+export PATH="$PATH:$JAVA_HOME"
 export PATH="$PATH:$NATIVE_PATH"
 
 source $ZSH/oh-my-zsh.sh
