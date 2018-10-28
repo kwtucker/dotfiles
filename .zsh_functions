@@ -48,3 +48,7 @@ function loadkubectl() {
 	fi
 }
 
+function kcx() {
+	kc exec $1 -it -- /bin/bash
+}
+
