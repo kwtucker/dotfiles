@@ -53,40 +53,52 @@ function kcx() {
 }
 
 function kcs() {
+	lab=alpha.k8s.aort.theplatform.com
+	prod=alpha.k8s.aort.theplatform.com
+
 	if [[ $1 == "prod" ]]; then
-		kubectl config use-context alpha.k8s.aort.theplatform.com
-		echo "\nHere are your pods for alpha.k8s.aor.theplatform.com\n"
+		kubectl config use-context $prod 
 		kubectl get pods	
 		return
 	elif [[ $1 == "lab" ]]; then
-		kubectl config use-context alpha.k8s.aort.theplatform.com
-		echo "\nHere are your pods for alpha.k8s.aort.theplatform.com\n"
+		kubectl config use-context $lab 
 		kubectl get pods	
 		return 	
 	fi
 
 	contexts=($(kubectl config get-contexts | awk '{print $2}'))
-	printf "\nSelect Context:\n\n"
+
+	echo "\nContexts\n" 
+
 	j=1
 	for i in "${contexts[@]:1}"
 	do
 		echo $j") "$i
 		((j++))
 	done
-	echo ""
-	read selection
 
-  context=($(echo "${contexts[$selection+1]}" | cut -d " " -f1))
-	if [[ $context != "" ]]; then
+	# read -e -p 'Select your context and press [ENTER]: ' -i "(Lab?)" selection 
+	echo -n "\nSelect your context and press [ENTER]: "
+	read  selection
+	echo	
 
-		kubectl config use-context $context 
-		echo "\nHere are your pods for ${contexts[$selection+1]}\n"
-		kubectl get pods	
-	else
-		echo "Selection Not Valid ${selection}"
-		echo "Selecting Lab Cluster"
-		kubectl config use-context alpha.k8s.aort.theplatform.com
-		echo "\nHere are your pods for alpha.k8s.aort.theplatform.com\n"
-		kubectl get pods	
+	# un signed ints match 
+  re='^[0-9]+([.][0-9]+)?$'
+	
+	# If the selection is equal to a number and greater than 0. 
+	if [[ $selection =~ $re && $selection -gt 0 ]]; then
+		context=($(echo "${contexts[$selection+1]}" | cut -d " " -f1))
+		if [[ $context != "" ]]; then
+			kubectl config use-context $context 
+			kubectl get pods	
+			return
+		fi
 	fi
+
+	# Defualt to Lab
+	echo "Selection Not Valid ${selection}"
+	echo "\nSelecting Lab Cluster"
+	kubectl config use-context $lab 
+	echo
+	kubectl get pods	
 }
