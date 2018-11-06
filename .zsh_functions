@@ -53,9 +53,40 @@ function kcx() {
 }
 
 function kcs() {
-	if [[ $1 == "prod" ]]; then	
-		kc config use-context alpha.k8s.aor.theplatform.com
+	if [[ $1 == "prod" ]]; then
+		kubectl config use-context alpha.k8s.aort.theplatform.com
+		echo "\nHere are your pods for alpha.k8s.aor.theplatform.com\n"
+		kubectl get pods	
+		return
+	elif [[ $1 == "lab" ]]; then
+		kubectl config use-context alpha.k8s.aort.theplatform.com
+		echo "\nHere are your pods for alpha.k8s.aort.theplatform.com\n"
+		kubectl get pods	
+		return 	
+	fi
+
+	contexts=($(kubectl config get-contexts | awk '{print $2}'))
+	printf "\nSelect Context:\n\n"
+	j=1
+	for i in "${contexts[@]:1}"
+	do
+		echo $j") "$i
+		((j++))
+	done
+	echo ""
+	read selection
+
+  context=($(echo "${contexts[$selection+1]}" | cut -d " " -f1))
+	if [[ $context != "" ]]; then
+
+		kubectl config use-context $context 
+		echo "\nHere are your pods for ${contexts[$selection+1]}\n"
+		kubectl get pods	
 	else
-		kc config use-context alpha.k8s.aort.theplatform.com
+		echo "Selection Not Valid ${selection}"
+		echo "Selecting Lab Cluster"
+		kubectl config use-context alpha.k8s.aort.theplatform.com
+		echo "\nHere are your pods for alpha.k8s.aort.theplatform.com\n"
+		kubectl get pods	
 	fi
 }
