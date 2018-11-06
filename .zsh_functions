@@ -52,3 +52,10 @@ function kcx() {
 	kc exec $1 -it -- /bin/bash
 }
 
+function kcs() {
+	if [[ $1 == "prod" ]]; then	
+		kc config use-context alpha.k8s.aor.theplatform.com
+	else
+		kc config use-context alpha.k8s.aort.theplatform.com
+	fi
+}
