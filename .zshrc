@@ -37,7 +37,7 @@ export PATH="$PATH:$GOPATH"
 export PATH="$PATH:$NVM_DIR"
 export PATH="$PATH:$JAVA_HOME"
 export PATH="$PATH:$NATIVE_PATH"
-
+export PATH=$PATH:$GOPATH/bin
 source $ZSH/oh-my-zsh.sh
 
 
