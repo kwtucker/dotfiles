@@ -60,6 +60,9 @@ set laststatus=2
 let g:NERDSpaceDelims = 1
 let NERDTreeShowHidden=1
 
+" Ctrl-P
+let g:ctrlp_show_hidden = 1
+
 " Leader is now ,
 let mapleader=','
 
