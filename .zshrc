@@ -1,12 +1,7 @@
 # Path to your oh-my-zsh installation.
 export APP_ENV="prod"
-export PUBLISHER="http://lrm-publisher.dev.aort.theplatform.com"
-export PUBLISHER_PROD="http://lrm-publisher.prod.aor.theplatform.com"
-
-export ADAPTER="http://lrm.dev.aort.theplatform.com"
-export ADAPTER_PROD="http://lrm.prod.aor.theplatform.com"
-
-export SCTEVS_PROD="https://sctevs.linear.theplatform.com/scte224"
+export PUBLISHER="https://lrm-publisher.aor.theplatform.com"
+export ADAPTER="https//lrm.aor.theplatform.com"
 export SCTEVS="https://sctevs.linear.theplatform.com/scte224"
 
 export ZSH=/Users/$USER/.oh-my-zsh

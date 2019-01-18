@@ -9,7 +9,6 @@
 	name = kevin_tucker2 
 	email = kevin_tucker2@comcast.com 
 [alias]
-
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
@@ -17,3 +16,5 @@
 	process = git-lfs filter-process
 [url "git@bitbucket.org:"]
 	insteadOf = https://bitbucket.org/
+[url "git@github.comcast.com:"]
+	insteadOf = https://github.comcast.com/
