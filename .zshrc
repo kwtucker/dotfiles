@@ -2,9 +2,11 @@
 export APP_ENV="prod"
 export PUBLISHER="https://lrm-publisher.aor.theplatform.com"
 export ADAPTER="https//lrm.aor.theplatform.com"
-export ADAPTER="http://localhost:8081"
+# export ADAPTER="http://localhost:8081"
+#
+export POSTGRES_USERNAME="zips"
+export POSTGRES_PASSWORD="zips"
 export SCTEVS="https://sctevs.linear.theplatform.com/scte224"
-
 export ZSH=/Users/$USER/.oh-my-zsh
 export EDITOR=vim
 export EVENT_NOKQUEUE=1
@@ -18,7 +20,7 @@ export UPDATE_ZSH_DAYS=13
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 export HIST_STAMPS="mm/dd/yyyy"
 fpath=(/usr/local/share/zsh-completions $fpath)
-plugins=(golang git zsh-syntax-highlighting zsh-autosuggestions)
+plugins=(golang git zsh-syntax-highlighting)
 
 # -------------------------------------------------------------------
 # ENV 
