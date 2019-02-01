@@ -1,9 +1,8 @@
 # Path to your oh-my-zsh installation.
 export APP_ENV="prod"
 export PUBLISHER="https://lrm-publisher.aor.theplatform.com"
-export ADAPTER="https//lrm.aor.theplatform.com"
-# export ADAPTER="http://localhost:8081"
-#
+# export ADAPTER="https//lrm.aor.theplatform.com"
+export ADAPTER="http://localhost:8081"
 export POSTGRES_USERNAME="zips"
 export POSTGRES_PASSWORD="zips"
 export SCTEVS="https://sctevs.linear.theplatform.com/scte224"
@@ -30,6 +29,7 @@ export SCRIPTS_PATH=/Users/$USER/scripts
 export MANPATH=/usr/local/man
 export CDPATH=~/go/src
 export GOPATH=$HOME/go
+export GO111MODULE=on;
 export NVM_DIR=$HOME/.nvm
 export JAVA_HOME=$(/usr/libexec/java_home)
 export NATIVE_PATH="/usr/local/go/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
