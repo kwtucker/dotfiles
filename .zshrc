@@ -6,6 +6,7 @@ export ADAPTER="http://localhost:8081"
 export POSTGRES_USERNAME="zips"
 export POSTGRES_PASSWORD="zips"
 export SCTEVS="https://sctevs.linear.theplatform.com/scte224"
+
 export ZSH=/Users/$USER/.oh-my-zsh
 export EDITOR=vim
 export EVENT_NOKQUEUE=1
@@ -29,7 +30,7 @@ export SCRIPTS_PATH=/Users/$USER/scripts
 export MANPATH=/usr/local/man
 export CDPATH=~/go/src
 export GOPATH=$HOME/go
-export GO111MODULE=on;
+export GO111MODULE=auto
 export NVM_DIR=$HOME/.nvm
 export JAVA_HOME=$(/usr/libexec/java_home)
 export NATIVE_PATH="/usr/local/go/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
