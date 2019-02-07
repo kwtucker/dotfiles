@@ -1,5 +1,6 @@
 set nocompatible              " be iMproved, required
-filetype off                  " required
+" filetype off                  " required
+filetype plugin on
 syntax on
 "set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
@@ -11,22 +12,21 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/nerdcommenter'
-Plugin 'scrooloose/syntastic'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
+Plugin 'scrooloose/syntastic'
 Plugin 'ctrlp.vim'
-Plugin 'mattn/emmet-vim'
 Plugin 'myusuf3/numbers.vim'
 Plugin 'tpope/vim-surround'
-Plugin 'davidhalter/jedi-vim'
+Plugin 'davidhalter/jedi-vim' " Python autocomplete
+Plugin 'joonty/vdebug'
 Plugin 'elzr/vim-json'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'fatih/vim-go'
-Plugin 'mdempsky/gocode', {'rtp': 'vim/'}
+Plugin 'nsf/gocode', {'rtp': 'vim/'}
 Plugin 'bling/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'tyrannicaltoucan/vim-deep-space'
 Plugin 'majutsushi/tagbar'
-Plugin 'joonty/vdebug'
 Plugin 'tpope/vim-unimpaired'
 
 " All of your Plugins must be added before the following line
@@ -70,6 +70,7 @@ let mapleader=','
 map <C-n> :NERDTreeToggle<CR>
 
 "Syntax Highlighting Go-vim
+set autowrite " Allow to build go automatically if in a go file
 let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_structs = 1
@@ -78,10 +79,23 @@ let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
 let g:go_fmt_command = "goimports"
 let g:go_list_type = "quickfix"
-autocmd FileType go nmap <leader>b  <Plug>(go-build)
+" autocmd FileType go nmap <leader>b  <Plug>(go-build)
 autocmd FileType go nmap <leader>r  <Plug>(go-run)
 autocmd FileType go nmap <leader>d  <Plug>(go-def)
-set autowrite " Allow to build go automatically if in a go file
+autocmd FileType go nmap <leader>t  <Plug>(go-test)
+autocmd FileType go nmap <leader>tc  <Plug>(go-coverage-toggle)
+
+" run :GoBuild or :GoTestCompile based on the go file
+function! s:build_go_files()
+  let l:file = expand('%')
+  if l:file =~# '^\f\+_test\.go$'
+    call go#test#Test(0, 1)
+  elseif l:file =~# '^\f\+\.go$'
+    call go#cmd#Build(0)
+  endif
+endfunction
+
+autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
 
 "Go TagBar
 "
