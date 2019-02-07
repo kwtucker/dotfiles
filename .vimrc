@@ -77,8 +77,13 @@ let g:go_highlight_interfaces = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
 let g:go_fmt_command = "goimports"
+autocmd FileType go nmap <leader>b  <Plug>(go-build)
+autocmd FileType go nmap <leader>r  <Plug>(go-run)
+autocmd FileType go nmap <leader>d  <Plug>(go-def)
+set autowrite " Allow to build go automatically if in a go file
 
 "Go TagBar
+"
 au BufRead,BufNewFile *.go set filetype=go
 let g:go_def_mapping_enabled=0
 nmap <C-t> :TagbarToggle<CR>
@@ -148,4 +153,7 @@ inoremap <down>  <nop>
 inoremap <left>  <nop>
 inoremap <right> <nop>
 
-
+" For error quickfix 
+nnoremap <leader>n :cnext<CR>
+nnoremap <leader>m :cprevious<CR>
+nnoremap <leader>c :cclose<CR>
