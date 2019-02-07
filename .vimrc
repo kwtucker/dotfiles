@@ -1,5 +1,5 @@
 set nocompatible              " be iMproved, required
-" filetype off                  " required
+filetype on                  " required
 filetype plugin on
 syntax on
 "set the runtime path to include Vundle and initialize
