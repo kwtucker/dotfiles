@@ -146,8 +146,8 @@ set clipboard=unnamed
 nmap <Leader>nh :nohlsearch <ENTER>
 
 " Adjust the split view
-nmap <Leader>< :20winc < <ENTER>
-nmap <Leader>> :20winc > <ENTER>
+nmap <Leader>> :20winc < <ENTER>
+nmap <Leader>< :20winc > <ENTER>
 
 " Very magic mode
 nnoremap / /\v
