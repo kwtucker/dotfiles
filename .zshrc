@@ -27,7 +27,6 @@ export BREW_PATH=/usr/local/Cellar
 export SCRIPTS_PATH=/Users/$USER/scripts
 export MANPATH=/usr/local/man
 export CDPATH=~/go/src
-# export GO111MODULE=off
 export GOPATH=$HOME/go
 export NVM_DIR=$HOME/.nvm
 export JAVA_HOME=$(/usr/libexec/java_home)

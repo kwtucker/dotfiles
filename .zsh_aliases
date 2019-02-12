@@ -9,10 +9,10 @@ alias m="tldr"
 alias up="cd .. && ls -la |  awk '{print \$9,\$10}'"
 alias c='clear'
 alias v='vim'
-alias zshrc="vim ~/dotfiles/.zshrc"
+alias zshrc="vim ~/.whalebyte/dotfiles/.zshrc"
 alias kc='kubectl'
 alias kcp='kubectl get pods'
-alias ktc='cd ~/Documents/Kevin/Code/'
+alias ktc='cd ~/.whalebyte/Code/'
 
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker/ && tree -L 1"
@@ -25,15 +25,15 @@ alias composer="php /usr/local/bin/composer.phar"
 
 
 # ---- dotfile git push ----
-alias dotpush='pwd=`pwd` && cd ~/dotfiles && gaa && sleep 2 &&  gcmsg "update dotfiles" && sleep 2 && git push origin master && sleep 6 && cd $pwd'
+alias dotpush='pwd=`pwd` && cd ~/.whalebyte/dotfiles && gaa && sleep 2 &&  gcmsg "update dotfiles" && sleep 2 && git push origin master && sleep 6 && cd $pwd'
 
 
 # ---- dotfile git pull ----
-alias dotpull='pwd=`pwd` && cd ~/dotfiles && git pull && sleep 6 && cd $pwd'
+alias dotpull='pwd=`pwd` && cd ~/.whalebyte/dotfiles && git pull && sleep 6 && cd $pwd'
 
 
 # ---- dotfile cd ----
-alias dot='cd ~/dotfiles && vim .'
+alias dot='cd ~/.whalebyte/dotfiles && vim .'
 
 alias docker_rm_all="docker rm \`docker ps -a -q\`"
 alias docker_rmi_all="docker rmi \`docker images -q\`"
