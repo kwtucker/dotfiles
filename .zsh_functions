@@ -114,7 +114,6 @@ function envsetup() {
 	ln -s ~/.whalebyte/dotfiles/.gitconfig ~/.gitconfig
 	ln -s ~/.whalebyte/dotfiles/.tmux.conf ~/.tmux.conf
 	ln -s ~/.whalebyte/dotfiles/.zshrc ~/.zshrc
-	ln -s ~/.whalebyte/dotfiles/.zsh_functions ~/.zsh_functions
 	ln -s ~/.whalebyte/dotfiles/.zsh_aliases ~/.zsh_aliases
 }
 
