@@ -1,10 +1,4 @@
 # Path to your oh-my-zsh installation.
-export APP_ENV="prod"
-export PUBLISHER="https://lrm-publisher.aor.theplatform.com"
-# export ADAPTER="https//lrm.aor.theplatform.com"
-export ADAPTER="http://localhost:8081"
-export SCTEVS="https://sctevs.linear.theplatform.com/scte224"
-
 export ZSH=/Users/$USER/.oh-my-zsh
 export EDITOR=vim
 export EVENT_NOKQUEUE=1
@@ -30,6 +24,8 @@ export CDPATH=~/go/src
 export GOPATH=$HOME/go
 export NVM_DIR=$HOME/.nvm
 export JAVA_HOME=$(/usr/libexec/java_home)
+export WHALEBYTE_SECRETS=$HOME/.whalebyte_secrets
+export WHALEBYTE_ENVS=$HOME/.whalebyte_envs
 export NATIVE_PATH="/usr/local/go/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 # -------------------------------------------------------------------
@@ -43,6 +39,8 @@ export PATH="$PATH:$NVM_DIR"
 export PATH="$PATH:$JAVA_HOME"
 export PATH="$PATH:$NATIVE_PATH"
 export PATH=$PATH:$GOPATH/bin
+export PATH=$PATH:$WHALEBYTE_SECRETS
+export PATH=$PATH:$WHALEBYTE_ENVS
 source $ZSH/oh-my-zsh.sh
 
 

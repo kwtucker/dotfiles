@@ -100,5 +100,40 @@ function kcs() {
 	echo "\nSelecting Lab Cluster"
 	kubectl config use-context $lab 
 	echo
-	kubectl get pods	
+	kubectl get pods
 }
+
+
+function envsetup() {
+	mkdir -p ~/.whalebyte{Code,notes/quiver_notes} ; touch ~/{.whalebyte_secrets,.whalebyte_envs}
+	mkdir -p ~/go/{bin,pkg,src}
+	mkdir -p ~/.vim/bundle
+	git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+	ln -s ~/.whalebyte/dotfiles/.vimrc ~/.vimrc
+	ln -s ~/.whalebyte/dotfiles/.bash_profile ~/.bash_profile
+	ln -s ~/.whalebyte/dotfiles/.gitconfig ~/.gitconfig
+	ln -s ~/.whalebyte/dotfiles/.tmux.conf ~/.tmux.conf
+	ln -s ~/.whalebyte/dotfiles/.zshrc ~/.zshrc
+	ln -s ~/.whalebyte/dotfiles/.zsh_functions ~/.zsh_functions
+	ln -s ~/.whalebyte/dotfiles/.zsh_aliases ~/.zsh_aliases
+}
+
+function leave() {
+	quiverB ; cp -rf ~/go/src/github.comcast.com/lrm  ~/.whalebyte/Comcast/code_backup ; cp -rf ~/go/src/github.com/kwtucker  ~/.whalebyte/code_backup
+}
+
+function cleanenv() {
+	echo -n "\nARE YOU SURE [N/y]: "
+	read  selection
+	echo
+	
+	if [[ $selection == '' || `echo "$selection" | awk '{print tolower($0)}'` == 'n' ]]; then
+		return
+	fi
+
+	if [[ `echo "$selection" | awk '{print tolower($0)}'` == 'y' ]]; then
+		rm -rf ~/{.whalebyte_secrets,.whalebyte_envs,.whalebyte,.ssh,.zsh,.zshrc,.zsh_functions,.zsh_aliases,.zsh_history,.vimrc,.gitconfig,.bash_profile,go/src}
+		return
+	fi
+}
+

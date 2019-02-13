@@ -101,36 +101,6 @@ autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
 au BufRead,BufNewFile *.go set filetype=go
 let g:go_def_mapping_enabled=0
 nmap <C-t> :TagbarToggle<CR>
-
-" let g:tagbar_type_go = {
-    " \ 'ctagstype' : 'go',
-    " \ 'kinds'     : [
-        " \ 'p:package',
-        " \ 'i:imports:1',
-        " \ 'c:constants',
-        " \ 'v:variables',
-        " \ 't:types',
-        " \ 'n:interfaces',
-        " \ 'w:fields',
-        " \ 'e:embedded',
-        " \ 'm:methods',
-        " \ 'r:constructor',
-        " \ 'f:functions'
-    " \ ],
-    " \ 'sro' : '.',
-    " \ 'kind2scope' : {
-        " \ 't' : 'ctype',
-        " \ 'n' : 'ntype'
-    " \ },
-    " \ 'scope2kind' : {
-        " \ 'ctype' : 't',
-        " \ 'ntype' : 'n'
-    " \ },
-    " \ 'ctagsbin'  : 'gotags',
-    " \ 'ctagsargs' : '-sort -silent'
-	" \ }
-
-
 nmap <Leader>s :w <ENTER>
 nmap <Leader>ss :wq <ENTER>
 nmap <C-t> :TagbarToggle<CR>
