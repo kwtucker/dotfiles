@@ -13,6 +13,9 @@ alias zshrc="vim ~/.whalebyte/dotfiles/.zshrc"
 alias kc='kubectl'
 alias kcp='kubectl get pods'
 alias ktc='cd ~/.whalebyte/Code/'
+alias wbenvs='cat ~/.whalebyte_envs'
+alias wbsecrets='cat ~/.whalebyte_secrets'
+
 
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker/ && tree -L 1"
