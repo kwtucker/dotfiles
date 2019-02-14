@@ -39,8 +39,6 @@ export PATH="$PATH:$NVM_DIR"
 export PATH="$PATH:$JAVA_HOME"
 export PATH="$PATH:$NATIVE_PATH"
 export PATH=$PATH:$GOPATH/bin
-export PATH=$PATH:$WHALEBYTE_SECRETS
-export PATH=$PATH:$WHALEBYTE_ENVS
 source $ZSH/oh-my-zsh.sh
 
 
@@ -65,5 +63,7 @@ source $ZSH/oh-my-zsh.sh
 
 . ~/.zsh_aliases
 . ~/.zsh_functions
+. ~/.whalebyte_secrets
+. ~/.whalebyte_envs
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
