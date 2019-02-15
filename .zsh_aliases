@@ -10,18 +10,29 @@ alias up="cd .. && ls -la |  awk '{print \$9,\$10}'"
 alias c='clear'
 alias v='vim'
 alias zshrc="vim ~/.whalebyte/dotfiles/.zshrc"
+
+# ---- Kubernetes ----
 alias kc='kubectl'
 alias kcp='kubectl get pods'
-alias ktc='cd ~/.whalebyte/Code/'
+alias kctx='kubectx'
+
+# ---- WhaleByte ----
+alias wb='cd ~/.whalebyte'
+alias wbcode='cd ~/.whalebyte/Code/'
+alias wbnotes='cd ~/.whalebyte/notes && code .'
 alias wbenvs='cat ~/.whalebyte_envs'
 alias wbsecrets='cat ~/.whalebyte_secrets'
+
 
 
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker/ && tree -L 1"
 alias gowork="cd ~/go/src/github.comcast.com/lrm && tree -L 1"
-alias gowui="cd ~/go/src/github.comcast.com/lrm/ui && go build && ./ui"
-alias work="cd ~/go/src/github.comcast.com/lrm/ui && code . && open -a 'Quiver' && open -a 'Slack' && open -a 'Microsoft Outlook' && open -a 'Spotify' && open -a 'Google Chrome' http:/localhost:8080 https://tpjira.corp.theplatform.com/secure/RapidBoard.jspa?rapidView=469 https://github.comcast.com/lrm/ui"
+
+alias gowui="cd ~/go/src/github.comcast.com/lrm/ui && code ."
+alias gowadp="cd ~/go/src/github.comcast.com/lrm/adapter && code ."
+alias gowpub="cd ~/go/src/github.comcast.com/lrm/publisher && code ."
+alias gowesni="cd ~/go/src/github.comcast.com/lrm/esni && code ."
 
 # ---- PHP ----
 alias composer="php /usr/local/bin/composer.phar"
