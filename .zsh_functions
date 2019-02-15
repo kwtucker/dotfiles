@@ -16,12 +16,12 @@ function myip() {
 }
 
 # Will commit backup for quiver notes. Pass the version in like "quiverB mm/dd/yy"
-function quiverB() {
+function notesB() {
 	pw=`pwd`
 	if [ ${#1} -ne 0 ]; then
-		cd ~/.whalebyte/notes/quiver_notes && gaa && sleep 2 &&  gcmsg "backup $1" && sleep 2 && git push origin master && sleep 6
+		cd ~/.whalebyte/notes && gaa && sleep 2 &&  gcmsg "backup $1" && sleep 2 && git push origin master && sleep 6
    	else
-		cd ~/.whalebyte/notes/quiver_notes && gaa && sleep 2 &&  gcmsg "backup" && sleep 2 && git push origin master && sleep 6
+		cd ~/.whalebyte/notes && gaa && sleep 2 &&  gcmsg "backup" && sleep 2 && git push origin master && sleep 6
    	fi
 	cd $pw
 }
@@ -54,7 +54,7 @@ function kcx() {
 
 function kcs() {
 	lab=alpha.k8s.aort.theplatform.com
-	prod=alpha.k8s.aort.theplatform.com
+	prod=alpha.k8s.aor.theplatform.com
 
 	if [[ $1 == "prod" ]]; then
 		kubectl config use-context $prod 
