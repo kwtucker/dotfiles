@@ -118,7 +118,7 @@ function envsetup() {
 }
 
 function leave() {
-	quiverB ; cp -rf ~/go/src/github.comcast.com/lrm  ~/.whalebyte/Comcast/code_backup ; cp -rf ~/go/src/github.com/kwtucker  ~/.whalebyte/code_backup
+	notesB ; cp -rf ~/go/src/github.comcast.com/lrm  ~/.whalebyte/Comcast/code_backup ; cp -rf ~/go/src/github.com/kwtucker  ~/.whalebyte/code_backup
 }
 
 function cleanenv() {
