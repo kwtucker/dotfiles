@@ -19,7 +19,7 @@ alias kctx='kubectx'
 # ---- WhaleByte ----
 alias wb='cd ~/.whalebyte'
 alias wbcode='cd ~/.whalebyte/Code/'
-alias wbnotes='cd ~/.whalebyte/notes && code .'
+alias wbnotes='code ~/.whalebyte/notes'
 alias wbenvs='cat ~/.whalebyte_envs'
 alias wbsecrets='cat ~/.whalebyte_secrets'
 
