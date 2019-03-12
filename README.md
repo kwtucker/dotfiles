@@ -26,7 +26,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/mas
 ##### 1. Go to ~/.whalebyte directory
 
 ```
-mkdir -p ~/.whalebyte{Code,notes/quiver_notes} ; touch ~/{.whalebyte_secrets,.whalebyte_envs}
+mkdir -p ~/.whalebyte/{Code,notes} ; touch ~/{.whalebyte_secrets,.whalebyte_envs}
 ```
 
 ##### 2. Clone dotfiles repo to ~/.whalebyte directory
