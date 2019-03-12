@@ -105,17 +105,20 @@ function kcs() {
 
 
 function envsetup() {
-	mkdir -p ~/.whalebyte{Code,notes/quiver_notes} ; touch ~/{.whalebyte_secrets,.whalebyte_envs}
+	mkdir -p ~/.whalebyte{Code,notes} ; touch ~/{.whalebyte_secrets,.whalebyte_envs}
 	mkdir -p ~/go/{bin,pkg,src}
 	mkdir -p ~/.vim/bundle
 	git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+}
+
+function dotfileslink() {
 	ln -s ~/.whalebyte/dotfiles/.vimrc ~/.vimrc
 	ln -s ~/.whalebyte/dotfiles/.bash_profile ~/.bash_profile
 	ln -s ~/.whalebyte/dotfiles/.gitconfig ~/.gitconfig
 	ln -s ~/.whalebyte/dotfiles/.tmux.conf ~/.tmux.conf
 	ln -s ~/.whalebyte/dotfiles/.zshrc ~/.zshrc
 	ln -s ~/.whalebyte/dotfiles/.zsh_aliases ~/.zsh_aliases
-}
+}	
 
 function leave() {
 	notesB ; cp -rf ~/go/src/github.comcast.com/lrm  ~/.whalebyte/Comcast/code_backup ; cp -rf ~/go/src/github.com/kwtucker  ~/.whalebyte/code_backup
