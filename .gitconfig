@@ -9,6 +9,7 @@
 	name = kevin_tucker2 
 	email = kevin_tucker2@comcast.com 
 [alias]
+	pt = !git tag -l | xargs git tag -d && git fetch -t
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f

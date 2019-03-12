@@ -14,7 +14,7 @@ alias zshrc="vim ~/.whalebyte/dotfiles/.zshrc"
 # ---- Kubernetes ----
 alias kc='kubectl'
 alias kcp='kubectl get pods'
-alias kctx='kubectx'
+alias kctx='kubectx && kcp'
 
 # ---- WhaleByte ----
 alias wb='cd ~/.whalebyte'
