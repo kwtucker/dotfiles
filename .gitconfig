@@ -6,8 +6,8 @@
 	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
 [user]
-	name = kevin_tucker2 
-	email = kevin_tucker2@comcast.com 
+	name = kwtucker
+	email = kwtucker4@gmail.com 
 [alias]
 	pt = !git tag -l | xargs git tag -d && git fetch -t
 [filter "lfs"]
@@ -19,3 +19,5 @@
 	insteadOf = https://bitbucket.org/
 [url "git@github.comcast.com:"]
 	insteadOf = https://github.comcast.com/
+[url "git@github.com:"]
+	insteadOf = https://github.com/

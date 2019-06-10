@@ -3,7 +3,7 @@ export ZSH=/Users/$USER/.oh-my-zsh
 export EDITOR=vim
 export EVENT_NOKQUEUE=1
 export ZSH_THEME="agnoster"
-
+export GO111MODULE=off
 # Uncomment the following line to change how often to auto-update (in days).
 export UPDATE_ZSH_DAYS=13
 
