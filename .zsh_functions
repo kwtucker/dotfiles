@@ -105,10 +105,10 @@ function kcs() {
 
 
 function envsetup() {
-	mkdir -p ~/.whalebyte{Code,notes} ; touch ~/{.whalebyte_secrets,.whalebyte_envs}
 	mkdir -p ~/go/{bin,pkg,src}
 	mkdir -p ~/.vim/bundle
 	git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+	dotfileslink
 }
 
 function dotfileslink() {
