@@ -1,15 +1,11 @@
 [core]
 	excludesfile = /Users/kevintucker/.gitignore_global
-[difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-[mergetool "sourcetree"]
-	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
 [user]
 	name = kevin_tucker2 
 	email = kevin_tucker2@comcast.com 
 [alias]
 	pt = !git tag -l | xargs git tag -d && git fetch -t
+	sort = !git tag -l | sort -V
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
