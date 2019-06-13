@@ -18,10 +18,10 @@ alias kctx='kubectx && kcp'
 
 # ---- WhaleByte ----
 alias wb='cd ~/.whalebyte'
-alias wbcode='cd ~/.whalebyte/Code/'
-alias wbnotes='code ~/.whalebyte/notes'
-alias wbenvs='cat ~/.whalebyte_envs'
-alias wbsecrets='cat ~/.whalebyte_secrets'
+alias wbc='cd ~/.whalebyte/Code/'
+alias wbn='code ~/.whalebyte/notes'
+alias wbe='cat ~/.whalebyte_envs'
+alias wbse='cat ~/.whalebyte_secrets'
 
 
 
@@ -29,10 +29,10 @@ alias wbsecrets='cat ~/.whalebyte_secrets'
 alias gohome="cd ~/go/src/github.com/kwtucker/ && tree -L 1"
 alias gowork="cd ~/go/src/github.comcast.com/lrm && tree -L 1"
 
-alias gowui="cd ~/go/src/github.comcast.com/lrm/ui && code ."
-alias gowadp="cd ~/go/src/github.comcast.com/lrm/adapter && code ."
-alias gowpub="cd ~/go/src/github.comcast.com/lrm/publisher && code ."
-alias gowesni="cd ~/go/src/github.comcast.com/lrm/esni && code ."
+alias gowui="cd ~/go/src/github.comcast.com/lrm/ui"
+alias gowadp="cd ~/go/src/github.comcast.com/lrm/adapter"
+alias gowpub="cd ~/go/src/github.comcast.com/lrm/publisher"
+alias gowesni="cd ~/go/src/github.comcast.com/lrm/esni"
 
 # ---- PHP ----
 alias composer="php /usr/local/bin/composer.phar"
