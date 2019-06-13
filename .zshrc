@@ -12,7 +12,7 @@ export UPDATE_ZSH_DAYS=13
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 export HIST_STAMPS="mm/dd/yyyy"
 fpath=(/usr/local/share/zsh-completions $fpath)
-plugins=(golang git zsh-syntax-highlighting)
+plugins=(golang git)
 
 # -------------------------------------------------------------------
 # ENV 
@@ -22,6 +22,7 @@ export SCRIPTS_PATH=/Users/$USER/scripts
 export MANPATH=/usr/local/man
 export CDPATH=~/go/src
 export GOPATH=$HOME/go
+export GO111MODULE="off"
 export NVM_DIR=$HOME/.nvm
 export JAVA_HOME=$(/usr/libexec/java_home)
 export WHALEBYTE_SECRETS=$HOME/.whalebyte_secrets
