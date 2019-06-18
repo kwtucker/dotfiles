@@ -3,7 +3,6 @@ export ZSH=/Users/$USER/.oh-my-zsh
 export EDITOR=vim
 export EVENT_NOKQUEUE=1
 export ZSH_THEME="agnoster"
-export GO111MODULE=off
 # Uncomment the following line to change how often to auto-update (in days).
 export UPDATE_ZSH_DAYS=13
 
@@ -18,11 +17,10 @@ plugins=(golang git)
 # ENV 
 # -------------------------------------------------------------------
 export BREW_PATH=/usr/local/Cellar
-export SCRIPTS_PATH=/Users/$USER/scripts
-export MANPATH=/usr/local/man
-export CDPATH=~/go/src
+export SCRIPTS_PATH=$HOME/.whalebyte/Code/scripts
+export CDPATH=$HOME/go/src
 export GOPATH=$HOME/go
-export GO111MODULE="off"
+export GO111MODULE=off
 export NVM_DIR=$HOME/.nvm
 export JAVA_HOME=$(/usr/libexec/java_home)
 export WHALEBYTE_SECRETS=$HOME/.whalebyte_secrets
@@ -50,7 +48,7 @@ source $ZSH/oh-my-zsh.sh
 # export WORKON_HOME=$HOME/.virtualenvs
 # export PROJECT_HOME=$HOME/python_dev
 # source /usr/local/bin/virtualenvwrapper.sh
-# # By running the virtualenv_info it will show th current env if activated
+# By running the virtualenv_info it will show th current env if activated
 # function virtualenv_info { [ $VIRTUAL_ENV ] && echo '('`basename $VIRTUAL_ENV`') ' }
 # export VIRTUAL_ENV_DISABLE_PROMPT=1
 

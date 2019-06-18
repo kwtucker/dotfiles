@@ -22,6 +22,7 @@ Plugin 'elzr/vim-json'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'fatih/vim-go'
 Plugin 'nsf/gocode', {'rtp': 'vim/'}
+Plugin 'tpope/vim-commentary' " comment/uncomment lines with gcc or gc in visual mode
 Plugin 'bling/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'tyrannicaltoucan/vim-deep-space'
@@ -49,7 +50,6 @@ set updatetime=250
 set background=dark
 colorscheme deep-space
 let g:airline_theme='deep_space'
-
 
 let g:airline_powerline_fonts = 1
 set t_Co=256
