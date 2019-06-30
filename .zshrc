@@ -62,7 +62,7 @@ source $ZSH/oh-my-zsh.sh
 
 . ~/.zsh_aliases
 . ~/.zsh_functions
-. ~/.whalebyte_secrets
-. ~/.whalebyte_envs
+. ~/.whalebyte/secrets
+. ~/.whalebyte/envs
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
