@@ -20,10 +20,14 @@ alias kctx='kubectx && kcp'
 alias wb='cd ~/.whalebyte'
 alias wbc='cd ~/.whalebyte/Code/'
 alias wbn='code ~/.whalebyte/notes'
-alias wbe='cat ~/.whalebyte_envs'
-alias wbse='cat ~/.whalebyte_secrets'
 
+# Envs
+alias wbee='vim ~/.whalebyte/envs'
+alias wbe='cat ~/.whalebyte/envs'
 
+# Secrets
+alias wbse='vim ~/.whalebyte/secrets'
+alias wbs='cat ~/.whalebyte/secrets'
 
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker/ && tree -L 1"
