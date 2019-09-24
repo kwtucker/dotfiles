@@ -25,12 +25,14 @@ export NVM_DIR=$HOME/.nvm
 export JAVA_HOME=$(/usr/libexec/java_home)
 export WHALEBYTE_SECRETS=$HOME/.whalebyte_secrets
 export WHALEBYTE_ENVS=$HOME/.whalebyte_envs
-export NATIVE_PATH="/usr/local/go/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export TEX=/Library/TeX/texbin
+export NATIVE_PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 # -------------------------------------------------------------------
 # PATH 
 # -------------------------------------------------------------------
 export PATH="$BREW_PATH"
+export PATH="$PATH:$TEX"
 export PATH="$PATH:$SCRIPTS_PATH"
 export PATH="$PATH:$MANPATH"
 export PATH="$PATH:$GOPATH"
