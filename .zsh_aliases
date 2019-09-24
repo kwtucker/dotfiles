@@ -31,12 +31,14 @@ alias wbs='cat ~/.whalebyte/secrets'
 
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker/ && tree -L 1"
-alias gowork="cd ~/go/src/github.comcast.com/lrm && tree -L 1"
+alias gowork="cd ~/go/src/github.comcast.com/yggdrasil/go && tree -L 1"
 
-alias gowui="cd ~/go/src/github.comcast.com/lrm/ui"
-alias gowadp="cd ~/go/src/github.comcast.com/lrm/adapter"
-alias gowpub="cd ~/go/src/github.comcast.com/lrm/publisher"
-alias gowesni="cd ~/go/src/github.comcast.com/lrm/esni"
+alias goygg="cd ~/go/src/github.comcast.com/yggdrasil/go"
+alias gopillar="cd ~/go/src/github.comcast.com/viper-cog/pillar"
+alias golrmui="cd ~/go/src/github.comcast.com/lrm/ui"
+alias golrmadp="cd ~/go/src/github.comcast.com/lrm/adapter"
+alias golrmpub="cd ~/go/src/github.comcast.com/lrm/publisher"
+alias golrmesni="cd ~/go/src/github.comcast.com/lrm/esni"
 
 # ---- PHP ----
 alias composer="php /usr/local/bin/composer.phar"
