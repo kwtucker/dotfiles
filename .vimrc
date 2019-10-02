@@ -14,7 +14,6 @@ Plugin 'scrooloose/nerdcommenter'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'scrooloose/syntastic'
 Plugin 'ctrlp.vim'
-Plugin 'myusuf3/numbers.vim'
 Plugin 'tpope/vim-surround'
 Plugin 'davidhalter/jedi-vim' " Python autocomplete
 Plugin 'joonty/vdebug'
@@ -43,6 +42,7 @@ set tabstop=2
 set shiftwidth=2
 set pastetoggle=<f2>
 set statusline=%{fugitive#statusline()}
+
 " Update time for vim gutter
 set updatetime=250
 
@@ -50,14 +50,22 @@ set updatetime=250
 set background=dark
 colorscheme deep-space
 let g:airline_theme='deep_space'
-
 let g:airline_powerline_fonts = 1
 set t_Co=256
 set laststatus=2
 
 " Add spaces after comment delimiters by default
 let g:NERDSpaceDelims = 1
+
+" Show hidden files in nerdtree
 let NERDTreeShowHidden=1
+
+" Close vim if the only window left open is a NERDTree
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+
+" Show nerdtree even if a file is not an arg when opening vim.
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
 " Ctrl-P
 let g:ctrlp_show_hidden = 1
@@ -67,6 +75,7 @@ let mapleader=','
 
 " Sets the nerd tree toggle to control n
 map <C-n> :NERDTreeToggle<CR>
+
 
 "Syntax Highlighting Go-vim
 set autowrite " Allow to build go automatically if in a go file
