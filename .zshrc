@@ -11,7 +11,7 @@ export UPDATE_ZSH_DAYS=13
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 export HIST_STAMPS="mm/dd/yyyy"
 fpath=(/usr/local/share/zsh-completions $fpath)
-plugins=(golang git)
+plugins=(golang git kubectl)
 
 # -------------------------------------------------------------------
 # ENV 
@@ -27,7 +27,6 @@ export WHALEBYTE_SECRETS=$HOME/.whalebyte_secrets
 export WHALEBYTE_ENVS=$HOME/.whalebyte_envs
 export TEX=/Library/TeX/texbin
 export NATIVE_PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-
 # -------------------------------------------------------------------
 # PATH 
 # -------------------------------------------------------------------

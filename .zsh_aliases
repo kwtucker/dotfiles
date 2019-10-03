@@ -12,8 +12,8 @@ alias v='vim'
 alias zshrc="vim ~/.whalebyte/dotfiles/.zshrc"
 
 # ---- Kubernetes ----
-alias kc='kubectl'
-alias kcp='kubectl get pods'
+# alias kc='kubectl'
+# alias kcp='kubectl get pods'
 alias kctx='kubectx && kcp'
 
 # ---- WhaleByte ----
@@ -60,5 +60,6 @@ alias docker_rmi_all="docker rmi \`docker images -q\`"
 alias docker_rmi_dangling="docker rmi \`docker images -qa -f 'dangling=true'\`"
 
 alias loadnvm='[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
+
 alias ctags="`brew --prefix`/bin/ctags"
 alias tag='ctags -R -f ./.git/tags .'
