@@ -48,60 +48,60 @@ function loadkubectl() {
 	fi
 }
 
-function kcx() {
-	kc exec $1 -it -- /bin/bash
-}
+# function kcx() {
+	# kc exec $1 -it -- /bin/bash
+# }
 
-function kcs() {
-	lab=alpha.k8s.aort.theplatform.com
-	prod=alpha.k8s.aor.theplatform.com
+# function kcs() {
+	# lab=alpha.k8s.aort.theplatform.com
+	# prod=alpha.k8s.aor.theplatform.com
 
-	if [[ $1 == "prod" ]]; then
-		kubectl config use-context $prod 
-		kubectl get pods	
-		return
-	elif [[ $1 == "lab" ]]; then
-		kubectl config use-context $lab 
-		kubectl get pods	
-		return 	
-	fi
+	# if [[ $1 == "prod" ]]; then
+		# kubectl config use-context $prod 
+		# kubectl get pods	
+		# return
+	# elif [[ $1 == "lab" ]]; then
+		# kubectl config use-context $lab 
+		# kubectl get pods	
+		# return 	
+	# fi
 
-	contexts=($(kubectl config get-contexts | awk '{print $2}'))
+	# contexts=($(kubectl config get-contexts | awk '{print $2}'))
 
-	echo "\nContexts\n" 
+	# echo "\nContexts\n" 
 
-	j=1
-	for i in "${contexts[@]:1}"
-	do
-		echo $j") "$i
-		((j++))
-	done
+	# j=1
+	# for i in "${contexts[@]:1}"
+	# do
+		# echo $j") "$i
+		# ((j++))
+	# done
 
-	# read -e -p 'Select your context and press [ENTER]: ' -i "(Lab?)" selection 
-	echo -n "\nSelect your context and press [ENTER]: "
-	read  selection
-	echo	
+	# # read -e -p 'Select your context and press [ENTER]: ' -i "(Lab?)" selection 
+	# echo -n "\nSelect your context and press [ENTER]: "
+	# read  selection
+	# echo	
 
-	# un signed ints match 
-  re='^[0-9]+([.][0-9]+)?$'
+	# # un signed ints match 
+  # re='^[0-9]+([.][0-9]+)?$'
 	
-	# If the selection is equal to a number and greater than 0. 
-	if [[ $selection =~ $re && $selection -gt 0 ]]; then
-		context=($(echo "${contexts[$selection+1]}" | cut -d " " -f1))
-		if [[ $context != "" ]]; then
-			kubectl config use-context $context 
-			kubectl get pods	
-			return
-		fi
-	fi
+	# # If the selection is equal to a number and greater than 0. 
+	# if [[ $selection =~ $re && $selection -gt 0 ]]; then
+		# context=($(echo "${contexts[$selection+1]}" | cut -d " " -f1))
+		# if [[ $context != "" ]]; then
+			# kubectl config use-context $context 
+			# kubectl get pods	
+			# return
+		# fi
+	# fi
 
-	# Defualt to Lab
-	echo "Selection Not Valid ${selection}"
-	echo "\nSelecting Lab Cluster"
-	kubectl config use-context $lab 
-	echo
-	kubectl get pods
-}
+	# # Defualt to Lab
+	# echo "Selection Not Valid ${selection}"
+	# echo "\nSelecting Lab Cluster"
+	# kubectl config use-context $lab 
+	# echo
+	# kubectl get pods
+# }
 
 
 function envsetup() {
