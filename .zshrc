@@ -10,8 +10,7 @@ export UPDATE_ZSH_DAYS=13
 # stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 export HIST_STAMPS="mm/dd/yyyy"
-fpath=(/usr/local/share/zsh-completions $fpath)
-plugins=(golang git kubectl)
+plugins=(golang git)
 
 # -------------------------------------------------------------------
 # ENV 
