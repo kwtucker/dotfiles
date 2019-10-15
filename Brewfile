@@ -1,3 +1,9 @@
+
+################################################################################
+# Tap 
+################################################################################
+tap 'mongodb/brew'
+
 ################################################################################
 # Simple brews
 ################################################################################
@@ -12,16 +18,17 @@ brew 'go'
 brew 'httpie'
 brew 'jq'
 brew 'kubernetes-cli'
+brew 'kubernetes-helm'
 brew 'lua@5.1'
 brew 'luarocks'
 brew 'make'
 brew 'mariadb'
-brew 'mongodb-community@4.2'
+brew 'mongodb-community'
 brew 'nats-streaming-server'
 brew 'nmap'
 brew 'nvm'
 brew 'openssl'
-brew 'postgresql', restart_service: :changed
+brew 'postgresq'
 brew 'postgis'
 brew 'prettier'
 brew 'python'
@@ -45,3 +52,5 @@ brew 'xz'
 brew 'yarn'
 brew 'yq'
 brew 'zsh'
+
+

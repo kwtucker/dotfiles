@@ -65,20 +65,6 @@ alias ctags="`brew --prefix`/bin/ctags"
 alias tag='ctags -R -f ./.git/tags .'
 
 
-if [ $commands[kubectl] ]; then
-  function kubectl() {
-    source <(command kubectl completion zsh)
-    command kubectl "$@"
-  }
-fi
-
-if [ $commands[stern] ]; then
-  function stern() {
-    source <(command stern --completion=zsh)
-    command stern "$@"
-  }
-fi
-
 alias k='kubectl'
 alias kp='k get pods -o wide'
 alias ks='k get services -o wide'
@@ -115,9 +101,11 @@ function kip() {
 function kenv() {
 	local ctx=$(kubectl config current-context)
 	local cns=$(kubectl config view --minify | grep namespace: | awk 'NR>0 {print $2}')
+	local server=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
 	echo "Context:    ${ctx}"
 	echo "Namespace:  ${cns}"
 	echo "Tiller:     $TILLER_NAMESPACE"
+	echo "Server:     ${server}"
 }
 
 function tns() {
