@@ -1,10 +1,10 @@
 [core]
 	excludesfile = /Users/ktucke214/.gitignore_global
 [user]
-	name = kevin_tucker2
-	email = kevin_tucker2@comcast.com
-	; name = kwtucker4
-	; email = kwtucker4@gmail.com
+	; name = kevin_tucker2
+	; email = kevin_tucker2@comcast.com
+	name = kwtucker4
+	email = kwtucker4@gmail.com
 [alias]
 	pt = !git tag -l | xargs git tag -d && git fetch -t
 	sort = !git tag -l | sort -V
