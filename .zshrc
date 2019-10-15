@@ -2,7 +2,9 @@
 export ZSH=/Users/$USER/.oh-my-zsh
 export EDITOR=vim
 export EVENT_NOKQUEUE=1
+
 export ZSH_THEME="agnoster"
+
 # Uncomment the following line to change how often to auto-update (in days).
 export UPDATE_ZSH_DAYS=13
 
@@ -10,17 +12,19 @@ export UPDATE_ZSH_DAYS=13
 # stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 export HIST_STAMPS="mm/dd/yyyy"
-plugins=(golang git)
+plugins=(golang git helm)
 
 # -------------------------------------------------------------------
 # ENV 
 # -------------------------------------------------------------------
+export ENV="ktucke214"
 export BREW_PATH=/usr/local/Cellar
 export SCRIPTS_PATH=$HOME/.whalebyte/Code/scripts
 export CDPATH=$HOME/go/src
 export GOPATH=$HOME/go
 export GO111MODULE=off
 export NVM_DIR=$HOME/.nvm
+export MONGOPATH="/usr/local/opt/mongodb-community@3.6/bin"
 export JAVA_HOME=$(/usr/libexec/java_home)
 export WHALEBYTE_SECRETS=$HOME/.whalebyte_secrets
 export WHALEBYTE_ENVS=$HOME/.whalebyte_envs
@@ -36,6 +40,7 @@ export PATH="$PATH:$MANPATH"
 export PATH="$PATH:$GOPATH"
 export PATH="$PATH:$NVM_DIR"
 export PATH="$PATH:$JAVA_HOME"
+export PATH="$PATH:$MONGOPATH"
 export PATH="$PATH:$NATIVE_PATH"
 export PATH=$PATH:$GOPATH/bin
 source $ZSH/oh-my-zsh.sh
