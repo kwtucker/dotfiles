@@ -17,5 +17,5 @@
 	insteadOf = https://bitbucket.org/
 [url "git@github.comcast.com:"]
 	insteadOf = https://github.comcast.com/
-; [url "git@github.com:"]
-	; insteadOf = https://github.com/
+[url "git@github.com:"]
+	insteadOf = https://github.com/
