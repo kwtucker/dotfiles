@@ -3,6 +3,27 @@
 # Tap 
 ################################################################################
 tap 'mongodb/brew'
+tap 'homebrew/cask'
+tap 'homebrew/cask-drivers'
+tap 'homebrew/cask-fonts'
+tap 'homebrew/services'
+
+
+
+################################################################################
+# Casks
+################################################################################
+# cask_args appdir: '/Applications'
+# 
+# cask 'alfred'
+# cask 'dropbox'
+# cask 'google-chrome'
+# cask 'iterm2'
+# cask 'postman'
+# cask 'slack'
+# cask 'spotify'
+# cask 'visual-studio-code'
+
 
 ################################################################################
 # Simple brews
@@ -28,7 +49,7 @@ brew 'nats-streaming-server'
 brew 'nmap'
 brew 'nvm'
 brew 'openssl'
-brew 'postgresq'
+brew 'postgresql'
 brew 'postgis'
 brew 'prettier'
 brew 'python'
