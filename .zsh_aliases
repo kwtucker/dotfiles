@@ -53,7 +53,7 @@ alias dotpull='pwd=`pwd` && cd ~/.whalebyte/dotfiles && git pull && sleep 6 && c
 
 
 # ---- dotfile cd ----
-alias dot='cd ~/.whalebyte/dotfiles && vim .'
+alias dot='cd ~/.whalebyte/dotfiles'
 
 alias docker_rm_all="docker rm \`docker ps -a -q\`"
 alias docker_rmi_all="docker rmi \`docker images -q\`"
