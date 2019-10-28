@@ -5,7 +5,7 @@
 
 # for the better man pages
 alias m="tldr"
-
+alias ll="exa -abghHliS"
 alias up="cd .. && ls -la |  awk '{print \$9,\$10}'"
 alias c='clear'
 alias v='vim'
