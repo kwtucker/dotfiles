@@ -2,8 +2,7 @@
 export ZSH=/Users/$USER/.oh-my-zsh
 export EDITOR=vim
 export EVENT_NOKQUEUE=1
-
-export ZSH_THEME="agnoster"
+export ZSH_THEME="whalebyte"
 
 # Uncomment the following line to change how often to auto-update (in days).
 export UPDATE_ZSH_DAYS=13
@@ -12,7 +11,7 @@ export UPDATE_ZSH_DAYS=13
 # stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 export HIST_STAMPS="mm/dd/yyyy"
-plugins=(golang git helm)
+plugins=(golang git helm zsh-syntax-highlighting zsh-autosuggestions git-open)
 
 # -------------------------------------------------------------------
 # ENV 
@@ -71,3 +70,9 @@ source $ZSH/oh-my-zsh.sh
 . ~/.whalebyte/envs
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+iterm2_print_user_vars() {
+  iterm2_set_user_var kubeCurrentContext $(kubectl config current-context)
+  iterm2_set_user_var kubeCurrentTillerNamespace $(echo $TILLER_NAMESPACE)
+  iterm2_set_user_var kubeCurrentNamespace $(kubectl config view --minify | grep namespace: | awk 'NR>0 {print $2}')
+}
