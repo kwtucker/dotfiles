@@ -12,8 +12,10 @@ Plugin 'airblade/vim-gitgutter'
 Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
-Plugin 'scrooloose/syntastic'
+" Plugin 'scrooloose/syntastic'
 Plugin 'ctrlp.vim'
+Plugin 'junegunn/fzf.vim'
+Plugin 'wincent/ferret'
 Plugin 'tpope/vim-surround'
 Plugin 'davidhalter/jedi-vim' " Python autocomplete
 Plugin 'joonty/vdebug'
@@ -27,6 +29,9 @@ Plugin 'vim-airline/vim-airline-themes'
 Plugin 'tyrannicaltoucan/vim-deep-space'
 Plugin 'majutsushi/tagbar'
 Plugin 'tpope/vim-unimpaired'
+Plugin 'posva/vim-vue'
+Plugin 'prettier/vim-prettier'
+Plugin 'othree/javascript-libraries-syntax.vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -76,6 +81,42 @@ let mapleader=','
 " Sets the nerd tree toggle to control n
 map <C-n> :NERDTreeToggle<CR>
 
+let g:used_javascript_libs = 'underscore,jquery,chai'
+let g:vue_pre_processors = ['scss']
+
+" print semicolons
+" Prettier default: true
+let g:prettier#config#semi = 'false'
+
+" single quotes over double quotes
+" Prettier default: false
+let g:prettier#config#single_quote = 'true'
+
+" print spaces between brackets
+" Prettier default: true
+let g:prettier#config#bracket_spacing = 'true'
+
+" put > on the last line instead of new line
+" Prettier default: false
+let g:prettier#config#jsx_bracket_same_line = 'false'
+
+" avoid|always
+" Prettier default: avoid
+let g:prettier#config#arrow_parens = 'avoid'
+
+" none|es5|all
+" Prettier default: none
+let g:prettier#config#trailing_comma = 'none'
+
+" flow|babylon|typescript|css|less|scss|json|graphql|markdown
+" Prettier default: babylon
+let g:prettier#config#parser = 'flow'
+
+" always|never|preserve
+let g:prettier#config#prose_wrap = 'preserve'
+
+" css|strict|ignore
+let g:prettier#config#html_whitespace_sensitivity = 'css'
 
 "Syntax Highlighting Go-vim
 set autowrite " Allow to build go automatically if in a go file
@@ -145,6 +186,8 @@ inoremap <up>    <nop>
 inoremap <down>  <nop>
 inoremap <left>  <nop>
 inoremap <right> <nop>
+
+nnoremap <esc> :noh<return><esc>
 
 " For error quickfix 
 nnoremap <leader>n :cnext<CR>

@@ -133,6 +133,7 @@ function dotfileslink() {
 	ln -s ~/.whalebyte/dotfiles/.zshrc ~/.zshrc
 	ln -s ~/.whalebyte/dotfiles/.zsh_aliases ~/.zsh_aliases
 	ln -s ~/.whalebyte/dotfiles/whalebyte.zsh-theme ~/.oh-my-zsh/themes
+	ln -s ~/.whalebyte/dotfiles/.bat.conf ~/.bat.conf.
 }	
 
 function leave() {

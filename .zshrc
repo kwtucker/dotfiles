@@ -16,12 +16,15 @@ plugins=(golang git helm zsh-syntax-highlighting zsh-autosuggestions git-open)
 # -------------------------------------------------------------------
 # ENV 
 # -------------------------------------------------------------------
-export ENV="ktucke214"
+export BAT_CONFIG_PATH="$HOME/.bat.conf"
+export ENV=$USER
 export BREW_PATH=/usr/local/Cellar
 export SCRIPTS_PATH=$HOME/.whalebyte/Code/scripts
 export CDPATH=$HOME/go/src
+export YGG_ROOT=$HOME/go/src/github.comcast.com/yggdrasil/go
+export GO11MODULE=auto # Set this to auto if you intend to keep the monorepo inside your GOPATH.
 export GOPATH=$HOME/go
-export GO111MODULE=off
+export GOPRIVATE=github.comcast.com # This excludes a comma separated list of hosts from the module proxy
 export NVM_DIR=$HOME/.nvm
 export MONGOPATH="/usr/local/opt/mongodb-community@3.6/bin"
 export JAVA_HOME=$(/usr/libexec/java_home)
