@@ -5,6 +5,7 @@ syntax on
 call plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-vinegar'
 Plug 'tpope/vim-commentary' " comment/uncomment lines with gcc or gc in visual mode
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-eunuch'
@@ -15,7 +16,6 @@ Plug 'scrooloose/syntastic'
 Plug 'junegunn/fzf.vim'
 Plug 'wincent/ferret'
 Plug 'davidhalter/jedi-vim' " Python autocomplete
-Plug 'joonty/vdebug'
 Plug 'elzr/vim-json'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
@@ -57,22 +57,10 @@ let g:airline_powerline_fonts = 1
 set laststatus=2
 
 let g:netrw_banner = 0
-
-" Close vim if the only window left open is a NERDTree
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-
-" Show nerdtree even if a file is not an arg when opening vim.
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-
-" Ctrl-P
-let g:ctrlp_show_hidden = 1
+let g:netrw_liststyle = 3
 
 " Leader is now ,
 let mapleader=' '
-
-" Sets the nerd tree toggle to control n
-map <C-n> :NERDTreeToggle<CR>
 
 let g:used_javascript_libs = 'underscore,jquery,chai'
 let g:vue_pre_processors = ['scss']
@@ -124,6 +112,7 @@ let g:go_list_type = "quickfix"
 " autocmd FileType go nmap <leader>b  <Plug>(go-build)
 autocmd FileType go nmap <leader>r  <Plug>(go-run)
 autocmd FileType go nmap <leader>d  <Plug>(go-def)
+autocmd FileType go nmap <leader>f  <Plug>(go-referrer)
 autocmd FileType go nmap <leader>t  <Plug>(go-test)
 autocmd FileType go nmap <leader>tc  <Plug>(go-coverage-toggle)
 
