@@ -8,7 +8,8 @@ alias m="tldr"
 alias ll="exa -abghHliS"
 alias up="cd .. && ls -la |  awk '{print \$9,\$10}'"
 alias c='clear'
-alias v='vim'
+alias v='nvim'
+alias vim='nvim'
 alias zshrc="vim ~/.whalebyte/dotfiles/.zshrc"
 
 # ---- Kubernetes ----
@@ -65,6 +66,7 @@ alias ctags="`brew --prefix`/bin/ctags"
 alias tag='ctags -R -f ./.git/tags .'
 
 
+# ---- Kubernetes ----
 alias k='kubectl'
 alias kp='k get pods -o wide'
 alias ks='k get services -o wide'
@@ -82,42 +84,3 @@ alias -g RS='$(    kubectl get rs    | fzf-tmux --header-lines=1 --reverse --mul
 alias -g SVC='$(   kubectl get svc   | fzf-tmux --header-lines=1 --reverse --multi --cycle | awk "{print \$1}")'
 alias -g ING='$(   kubectl get ing   | fzf-tmux --header-lines=1 --reverse --multi --cycle | awk "{print \$1}")'
 alias -g CTX='$(   kubectl config get-contexts -o=name | sort -fd | fzf-tmux --reverse --multi --cycle)'
-
-
-function kport() {
-	local pod=$(echo PODS)
-	local port=$(kubectl get pod ${pod} -o json | jq '.spec.containers | .[0].ports | .[0].containerPort')
-	k port-forward ${pod} ${port}:${port}
-}
-
-function kip() {
-	local node_ip=$(kubectl get pods -l name=tiller -o wide | awk 'NR>1 {print $7}')
-	local node_ports=$(kubectl get svc -o json SVC | jq -r '.spec.ports[] | "\(.name) \(.nodePort)"')
-	if [[ $(echo "${node_ports}" | wc -l) -eq 1 ]]; then
-		echo "${node_ports}" \
-			| awk -v ip="${node_ip}" '{print "http://" ip ":"$2}' > >(cat) > >(tr -d '\n' | pbcopy)
-	else
-		echo "${node_ports}" \
-			| awk -v OFS='\t' -v ip="${node_ip}" '{print $1, " http://" ip ":"$2}' \
-			| fzf-tmux --cycle \
-			| awk '{print $2}' > >(cat) > >(tr -d '\n' | pbcopy)
-	fi
-}
-
-function kenv() {
-	local ctx=$(kubectl config current-context)
-	local cns=$(kubectl config view --minify | grep namespace: | awk 'NR>0 {print $2}')
-	local server=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
-	echo "Context:    ${ctx}"
-	echo "Namespace:  ${cns}"
-	echo "Tiller:     $TILLER_NAMESPACE"
-	echo "Server:     ${server}"
-}
-
-function tns() {
-	local ctx=$(kubectl config current-context)
-	local cns=$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${ctx}\")].context.namespace}")
-	echo "${cns}" >! "${HOME}/.tiller_namespace"
-	export TILLER_NAMESPACE=${cns}
-	echo "Switched Tiller namespace to ${cns}"
-}

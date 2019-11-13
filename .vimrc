@@ -1,40 +1,35 @@
 set nocompatible              " be iMproved, required
 filetype plugin on
 syntax on
-"set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
 
-"let Vundle manage Vundle, required
-Plugin 'gmarik/Vundle.vim'
-Plugin 'tpope/vim-fugitive'
-Plugin 'airblade/vim-gitgutter'
-Plugin 'scrooloose/nerdtree'
-Plugin 'scrooloose/nerdcommenter'
-Plugin 'Xuyuanp/nerdtree-git-plugin'
-" Plugin 'scrooloose/syntastic'
-Plugin 'ctrlp.vim'
-Plugin 'junegunn/fzf.vim'
-Plugin 'wincent/ferret'
-Plugin 'tpope/vim-surround'
-Plugin 'davidhalter/jedi-vim' " Python autocomplete
-Plugin 'joonty/vdebug'
-Plugin 'elzr/vim-json'
-Plugin 'christoomey/vim-tmux-navigator'
-Plugin 'fatih/vim-go'
-Plugin 'nsf/gocode', {'rtp': 'vim/'}
-Plugin 'tpope/vim-commentary' " comment/uncomment lines with gcc or gc in visual mode
-Plugin 'bling/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
-Plugin 'tyrannicaltoucan/vim-deep-space'
-Plugin 'majutsushi/tagbar'
-Plugin 'tpope/vim-unimpaired'
-Plugin 'posva/vim-vue'
-Plugin 'prettier/vim-prettier'
-Plugin 'othree/javascript-libraries-syntax.vim'
+call plug#begin('~/.vim/plugged')
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-commentary' " comment/uncomment lines with gcc or gc in visual mode
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-eunuch'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-markdown'
+Plug 'airblade/vim-gitgutter'
+Plug 'scrooloose/syntastic'
+Plug 'junegunn/fzf.vim'
+Plug 'wincent/ferret'
+Plug 'davidhalter/jedi-vim' " Python autocomplete
+Plug 'joonty/vdebug'
+Plug 'elzr/vim-json'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'nsf/gocode', {'rtp': 'vim/'}
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'chriskempson/base16-vim'
+Plug 'drewtempelmeyer/palenight.vim'
+Plug 'majutsushi/tagbar'
+Plug 'posva/vim-vue'
+Plug 'prettier/vim-prettier'
+Plug 'othree/javascript-libraries-syntax.vim'
+call plug#end()
 
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
 filetype plugin indent on    " required
 
 " Allow backspace in insert mode
@@ -47,23 +42,21 @@ set tabstop=2
 set shiftwidth=2
 set pastetoggle=<f2>
 set statusline=%{fugitive#statusline()}
-
+set noshowmode
 " Update time for vim gutter
 set updatetime=250
 
 " Theme of work area and tabline
 set background=dark
-colorscheme deep-space
-let g:airline_theme='deep_space'
-let g:airline_powerline_fonts = 1
+colorscheme palenight
+let base16colorspace=256  " Access colors present in 256 colorspace
 set t_Co=256
+set termguicolors
+let g:airline_theme='bubblegum'
+let g:airline_powerline_fonts = 1
 set laststatus=2
 
-" Add spaces after comment delimiters by default
-let g:NERDSpaceDelims = 1
-
-" Show hidden files in nerdtree
-let NERDTreeShowHidden=1
+let g:netrw_banner = 0
 
 " Close vim if the only window left open is a NERDTree
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
@@ -76,7 +69,7 @@ autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 let g:ctrlp_show_hidden = 1
 
 " Leader is now ,
-let mapleader=','
+let mapleader=' '
 
 " Sets the nerd tree toggle to control n
 map <C-n> :NERDTreeToggle<CR>

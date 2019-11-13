@@ -1,6 +1,6 @@
 # Path to your oh-my-zsh installation.
 export ZSH=/Users/$USER/.oh-my-zsh
-export EDITOR=vim
+export EDITOR=nvim
 export EVENT_NOKQUEUE=1
 export ZSH_THEME="whalebyte"
 
@@ -17,6 +17,12 @@ plugins=(golang git helm zsh-syntax-highlighting zsh-autosuggestions git-open)
 # ENV 
 # -------------------------------------------------------------------
 export BAT_CONFIG_PATH="$HOME/.bat.conf"
+export BAT_THEME="TwoDark"
+export FZF_DEFAULT_OPTS="--height 60% --layout=reverse --border --preview 'bat --color=always {} | head -40'"
+
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
 export ENV=$USER
 export BREW_PATH=/usr/local/Cellar
 export SCRIPTS_PATH=$HOME/.whalebyte/Code/scripts
@@ -47,6 +53,13 @@ export PATH="$PATH:$NATIVE_PATH"
 export PATH=$PATH:$GOPATH/bin
 source $ZSH/oh-my-zsh.sh
 
+[ -f ~/.fzf.bash ] && source ~/.fzf.zsh
+
+# Base16 Shell
+export BASE16_SHELL="$HOME/.config/base16-shell/"
+[ -n "$PS1" ] && \
+    [ -s "$BASE16_SHELL/profile_helper.sh" ] && \
+        eval "$("$BASE16_SHELL/profile_helper.sh")"
 
 # -------------------------------------------------------------------
 # Python 
