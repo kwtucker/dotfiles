@@ -1,10 +1,11 @@
 [core]
 	excludesfile = /Users/ktucke214/.gitignore_global
 [user]
-	; name = kevin_tucker2
-	; email = kevin_tucker2@comcast.com
-	name = kwtucker4
-	email = kwtucker4@gmail.com
+	name = kevin_tucker2
+	email = kevin_tucker2@comcast.com
+[fetch]
+  prune = true
+  pruneTags = true	
 [alias]
 	pt = !git tag -l | xargs git tag -d && git fetch -t
 	sort = !git tag -l | sort -V
@@ -15,7 +16,7 @@
 	process = git-lfs filter-process
 [url "git@bitbucket.org:"]
 	insteadOf = https://bitbucket.org/
-[url "git@github.comcast.com:"]
-	insteadOf = https://github.comcast.com/
-[url "git@github.com:"]
-	insteadOf = https://github.com/
+; [url "git@github.comcast.com:"]
+; 	insteadOf = https://github.comcast.com/
+; [url "git@github.com:"]
+; 	insteadOf = https://github.com/
