@@ -13,6 +13,7 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-markdown'
 Plug 'airblade/vim-gitgutter'
 Plug 'scrooloose/syntastic'
+Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'wincent/ferret'
 Plug 'davidhalter/jedi-vim' " Python autocomplete
@@ -58,6 +59,10 @@ set laststatus=2
 
 let g:netrw_banner = 0
 let g:netrw_liststyle = 3
+
+let g:fzf_prefer_tmux = 1
+nnoremap <C-p> :Files<Cr>
+nnoremap <C-g> :Rg<Cr>
 
 " Leader is now ,
 let mapleader=' '
