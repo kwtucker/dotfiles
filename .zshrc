@@ -19,7 +19,6 @@ plugins=(golang git helm zsh-syntax-highlighting zsh-autosuggestions git-open)
 export BAT_CONFIG_PATH="$HOME/.bat.conf"
 export BAT_THEME="TwoDark"
 export FZF_DEFAULT_OPTS="--height 60% --layout=reverse --border --preview 'bat --color=always {} | head -40'"
-
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
