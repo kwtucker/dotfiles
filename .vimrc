@@ -114,6 +114,11 @@ let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
 let g:go_fmt_command = "goimports"
 let g:go_list_type = "quickfix"
+
+let g:go_def_mode='gopls'
+
+let g:go_info_mode='gopls'
+
 " autocmd FileType go nmap <leader>b  <Plug>(go-build)
 autocmd FileType go nmap <leader>r  <Plug>(go-run)
 autocmd FileType go nmap <leader>d  <Plug>(go-def)
@@ -155,7 +160,8 @@ nmap <Leader>nh :nohlsearch <ENTER>
 " Adjust the split view
 nmap <Leader>> :20winc < <ENTER>
 nmap <Leader>< :20winc > <ENTER>
-
+set splitbelow
+set splitright
 " Very magic mode
 nnoremap / /\v
 vnoremap / /\v
