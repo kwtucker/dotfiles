@@ -11,12 +11,19 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-markdown'
+if has('nvim')
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+  Plug 'Shougo/deoplete.nvim'
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
+endif
+Plug 'deoplete-plugins/deoplete-go', { 'do': 'make'}
 Plug 'airblade/vim-gitgutter'
 Plug 'scrooloose/syntastic'
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'wincent/ferret'
-Plug 'davidhalter/jedi-vim' " Python autocomplete
 Plug 'elzr/vim-json'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
@@ -118,6 +125,15 @@ let g:go_list_type = "quickfix"
 let g:go_def_mode='gopls'
 
 let g:go_info_mode='gopls'
+
+" Dark powered asynchronous completion framework for neovim/Vim8
+set completeopt+=noselect
+let g:deoplete#enable_at_startup = 1
+call deoplete#custom#option('smart_case', v:true)
+" deoplete-go settings
+let g:deoplete#sources#go#gocode_binary = $GOPATH.'/bin/gocode'
+let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
+let g:deoplete#sources#go#package_dot = 1
 
 " autocmd FileType go nmap <leader>b  <Plug>(go-build)
 autocmd FileType go nmap <leader>r  <Plug>(go-run)
