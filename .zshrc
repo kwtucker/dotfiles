@@ -2,7 +2,8 @@
 export ZSH=/Users/$USER/.oh-my-zsh
 export EDITOR=nvim
 export EVENT_NOKQUEUE=1
-export ZSH_THEME="whalebyte"
+# export ZSH_THEME="whalebyte"
+export ZSH_THEME=""
 
 # Uncomment the following line to change how often to auto-update (in days).
 export UPDATE_ZSH_DAYS=13
@@ -27,7 +28,7 @@ export BREW_PATH=/usr/local/Cellar
 export SCRIPTS_PATH=$HOME/.whalebyte/Code/scripts
 export CDPATH=$HOME/go/src
 export YGG_ROOT=$HOME/go/src/github.comcast.com/yggdrasil/go
-export GO11MODULE=auto # Set this to auto if you intend to keep the monorepo inside your GOPATH.
+export GO111MODULE=auto # Set this to auto if you intend to keep the monorepo inside your GOPATH.
 export GOPATH=$HOME/go
 export GOPRIVATE=github.comcast.com # This excludes a comma separated list of hosts from the module proxy
 export NVM_DIR=$HOME/.nvm
@@ -60,6 +61,9 @@ export BASE16_SHELL="$HOME/.config/base16-shell/"
     [ -s "$BASE16_SHELL/profile_helper.sh" ] && \
         eval "$("$BASE16_SHELL/profile_helper.sh")"
 
+autoload -U promptinit; promptinit
+prompt pure
+
 # -------------------------------------------------------------------
 # Python 
 # -------------------------------------------------------------------
@@ -88,6 +92,7 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 
 iterm2_print_user_vars() {
   iterm2_set_user_var kubeCurrentContext $(kubectl config current-context)
-  iterm2_set_user_var kubeCurrentTillerNamespace $(echo $TILLER_NAMESPACE)
+  # iterm2_set_user_var kubeCurrentTillerNamespace $(echo $TILLER_NAMESPACE)
+  iterm2_set_user_var kubeCurrentTillerNamespace $(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(kubectl config current-context)\")].context.namespace}")
   iterm2_set_user_var kubeCurrentNamespace $(kubectl config view --minify | grep namespace: | awk 'NR>0 {print $2}')
 }

@@ -31,8 +31,8 @@ alias wbse='vim ~/.whalebyte/secrets'
 alias wbs='cat ~/.whalebyte/secrets'
 
 # ---- GO ----
-alias gohome="cd ~/go/src/github.com/kwtucker/ && tree -L 1"
-alias gowork="cd ~/go/src/github.comcast.com/yggdrasil/go && tree -L 1"
+alias gohome="cd ~/go/src/github.com/kwtucker" 
+alias gowork="cd ~/go/src/github.comcast.com/yggdrasil/go"
 
 alias goygg="cd ~/go/src/github.comcast.com/yggdrasil/go"
 alias gopillar="cd ~/go/src/github.comcast.com/viper-cog/pillar"
