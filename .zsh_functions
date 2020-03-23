@@ -15,6 +15,12 @@ function myip() {
   ifconfig en1 | grep 'inet6 ' | sed -e 's/ / /' | awk '{print "en1 (IPv6): " $2 " " $3 " " $4 " " $5 " " $6}'
 }
 
+# function colors() {
+# 	for i in {0..255}; do
+# 			printf "\x1b[38;5;${i}mcolour${i}\x1b[0m\n"
+# 	done
+# }
+
 # Will commit backup for quiver notes. Pass the version in like "quiverB mm/dd/yy"
 function notesB() {
 	pw=`pwd`
@@ -36,12 +42,6 @@ function deletetag() {
 	git push origin :$1 && git tag -d $1
 }
 
-# 				TAG   COMMIT
-# movetagcommit 2.0.4 ad243ff <BRANCH_NAME>
-function movetagcommit() {
-	git push origin :$1 && git tag -fa -m "moving tag $1 to commit $2" $1 $2 && git push origin $3 $1
-}
-
 function envsetup() {
 	mkdir -p ~/go/{bin,pkg,src}
 	mkdir -p ~/.vim/bundle
@@ -51,17 +51,18 @@ function envsetup() {
 
 function dotfileslink() {
 	ln -s ~/.whalebyte/dotfiles/.vimrc ~/.vimrc
-	ln -s ~/.whalebyte/dotfiles/.bash_profile ~/.bash_profile
 	ln -s ~/.whalebyte/dotfiles/.gitconfig ~/.gitconfig
+	ln -s ~/.whalebyte/dotfiles/.gitconfig_global ~/.gitconfig_global
 	ln -s ~/.whalebyte/dotfiles/.tmux.conf ~/.tmux.conf
 	ln -s ~/.whalebyte/dotfiles/.zshrc ~/.zshrc
+	ln -s ~/.whalebyte/dotfiles/.zsh_functions ~/.zsh_functions
 	ln -s ~/.whalebyte/dotfiles/.zsh_aliases ~/.zsh_aliases
 	ln -s ~/.whalebyte/dotfiles/whalebyte.zsh-theme ~/.oh-my-zsh/themes
-	ln -s ~/.whalebyte/dotfiles/.bat.conf ~/.bat.conf.
+	ln -s ~/.whalebyte/dotfiles/.bat.conf ~/.bat.conf
 }	
 
 function leave() {
-	notesB ; cp -rf ~/go/src/github.comcast.com/lrm  ~/.whalebyte/Comcast/code_backup ; cp -rf ~/go/src/github.com/kwtucker  ~/.whalebyte/code_backup
+	cleanenv	
 }
 
 function cleanenv() {
@@ -74,13 +75,12 @@ function cleanenv() {
 	fi
 
 	if [[ `echo "$selection" | awk '{print tolower($0)}'` == 'y' ]]; then
-		rm -rf ~/{.whalebyte_secrets,.whalebyte_envs,.whalebyte,.ssh,.zsh,.zshrc,.zsh_functions,.zsh_aliases,.zsh_history,.vimrc,.gitconfig,go/src}
+		notesB ; rm -rf ~/{.whalebyte_secrets,.whalebyte_envs,.whalebyte,.ssh,.zsh,.zshrc,.zsh_functions,.zsh_aliases,.zsh_history,.vimrc,.gitconfig,go/src}
 		return
 	fi
 }
 
 # ---- Kubernetes ----
-
 function loadkubectl() {
 	if [ $commands[kubectl] ]; then 
 		source <(kubectl completion zsh) 
@@ -139,5 +139,44 @@ function tns() {
 	echo "${cns}" >! "${HOME}/.tiller_namespace"
 	export TILLER_NAMESPACE=${cns}
 	echo "Switched Tiller namespace to ${cns}"
+}
+
+# -- FZF --------------------
+# fe [FUZZY PATTERN] - Open the selected file with the default editor
+#   - Bypass fuzzy finder if there's only one match (--select-1)
+#   - Exit if there's no match (--exit-0)
+function fe() (
+  IFS=$'\n' files=($(fzf-tmux --query="$1" --multi --select-1 --exit-0))
+  [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
+)
+
+# fd - cd to selected directory
+function fd() {
+  local dir
+  dir=$(find ${1:-.} -path '*/\.*' -prune \
+                  -o -type d -print 2> /dev/null | fzf +m) &&
+  cd "$dir"
+}
+
+function tm() {
+  [[ -n "$TMUX" ]] && change="switch-client" || change="attach-session"
+  if [ $1 ]; then
+    tmux $change -t "$1" 2>/dev/null || (tmux new-session -d -s $1 && tmux $change -t "$1"); return
+  fi
+  session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | fzf --exit-0) &&  tmux $change -t "$session" || echo "No sessions found."
+}
+
+# zsh; needs setopt re_match_pcre. Kill session
+function tmk () {
+    local sessions
+    sessions="$(tmux ls|fzf --exit-0 --multi)"  || return $?
+    local i
+    for i in "${(f@)sessions}"
+    do
+        [[ $i =~ '([^:]*):.*' ]] && {
+            echo "Killing $match[1]"
+            tmux kill-session -t "$match[1]"
+        }
+    done
 }
 

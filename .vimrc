@@ -57,17 +57,23 @@ set updatetime=250
 " Theme of work area and tabline
 set background=dark
 colorscheme palenight
-let base16colorspace=256  " Access colors present in 256 colorspace
+" let base16colorspace=256  " Access colors present in 256 colorspace
+if filereadable(expand("~/.vimrc_background"))
+  let base16colorspace=256
+  source ~/.vimrc_background
+endif
+
 set t_Co=256
 set termguicolors
 let g:airline_theme='bubblegum'
 let g:airline_powerline_fonts = 1
 set laststatus=2
 
-let g:netrw_banner = 0
+let g:netrw_banner = 0 
 let g:netrw_liststyle = 3
 
 let g:fzf_prefer_tmux = 1
+
 nnoremap <C-p> :Files<Cr>
 nnoremap <C-g> :Rg<Cr>
 
@@ -135,10 +141,9 @@ let g:deoplete#sources#go#gocode_binary = $GOPATH.'/bin/gocode'
 let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
 let g:deoplete#sources#go#package_dot = 1
 
-" autocmd FileType go nmap <leader>b  <Plug>(go-build)
 autocmd FileType go nmap <leader>r  <Plug>(go-run)
 autocmd FileType go nmap <leader>d  <Plug>(go-def)
-autocmd FileType go nmap <leader>f  <Plug>(go-referrer)
+autocmd FileType go nmap <leader>f  <Plug>(go-referrers)
 autocmd FileType go nmap <leader>t  <Plug>(go-test)
 autocmd FileType go nmap <leader>tc  <Plug>(go-coverage-toggle)
 
@@ -178,12 +183,15 @@ nmap <Leader>> :20winc < <ENTER>
 nmap <Leader>< :20winc > <ENTER>
 set splitbelow
 set splitright
+
 " Very magic mode
 nnoremap / /\v
 vnoremap / /\v
 
 " Quick ESC
 imap jj <ESC>
+
+" Adds a line below.
 nmap oo o<Esc>k
 
 " Disables the arrow keys
