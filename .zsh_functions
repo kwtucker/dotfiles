@@ -2,36 +2,8 @@
 # Functions 
 # -------------------------------------------------------------------
 
-# turn hidden files on/off in Finder
-function hiddenOn() { defaults write com.apple.Finder AppleShowAllFiles YES ; }
-function hiddenOff() { defaults write com.apple.Finder AppleShowAllFiles NO ; }
-
-# myIP address
-function myip() {
-  ifconfig lo0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "lo0       : " $2}'
-  ifconfig en0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en0 (IPv4): " $2 " " $3 " " $4 " " $5 " " $6}'
-  ifconfig en0 | grep 'inet6 ' | sed -e 's/ / /' | awk '{print "en0 (IPv6): " $2 " " $3 " " $4 " " $5 " " $6}'
-  ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1 (IPv4): " $2 " " $3 " " $4 " " $5 " " $6}'
-  ifconfig en1 | grep 'inet6 ' | sed -e 's/ / /' | awk '{print "en1 (IPv6): " $2 " " $3 " " $4 " " $5 " " $6}'
-}
-
-# function colors() {
-# 	for i in {0..255}; do
-# 			printf "\x1b[38;5;${i}mcolour${i}\x1b[0m\n"
-# 	done
-# }
-
-# Will commit backup for quiver notes. Pass the version in like "quiverB mm/dd/yy"
-function notesB() {
-	pw=`pwd`
-	if [ ${#1} -ne 0 ]; then
-		cd ~/.whalebyte/notes && gaa && sleep 2 &&  gcmsg "backup $1" && sleep 2 && git push origin master && sleep 6
-   	else
-		cd ~/.whalebyte/notes && gaa && sleep 2 &&  gcmsg "backup" && sleep 2 && git push origin master && sleep 6
-   	fi
-	cd $pw
-}
-
+# -- GIT ------------------
+#
 # movetag 1.0.0
 function movetaghead() {
 	git push origin :$1 && git tag -fa -m "moving tag $1" $1 && git push origin master $1
@@ -42,13 +14,8 @@ function deletetag() {
 	git push origin :$1 && git tag -d $1
 }
 
-function envsetup() {
-	mkdir -p ~/go/{bin,pkg,src}
-	mkdir -p ~/.vim/bundle
-	git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-	dotfileslink
-}
-
+# Environment ------------------
+#
 function dotfileslink() {
 	ln -s ~/.whalebyte/dotfiles/.vimrc ~/.vimrc
 	ln -s ~/.whalebyte/dotfiles/.gitconfig ~/.gitconfig
@@ -60,10 +27,6 @@ function dotfileslink() {
 	ln -s ~/.whalebyte/dotfiles/whalebyte.zsh-theme ~/.oh-my-zsh/themes
 	ln -s ~/.whalebyte/dotfiles/.bat.conf ~/.bat.conf
 }	
-
-function leave() {
-	cleanenv	
-}
 
 function cleanenv() {
 	echo -n "\nARE YOU SURE [N/y]: "
@@ -80,7 +43,19 @@ function cleanenv() {
 	fi
 }
 
-# ---- Kubernetes ----
+function envsetup() {
+	mkdir -p ~/go/{bin,pkg,src}
+	mkdir -p ~/.vim/bundle
+	git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+	dotfileslink
+}
+
+function leave() {
+	cleanenv	
+}
+
+# -- Kubernetes ------------------
+#
 function loadkubectl() {
 	if [ $commands[kubectl] ]; then 
 		source <(kubectl completion zsh) 
@@ -150,14 +125,7 @@ function fe() (
   [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
 )
 
-# fd - cd to selected directory
-function fd() {
-  local dir
-  dir=$(find ${1:-.} -path '*/\.*' -prune \
-                  -o -type d -print 2> /dev/null | fzf +m) &&
-  cd "$dir"
-}
-
+# -- TMUX --------------------
 function tm() {
   [[ -n "$TMUX" ]] && change="switch-client" || change="attach-session"
   if [ $1 ]; then
@@ -180,3 +148,34 @@ function tmk () {
     done
 }
 
+# -- MISC ------------------
+#
+# turn hidden files on/off in Finder
+function hiddenOn() { defaults write com.apple.Finder AppleShowAllFiles YES ; }
+function hiddenOff() { defaults write com.apple.Finder AppleShowAllFiles NO ; }
+
+# myIP address
+function myip() {
+  ifconfig lo0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "lo0       : " $2}'
+  ifconfig en0 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en0 (IPv4): " $2 " " $3 " " $4 " " $5 " " $6}'
+  ifconfig en0 | grep 'inet6 ' | sed -e 's/ / /' | awk '{print "en0 (IPv6): " $2 " " $3 " " $4 " " $5 " " $6}'
+  ifconfig en1 | grep 'inet ' | sed -e 's/:/ /' | awk '{print "en1 (IPv4): " $2 " " $3 " " $4 " " $5 " " $6}'
+  ifconfig en1 | grep 'inet6 ' | sed -e 's/ / /' | awk '{print "en1 (IPv6): " $2 " " $3 " " $4 " " $5 " " $6}'
+}
+
+function colors() {
+	for i in {0..255}; do
+			printf "\x1b[38;5;${i}mcolour${i}\x1b[0m\n"
+	done
+}
+
+# Will commit backup for quiver notes. Pass the version in like "quiverB mm/dd/yy"
+function notesB() {
+	pw=`pwd`
+	if [ ${#1} -ne 0 ]; then
+		cd ~/.whalebyte/notes && gaa && sleep 2 &&  gcmsg "backup $1" && sleep 2 && git push origin master && sleep 6
+   	else
+		cd ~/.whalebyte/notes && gaa && sleep 2 &&  gcmsg "backup" && sleep 2 && git push origin master && sleep 6
+   	fi
+	cd $pw
+}
