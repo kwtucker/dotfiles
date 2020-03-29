@@ -25,7 +25,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/mas
 ##### 1. Go to ~/.whalebyte directory
 
 ```
-mkdir -p ~/.whalebyte/{Code,notes} ; touch ~/{.whalebyte_secrets,.whalebyte_envs}
+mkdir -p ~/.whalebyte/{Code,notes} ; touch ~/{.secret,.env}
 ```
 
 ##### 2. Clone dotfiles repo to ~/.whalebyte directory
@@ -36,20 +36,27 @@ git clone git@github.com:kwtucker/dotfiles.git  ~/.whalebyte/dotfiles
 
 ##### 3. Setup dotfile components
 
+*NOTE*: Make sure if needed to create local files first:
+ - git: [user] name and email and [url] instead of mapping
+ - zsh: environment variables with usernames and tokens set.
+
+```shell
+git/config.local
+zsh/local.zsh
 ```
+
+Setup dotfile with make targert
+
+```shell
 cd ~/.whalebyte/dotfiles
 make install
 ```
 
-##### 3. Then you must install your plugins.
-
-In the home directory enter the following:
+##### 3. Then install vim plugins.
 
 ```shell
   $ vim
-
-  :PluginInstall
-  :q
+  :PlugInstall
 ```
 
 ## Credits
