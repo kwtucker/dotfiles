@@ -14,13 +14,6 @@ export HIST_STAMPS="mm/dd/yyyy"
 plugins=(golang git helm zsh-syntax-highlighting zsh-autosuggestions git-open)
 
 ################################################################################
-# Export XDG locations.
-export XDG_CONFIG_HOME=${HOME}/.config
-export XDG_CACHE_HOME=${HOME}/.cache
-export XDG_DATA_HOME=${HOME}/.local/share
-export XDG_RUNTIME_DIR=${HOME}/tmp/runtime
-
-################################################################################
 # All the ZSH files.
 typeset -U config_files
 config_files=($XDG_CONFIG_HOME/*/*.zsh)
@@ -36,6 +29,14 @@ done
 for file in ${config_files:#*/env.zsh}; do
   source "$file"
 done
+
+################################################################################
+# Initialize the autocompletion framework.
+if [[ -n ${XDG_CACHE_HOME}/zsh/zcompdump(#qN.mh+24) ]]; then
+	autoload -Uz compinit -i -d ${XDG_CACHE_HOME}/zsh/zcompdump;
+else
+  autoload -Uz compinit -C ${XDG_CACHE_HOME}/zsh/zcompdump;
+fi;
 
 ################################################################################
 unset config_files 
