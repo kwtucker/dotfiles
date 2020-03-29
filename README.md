@@ -2,8 +2,6 @@
 
 ## Intstallation:
 
-### Install Brew ( Mac OS ) & Oh My ZSH
-
 Link to the brew command - [Brew](https://brew.sh/)
 
 Brew Install
@@ -56,7 +54,7 @@ In the home directory enter the following:
 
 ## Credits
 
-#### Influneced by and examples taken from:
+Influneced by and examples taken from:
 
 [mnarrell](https://github.com/mnarrell/dotfiles)
 
