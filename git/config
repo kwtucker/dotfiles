@@ -1,7 +1,7 @@
 [include]
   path = config.local
 [core]
-	excludesfile = ${XDG_CONFIG_HOME}/gitignore_global
+	excludesfile = ${XDG_CONFIG_HOME}/ignore_global
 [fetch]
   prune = true
   pruneTags = true	

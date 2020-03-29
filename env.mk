@@ -9,3 +9,8 @@ XDG_RUNTIME_DIR := ${HOME}/tmp/xdg_runtime
 	@mkdir -p $(XDG_CACHE_HOME)
 	@mkdir -p $(XDG_DATA_HOME)
 	@mkdir -p $(XDG_RUNTIME_DIR)
+
+.PHONY: .remove.xdg.module
+.remove.xdg.module.%:
+	rm -rf $(XDG_CONFIG_HOME)/$*
+	rm -rf $(XDG_CACHE_HOME)/$*
