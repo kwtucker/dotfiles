@@ -56,7 +56,7 @@ In the home directory enter the following:
 
 ## Credits
 
-### Influneced by and examples taken from:
+#### Influneced by and examples taken from:
 
 [mnarrell](https://github.com/mnarrell/dotfiles)
 
