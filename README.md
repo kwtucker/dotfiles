@@ -25,7 +25,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/mas
 ##### 1. Go to ~/.whalebyte directory
 
 ```
-mkdir -p ~/.whalebyte/{Code,notes} ; touch ~/{.secret,.env}
+mkdir -p ~/.whalebyte/{Code,notes} ; touch ~/.whalebyte/.secret .env
 ```
 
 ##### 2. Clone dotfiles repo to ~/.whalebyte directory
@@ -53,6 +53,8 @@ make install
 ```
 
 ##### 3. Then install vim plugins.
+
+*Install*: [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```shell
   $ vim
