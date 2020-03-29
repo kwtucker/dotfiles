@@ -9,22 +9,6 @@ tap 'homebrew/cask-fonts'
 tap 'homebrew/services'
 
 
-
-################################################################################
-# Casks
-################################################################################
-# cask_args appdir: '/Applications'
-# 
-# cask 'alfred'
-# cask 'dropbox'
-# cask 'google-chrome'
-# cask 'iterm2'
-# cask 'postman'
-# cask 'slack'
-# cask 'spotify'
-# cask 'visual-studio-code'
-
-
 ################################################################################
 # Simple brews
 ################################################################################
@@ -47,7 +31,7 @@ brew 'luarocks'
 brew 'make'
 brew 'mariadb'
 brew 'mongodb-community'
-brew 'nats-streaming-server'
+brew 'nats-server'
 brew 'nmap'
 brew 'nvm'
 brew 'openssl'
@@ -76,5 +60,3 @@ brew 'xz'
 brew 'yarn'
 brew 'yq'
 brew 'zsh'
-
-

@@ -1,8 +1,7 @@
+[include]
+  path = config.local
 [core]
-	excludesfile = /Users/ktucke214/.gitignore_global
-[user]
-	name = kevin_tucker2
-	email = kevin_tucker2@comcast.com
+	excludesfile = ${XDG_CONFIG_HOME}/gitignore_global
 [fetch]
   prune = true
   pruneTags = true	
@@ -18,5 +17,3 @@
 	insteadOf = https://bitbucket.org/
 [url "git@github.com:"]
 	insteadOf = https://github.com/
-[url "git@github.comcast.com:"]
-	insteadOf = https://github.comcast.com/

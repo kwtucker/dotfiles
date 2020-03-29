@@ -1,4 +1,4 @@
-MODULES = git golang
+MODULES = zsh fzf tmux git whalebyte golang bat kubernetes 
 
 CLEAN := $(addsuffix .clean,$(MODULES))
 
@@ -8,11 +8,8 @@ $(MODULES):
 $(CLEAN):
 	$(MAKE) -C $(basename $@) clean
 
-all: brew $(MODULES)
+all: $(MODULES)
 
-brew:
-	brew bundle
-	
 clean.all: $(CLEAN)
 
 .PHONY: $(MODULES) $(CLEAN) all clean.all

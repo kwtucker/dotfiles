@@ -1,0 +1,1 @@
+export WHALEBYTE="$HOME/.whalebyte"

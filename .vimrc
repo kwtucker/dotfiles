@@ -27,6 +27,7 @@ Plug 'wincent/ferret'
 Plug 'elzr/vim-json'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'SirVer/ultisnips'
 Plug 'nsf/gocode', {'rtp': 'vim/'}
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
