@@ -1,8 +1,8 @@
 # Dotfiles
 
-### Intstallation:
+## Intstallation:
 
-##### Install Brew ( Mac OS ) & Oh My ZSH
+### Install Brew ( Mac OS ) & Oh My ZSH
 
 Link to the brew command - [Brew](https://brew.sh/)
 
@@ -10,8 +10,9 @@ Brew Install
 
 ```
 brew update
-brew install httpie tldr vim tmux git ctags asciinema mongodb mariadb nvm tree yarn
+brew bundle
 brew tap homebrew/services
+brew services start nats-server
 brew services start mariadb
 brew services start mongodb
 brew services list
@@ -35,13 +36,14 @@ mkdir -p ~/.whalebyte/{Code,notes} ; touch ~/{.whalebyte_secrets,.whalebyte_envs
 git clone git@github.com:kwtucker/dotfiles.git  ~/.whalebyte/dotfiles
 ```
 
-##### 3. Run Setup.
+##### 3. Setup dotfile components
 
 ```
-ln -s ~/.whalebyte/dotfiles/.zsh_functions ~/.zsh_functions && source ~/.zsh_functions && envsetup
+cd ~/.whalebyte/dotfiles
+make install
 ```
 
-##### 6. Then you must install your plugins.
+##### 3. Then you must install your plugins.
 
 In the home directory enter the following:
 
@@ -51,3 +53,10 @@ In the home directory enter the following:
   :PluginInstall
   :q
 ```
+
+## Credits
+
+### Influneced by and examples taken from:
+
+[mnarrell](https://github.com/mnarrell/dotfiles)
+
