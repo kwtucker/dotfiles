@@ -6,9 +6,7 @@ install: .ensure.xdg
 	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/zsh
 	ln -sf $(CURDIR)/zshenv $(HOME)/.zshenv
 
-clean:
+clean: .remove.xdg.module.zsh
 	rm -f $(HOME)/.zshenv
-	rm -rf $(XDG_CONFIG_HOME)/zsh
-	rm -rf ${XDG_CACHE_HOME}/zsh
 
 .PHONY: install clean
