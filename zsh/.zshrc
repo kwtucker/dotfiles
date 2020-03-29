@@ -1,16 +1,3 @@
-# Path to your oh-my-zsh installation.
-export ZSH=/Users/$USER/.oh-my-zsh
-export EDITOR=nvim
-export EVENT_NOKQUEUE=1
-export ZSH_THEME=""
-
-# Uncomment the following line to change how often to auto-update (in days).
-export UPDATE_ZSH_DAYS=13
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-export HIST_STAMPS="mm/dd/yyyy"
 plugins=(golang git helm zsh-syntax-highlighting zsh-autosuggestions git-open)
 
 ################################################################################
@@ -32,10 +19,11 @@ done
 
 ################################################################################
 # Initialize the autocompletion framework.
+autoload -Uz compinit
 if [[ -n ${XDG_CACHE_HOME}/zsh/zcompdump(#qN.mh+24) ]]; then
-	autoload -Uz compinit -i -d ${XDG_CACHE_HOME}/zsh/zcompdump;
+  compinit -i -d ${XDG_CACHE_HOME}/zsh/zcompdump;
 else
-  autoload -Uz compinit -C ${XDG_CACHE_HOME}/zsh/zcompdump;
+  compinit -C ${XDG_CACHE_HOME}/zsh/zcompdump;
 fi;
 
 ################################################################################
@@ -64,19 +52,16 @@ prompt pure
 # function virtualenv_info { [ $VIRTUAL_ENV ] && echo '('`basename $VIRTUAL_ENV`') ' }
 # export VIRTUAL_ENV_DISABLE_PROMPT=1
 
-# TODO: Abstract this to local file
-. ~/.whalebyte/secrets
-. ~/.whalebyte/envs
-
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 iterm2_print_user_vars() {
   iterm2_set_user_var kubeCurrentContext $(kubectl config current-context)
-  # iterm2_set_user_var kubeCurrentTillerNamespace $(echo $TILLER_NAMESPACE)
   iterm2_set_user_var kubeCurrentTillerNamespace $(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(kubectl config current-context)\")].context.namespace}")
   iterm2_set_user_var kubeCurrentNamespace $(kubectl config view --minify | grep namespace: | awk 'NR>0 {print $2}')
 }
 
 ################################################################################
-# Load local configurations, including $PRIVATE_DOTFILES.
+# Load local configurations.
 [ -f ${XDG_CONFIG_HOME}/zsh/local.zsh ] && . ${XDG_CONFIG_HOME}/zsh/local.zsh
+[ -f ${WHALEBYTE}/secret ] && . $WHALEBYTE/secret
+[ -f ${WHALEBYTE}/env ] && . $WHALEBYTE/env
