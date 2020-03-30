@@ -52,7 +52,7 @@ cd ~/.whalebyte/dotfiles
 make all 
 ```
 
-##### 3. Then install vim plugins.
+##### 4. Then install vim plugins.
 
 *Install*: [vim-plug](https://github.com/junegunn/vim-plug)
 
