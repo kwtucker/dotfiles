@@ -49,7 +49,7 @@ Setup dotfile with make targert
 
 ```shell
 cd ~/.whalebyte/dotfiles
-make install
+make all 
 ```
 
 ##### 3. Then install vim plugins.
