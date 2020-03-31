@@ -65,5 +65,5 @@ iterm2_print_user_vars() {
 ################################################################################
 # Load local configurations.
 [ -f ${XDG_CONFIG_HOME}/zsh/local.zsh ] && . ${XDG_CONFIG_HOME}/zsh/local.zsh
-[ -f ${WHALEBYTE}/secret ] && . $WHALEBYTE/.secret
-[ -f ${WHALEBYTE}/env ] && . $WHALEBYTE/.env
+[ -f ${WHALEBYTE}/.secret ] && . ${WHALEBYTE}/.secret
+[ -f ${WHALEBYTE}/.env ] && . ${WHALEBYTE}/.env
