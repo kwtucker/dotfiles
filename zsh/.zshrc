@@ -11,6 +11,11 @@ for file in ${(M)config_files:#*/env.zsh}; do
   source "$file"
 done
 
+source $ZSH/oh-my-zsh.sh
+
+# Need to make sure path is sourced first.
+source $XDG_CONFIG_HOME/zsh/path.zsh
+
 ################################################################################
 # Load everything but the env files.
 for file in ${config_files:#*/env.zsh}; do
@@ -28,9 +33,6 @@ fi;
 
 ################################################################################
 unset config_files 
-
-
-source $ZSH/oh-my-zsh.sh
 
 # Base16 Shell
 export BASE16_SHELL="$HOME/.config/base16-shell/"
