@@ -1,5 +1,5 @@
 [include]
-  path = config.local
+  path = ~/.whalebyte/.gitconfig.local
 [fetch]
   prune = true
   pruneTags = true	

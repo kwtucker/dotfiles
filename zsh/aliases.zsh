@@ -47,6 +47,3 @@ alias docker_rmi_dangling="docker rmi \`docker images -qa -f 'dangling=true'\`"
 
 alias loadnvm='[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
 
-alias ctags="`brew --prefix`/bin/ctags"
-alias tag='ctags -R -f ./.git/tags .'
-
