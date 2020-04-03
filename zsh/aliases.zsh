@@ -28,7 +28,7 @@ alias composer="php /usr/local/bin/composer.phar"
 
 
 # ---- dotfile git push ----
-alias dotpush="pwd=`pwd` && cd $WHALEBYTE/dotfiles && gaa && sleep 2 &&  gcmsg 'update dotfiles' && sleep 2 && git push origin master && sleep 7 && cd $pwd"
+alias dotpush='pwd=`pwd` && cd $WHALEBYTE/dotfiles && gaa && sleep 2 &&  gcmsg 'update dotfiles' && sleep 2 && git push origin master && sleep 7 && cd $pwd'
 
 # ---- dotfile python ----
 alias python=/usr/local/bin/python3
