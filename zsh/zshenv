@@ -11,6 +11,9 @@ export ENV=$USER
 export BREWPATH=/usr/local/Cellar
 export CDPATH=$HOME/go/src
 export JAVA_HOME=$(/usr/libexec/java_home)
+export NVM_DIR=$HOME/.nvm
+export MONGOPATH="/usr/local/opt/mongodb-community@3.6/bin"
+export TEX=/Library/TeX/texbin
 
 # Path to your oh-my-zsh installation.
 export ZSH=/Users/$USER/.oh-my-zsh
