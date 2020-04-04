@@ -2,19 +2,19 @@
   "entries": {
     "tap": {
       "mongodb/brew": {
-        "revision": "c15b827e8d8cafb9ae5c15703cc62a4fbfd2f450"
+        "revision": "7ee43ef05acf1c7e9b8645e6509739c5bfaa4677"
       },
       "homebrew/cask": {
-        "revision": "a8ad5fc90aec606c4be4e124df34901ea6002f93"
+        "revision": "ffc790da368b2fd82a3aef6ec1ae82b0de39a868"
       },
       "homebrew/cask-drivers": {
-        "revision": "0fce226ddcc1f821866334dbaed257c576303938"
+        "revision": "a6d430f5deff348b4c208cfc5bb990b81df0e347"
       },
       "homebrew/cask-fonts": {
-        "revision": "782a4cebd3d2b2d804722fd51d872b4d6c3d4c72"
+        "revision": "d67992875ef158ba31c59dc9a89aaf1e4d348fdb"
       },
       "homebrew/services": {
-        "revision": "984f3a2528961b01a5481af6d79dfd6a7c903995"
+        "revision": "64347a3a5761db1b392f1b30b045aeb4592e17a9"
       }
     },
     "brew": {
@@ -405,22 +405,22 @@
         "bottle": false
       },
       "nats-server": {
-        "version": "2.1.4",
+        "version": "2.1.6",
         "bottle": {
           "cellar": ":any_skip_relocation",
           "prefix": "/usr/local",
           "files": {
             "catalina": {
-              "url": "https://homebrew.bintray.com/bottles/nats-server-2.1.4.catalina.bottle.tar.gz",
-              "sha256": "7e0f067fdd4c961e738fd3e1a0afaca72832e8aec382b06c9f1d568b8b3b4b6a"
+              "url": "https://homebrew.bintray.com/bottles/nats-server-2.1.6.catalina.bottle.tar.gz",
+              "sha256": "fe6c8d4f1071ef269568ddd336ce87841746cf917bc50496c39a8ad7e4d31e51"
             },
             "mojave": {
-              "url": "https://homebrew.bintray.com/bottles/nats-server-2.1.4.mojave.bottle.tar.gz",
-              "sha256": "4069f2d5fecd96aad7e4da8d9dcfaa9140511fb962849aa0b4bab14eaf181a59"
+              "url": "https://homebrew.bintray.com/bottles/nats-server-2.1.6.mojave.bottle.tar.gz",
+              "sha256": "b81ec9181615a2118a5a47e823318eec5054e4503825bd43a6ad6ab505a47b4f"
             },
             "high_sierra": {
-              "url": "https://homebrew.bintray.com/bottles/nats-server-2.1.4.high_sierra.bottle.tar.gz",
-              "sha256": "65eff25b8df8d5d49c3e07142b475b6f7e91542969bdf02b0b279424c50bdfd9"
+              "url": "https://homebrew.bintray.com/bottles/nats-server-2.1.6.high_sierra.bottle.tar.gz",
+              "sha256": "09b715a345599e63e3aa58c10523a27e9639d662753d7cca4b3fba7471432900"
             }
           }
         }
@@ -583,22 +583,22 @@
         }
       },
       "ruby": {
-        "version": "2.7.0",
+        "version": "2.7.1",
         "bottle": {
           "cellar": "/usr/local/Cellar",
           "prefix": "/usr/local",
           "files": {
             "catalina": {
-              "url": "https://homebrew.bintray.com/bottles/ruby-2.7.0.catalina.bottle.1.tar.gz",
-              "sha256": "9beef157f5acf35a3ac7c3c2020cc4eef21bc272e4e6a8739fc9d3e53a1df12b"
+              "url": "https://homebrew.bintray.com/bottles/ruby-2.7.1.catalina.bottle.tar.gz",
+              "sha256": "7f5ed2afb15b25f9616b617ecca2ee376eb67cf6c105790df22221b7be9c1ef9"
             },
             "mojave": {
-              "url": "https://homebrew.bintray.com/bottles/ruby-2.7.0.mojave.bottle.1.tar.gz",
-              "sha256": "7acf2f1bebc6711f5de7c721c28befe47c1f1957cebaaa20ab37626908506c21"
+              "url": "https://homebrew.bintray.com/bottles/ruby-2.7.1.mojave.bottle.tar.gz",
+              "sha256": "cc995a06e761acc8a807b040d8e7fe301902a4fc63d2beaaae40e04c710e7338"
             },
             "high_sierra": {
-              "url": "https://homebrew.bintray.com/bottles/ruby-2.7.0.high_sierra.bottle.1.tar.gz",
-              "sha256": "6d691ee3a6de3ed4f46b7e8f622a8fb6aa932469a84ef1c04fb3829372a63522"
+              "url": "https://homebrew.bintray.com/bottles/ruby-2.7.1.high_sierra.bottle.tar.gz",
+              "sha256": "2605ad1636e40d747878a8df7d1ef51a15e58e70ce03510b9ea582c02a448e26"
             }
           }
         }
@@ -970,10 +970,10 @@
       "catalina": {
         "HOMEBREW_VERSION": "2.2.11",
         "HOMEBREW_PREFIX": "/usr/local",
-        "Homebrew/homebrew-core": "530bab422d7d96dd3c12a16fe338e7e716ebab03",
+        "Homebrew/homebrew-core": "bd40745ecba2f893db446ea28431d396d0c23a39",
         "CLT": "11.4.0.0.1.1583798712",
-        "Xcode": "11.4",
-        "macOS": "10.15.3"
+        "Xcode": "11.3",
+        "macOS": "10.15.4"
       }
     }
   }

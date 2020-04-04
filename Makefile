@@ -1,4 +1,4 @@
-MODULES = zsh fzf tmux git whalebyte golang bat kubernetes 
+MODULES = zsh fzf kubernetes tmux whalebyte git golang bat nvim
 
 CLEAN := $(addsuffix .clean,$(MODULES))
 

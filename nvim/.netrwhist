@@ -1,0 +1,11 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =9
+let g:netrw_dirhist_9='/Users/ktucke214/.whalebyte/dotfiles/nvim'
+let g:netrw_dirhist_8='/Users/ktucke214/Desktop/fonts'
+let g:netrw_dirhist_7='/Users/ktucke214'
+let g:netrw_dirhist_6='/Users/ktucke214/.vim/plugged'
+let g:netrw_dirhist_5='/Users/ktucke214/.vim'
+let g:netrw_dirhist_4='/Users/ktucke214'
+let g:netrw_dirhist_3='/Users/ktucke214/Desktop'
+let g:netrw_dirhist_2='/Users/ktucke214/.whalebyte/dotfiles/nvim'
+let g:netrw_dirhist_1='/Users/ktucke214/.whalebyte/dotfiles'
