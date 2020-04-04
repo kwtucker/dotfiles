@@ -57,9 +57,9 @@ prompt pure
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 iterm2_print_user_vars() {
-  iterm2_set_user_var kubeCurrentContext $(kubectl config current-context)
-  iterm2_set_user_var kubeCurrentTillerNamespace $(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(kubectl config current-context)\")].context.namespace}")
-  iterm2_set_user_var kubeCurrentNamespace $(kubectl config view --minify | grep namespace: | awk 'NR>0 {print $2}')
+ iterm2_set_user_var kubeCurrentContext $(kubectl config current-context)
+ iterm2_set_user_var kubeCurrentTillerNamespace $(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(kubectl config current-context)\")].context.namespace}")
+ iterm2_set_user_var kubeCurrentNamespace $(kubectl config view --minify | grep namespace: | awk 'NR>0 {print $2}')
 }
 
 ################################################################################
@@ -67,3 +67,4 @@ iterm2_print_user_vars() {
 [ -f ${XDG_CONFIG_HOME}/zsh/local.zsh ] && . ${XDG_CONFIG_HOME}/zsh/local.zsh
 [ -f ${WHALEBYTE}/.secret ] && . ${WHALEBYTE}/.secret
 [ -f ${WHALEBYTE}/.env ] && . ${WHALEBYTE}/.env
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
