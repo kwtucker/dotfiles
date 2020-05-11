@@ -1,3 +1,4 @@
 .DS_Store
 git/config.local
 zsh/local.zsh
+Brewfile.lock.json

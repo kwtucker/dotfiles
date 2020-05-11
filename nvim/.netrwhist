@@ -1,5 +1,6 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhistcnt =4
+let g:netrw_dirhistcnt =5
+let g:netrw_dirhist_5='/Users/ktucke214/.whalebyte/dotfiles'
 let g:netrw_dirhist_4='/Users/kevintucker/.whalebyte/dotfiles/zsh'
 let g:netrw_dirhist_3='/Users/kevintucker/.whalebyte/dotfiles'
 let g:netrw_dirhist_2='/Users/kevintucker/.whalebyte/dotfiles/zsh'
@@ -9,4 +10,3 @@ let g:netrw_dirhist_9='/Users/kevintucker'
 let g:netrw_dirhist_8='/Users/kevintucker/.whalebyte/dotfiles/zsh'
 let g:netrw_dirhist_7='/Users/kevintucker/.whalebyte/dotfiles'
 let g:netrw_dirhist_6='/Users/kevintucker/.whalebyte/dotfiles/zsh'
-let g:netrw_dirhist_5='/Users/kevintucker/.whalebyte/dotfiles'
