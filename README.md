@@ -1,6 +1,6 @@
 # Dotfiles
 
-## Intstallation:
+## Clone:
 
 ```
 git clone git@github.com:kwtucker/dotfiles ~/.dotfiles
