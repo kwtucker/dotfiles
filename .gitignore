@@ -1,4 +1,11 @@
 .DS_Store
+.netrwbook
+.netrwhist*
+
+nvim/autoload
+
 git/config.local
 zsh/local.zsh
+
 Brewfile.lock.json
+

@@ -1,3 +1,7 @@
+#! /usr/bin/env zsh
+
+export DOTFILES="$HOME/.dotfiles"
+
 ################################################################################
 # All the ZSH files.
 typeset -U config_files

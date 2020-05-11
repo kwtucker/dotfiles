@@ -39,13 +39,13 @@ alias python=/usr/local/bin/python3
 alias pip=/usr/local/bin/pip3
 
 # ---- dotfile git pull ----
-alias dotpull='pwd=`pwd` && cd ~/.whalebyte/dotfiles && git pull && sleep 6 && cd $pwd'
+alias dotpull="pwd=`pwd` && cd $DOTFILES && git pull && sleep 6 && cd $pwd"
 
 # ---- dotfile git push ----
-alias dotpush="cd $WHALEBYTE/dotfiles && gaa && gcmsg 'update dotfiles' && git push origin master && cd -"
+alias dotpush="cd $DOTFILES && gaa && gcmsg 'update dotfiles' && git push origin master && cd -"
 
 # ---- dotfile cd ----
-alias dot='cd ~/.whalebyte/dotfiles'
+alias dot="cd $DOTFILES"
 
 if [ $commands[exa] ]; then
   alias ls='exa'
