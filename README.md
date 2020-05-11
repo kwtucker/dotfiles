@@ -2,18 +2,9 @@
 
 ## Intstallation:
 
-Link to the brew command - [Brew](https://brew.sh/)
-
-Brew Install
-
 ```
-brew update
-brew bundle
-brew tap homebrew/services
-brew services start nats-server
-brew services start mariadb
-brew services start mongodb
-brew services list
+git clone git@github.com:kwtucker/dotfiles ~/.dotfiles
+cd ~/.dotfiles && . ./bootstrap
 ```
 
 ##### 1. Go to ~/.whalebyte directory
@@ -22,13 +13,7 @@ brew services list
 mkdir -p ~/.whalebyte/{Code,notes} ; touch ~/.whalebyte/.secret .env
 ```
 
-##### 2. Clone dotfiles repo to ~/.whalebyte directory
-
-```
-git clone git@github.com:kwtucker/dotfiles.git  ~/.whalebyte/dotfiles
-```
-
-##### 3. Setup dotfile components
+##### 2. Setup dotfile components
 
 *NOTE*: Make sure if needed to create local files first:
  - git: [user] name and email and [url] instead of mapping
@@ -37,13 +22,6 @@ git clone git@github.com:kwtucker/dotfiles.git  ~/.whalebyte/dotfiles
 ```shell
 git/config.local
 zsh/local.zsh
-```
-
-Setup dotfile with make targert
-
-```shell
-cd ~/.whalebyte/dotfiles
-make all 
 ```
 
 ##### 4. Then install vim plugins.
