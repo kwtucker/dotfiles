@@ -4,7 +4,6 @@
 
 ```
 git clone git@github.com:kwtucker/dotfiles ~/.dotfiles
-cd ~/.dotfiles && . ./bootstrap
 ```
 
 ##### 1. Go to ~/.whalebyte directory
@@ -20,17 +19,14 @@ mkdir -p ~/.whalebyte/{Code,notes} ; touch ~/.whalebyte/.secret .env
  - zsh: environment variables with usernames and tokens set.
 
 ```shell
-git/config.local
-zsh/local.zsh
+.dotfiles/git/config.local
+.dotfiles/zsh/local.zsh
 ```
 
-##### 4. Then install vim plugins.
+##### 3. Install Dotfiles
 
-*Install*: [vim-plug](https://github.com/junegunn/vim-plug)
-
-```shell
-  $ vim
-  :PlugInstall
+```
+cd ~/.dotfiles && . ./bootstrap
 ```
 
 ## Credits
