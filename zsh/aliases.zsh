@@ -16,7 +16,7 @@ alias up="cd .. && ls -la |  awk '{print \$9,\$10}'"
 alias c='clear'
 alias v='nvim'
 alias vim='nvim'
-alias zshrc="vim $WHALEBYTE/dotfiles/zsh/.zshrc"
+alias zshrc="vim $DOTFILES/zsh/.zshrc"
 
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker" 
