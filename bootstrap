@@ -1,0 +1,32 @@
+#! /usr/bin/env bash
+
+echo "This file should be sourced..."
+echo ''
+
+export XDG_CONFIG_HOME=${HOME}/.config
+export XDG_CACHE_HOME=${HOME}/.cache
+export XDG_DATA_HOME=${HOME}/.local/share
+export XDG_RUNTIME_DIR=${HOME}/tmp/xdg_runtime
+
+while read -r env; do
+  echo "Sourcing $env"
+  source "${env}"
+done < <(find . -name env.zsh)
+echo ''
+
+echo "Setting PATH..."
+echo ''
+
+source zsh/path.zsh
+
+echo "Setting up Homebrew..."
+echo ''
+
+if test ! "$(command -v brew)"; then
+  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" | while read -r line; do echo "$line"; done
+else
+  while read -r brw; do
+    echo "${brw}"
+  done < <(brew update)
+  echo ''
+fi

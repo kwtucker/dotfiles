@@ -14,3 +14,4 @@ XDG_RUNTIME_DIR := ${HOME}/tmp/xdg_runtime
 .remove.xdg.module.%:
 	rm -rf $(XDG_CONFIG_HOME)/$*
 	rm -rf $(XDG_CACHE_HOME)/$*
+	rm -rf $(XDG_DATA_HOME)/$*

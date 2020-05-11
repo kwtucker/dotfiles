@@ -15,3 +15,6 @@
 	insteadOf = https://bitbucket.org/
 [url "git@github.com:"]
 	insteadOf = https://github.com/
+[user]
+	name = Kevin Tucker
+	email = kwtucker4@gmail.com
