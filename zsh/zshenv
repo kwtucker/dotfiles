@@ -1,23 +1,23 @@
-export XDG_CONFIG_HOME=${HOME}/.config
-export XDG_CACHE_HOME=${HOME}/.cache
-export XDG_DATA_HOME=${HOME}/.local/share
-export XDG_RUNTIME_DIR=${HOME}/tmp/runtime
+export XDG_CONFIG_HOME=$HOME/.config
+export XDG_CACHE_HOME=$HOME/.cache
+export XDG_DATA_HOME=$HOME/.local/share
+export XDG_RUNTIME_DIR=$HOME/tmp/runtime
 
-export EDITOR=nvim
+export EDITOR='/usr/local/bin/nvim'
 export EVENT_NOKQUEUE=1
 export ENV=$USER
 
 # MISC.
 export BREWPATH=/usr/local/Cellar
 export CDPATH=$HOME/go/src
-export NVM_DIR=$HOME/.nvm
+
 export MONGOPATH="/usr/local/opt/mongodb-community@3.6/bin"
 export TEX=/Library/TeX/texbin
 
 # Path to your oh-my-zsh installation.
-export ZSH=/Users/$USER/.oh-my-zsh
+export ZSH=$XDG_CONFIG_HOME/oh-my-zsh/
 export ZSH_THEME=""
-export UPDATE_ZSH_DAYS=13
-export ZDOTDIR=${XDG_CONFIG_HOME}/zsh
-export ZSH_COMPDUMP=${XDG_DATA_HOME}/zsh
-
+export ZSH_CUSTOM=$ZSH/custom/
+export ZDOTDIR=$XDG_CONFIG_HOME/zsh/
+export ZSH_COMPDUMP=$XDG_DATA_HOME/zsh/zshCompletionDump
+export ZSH_CACHE_DIR=$XDG_CACHE_HOME/zsh/

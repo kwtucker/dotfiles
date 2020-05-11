@@ -16,12 +16,6 @@ brew services start mongodb
 brew services list
 ```
 
-Install [Oh My ZSH](https://github.com/robbyrussell/oh-my-zsh)
-
-```
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-```
-
 ##### 1. Go to ~/.whalebyte directory
 
 ```

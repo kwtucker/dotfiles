@@ -1,0 +1,8 @@
+robbyrussell/oh-my-zsh path:plugins/git
+robbyrussell/oh-my-zsh path:plugins/golang
+robbyrussell/oh-my-zsh path:plugins/helm
+zsh-users/zsh-syntax-highlighting
+zsh-users/zsh-autosuggestions
+paulirish/git-open
+mafredri/zsh-async
+sindresorhus/pure
