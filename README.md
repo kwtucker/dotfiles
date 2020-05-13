@@ -6,7 +6,7 @@
 git clone git@github.com:kwtucker/dotfiles ~/.dotfiles
 ```
 
-##### 1. Go to ~/.whalebyte directory
+##### 1. Create the ~/.whalebyte directory
 
 ```
 mkdir -p ~/.whalebyte/{Code,notes} ; touch ~/.whalebyte/.secret .env
