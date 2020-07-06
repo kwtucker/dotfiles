@@ -37,6 +37,7 @@ Plug 'majutsushi/tagbar'
 Plug 'posva/vim-vue'
 Plug 'prettier/vim-prettier'
 Plug 'othree/javascript-libraries-syntax.vim'
+Plug 'mbbill/undotree'
 call plug#end()
 
 filetype plugin indent on    " required
@@ -54,6 +55,16 @@ set statusline=%{fugitive#statusline()}
 set noshowmode
 " Update time for vim gutter
 set updatetime=250
+
+" Turn off backup and set the undodir
+set nobackup
+if has("persistent_undo")
+	set undodir=$XDG_DATA_HOME/nvim/undo
+	set undofile
+endif
+
+" UndoTree
+nnoremap <leader>u :UndotreeShow<CR>
 
 " Theme of work area and tabline
 set background=dark
@@ -169,11 +180,6 @@ nmap <Leader>s :w <ENTER>
 nmap <Leader>ss :wq <ENTER>
 nmap <C-t> :TagbarToggle<CR>
 
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <bs>  <C-W>h
-map <C-l> <C-W>l
-
 set clipboard=unnamed
 
 " Will un highlight the search results
@@ -182,6 +188,7 @@ nmap <Leader>nh :nohlsearch <ENTER>
 " Adjust the split view
 nmap <Leader>> :20winc < <ENTER>
 nmap <Leader>< :20winc > <ENTER>
+
 set splitbelow
 set splitright
 
