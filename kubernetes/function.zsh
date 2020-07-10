@@ -12,8 +12,16 @@ function kport() {
 }
 
 function kip() {
-	local node_ip=$(kubectl get pods -l name=tiller -o wide | awk 'NR>1 {print $7}')
-	local node_ports=$(kubectl get svc -o json SVC | jq -r '.spec.ports[] | "\(.name) \(.nodePort)"')
+	local pod=$(kubectl get pod PODS | awk 'NR>1 {print $1}')
+	local node_ip=$(kubectl get pod $pod -o custom-columns=IP:.spec.nodeName | awk 'NR>1 {print $1}')
+	local serviceName=$(kubectl get pod $pod -o custom-columns=NAME:.spec.containers[0].name | awk 'NR>1 {print $1}')
+	local node_ports=$(kubectl get svc -o json ${serviceName} | jq -r '.spec.ports[] | "\(.name) \(.nodePort)"')
+
+	if [[ $(echo "${node_ports}" | awk '{print $2}') -eq null ]]; then
+		echo "no port for ${pod} pod. Try another one"
+		return
+	fi
+
 	if [[ $(echo "${node_ports}" | wc -l) -eq 1 ]]; then
 		echo "${node_ports}" \
 			| awk -v ip="${node_ip}" '{print "http://" ip ":"$2}' > >(cat) > >(tr -d '\n' | pbcopy)
