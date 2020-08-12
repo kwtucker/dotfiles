@@ -9,6 +9,7 @@ PATH=${PATH}:${BREWPATH}
 PATH=${PATH}:${CDPATH}
 PATH=${PATH}:${NVM_DIR}
 PATH=${PATH}:${MONGOPATH}
+PATH=${PATH}:${GNU_BIN}
 PATH=${PATH}:${TEX}
 PATH=${PATH}:/usr/local/bin
 PATH=${PATH}:/usr/local/sbin
