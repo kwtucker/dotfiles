@@ -22,13 +22,6 @@ alias zshrc="vim $DOTFILES/zsh/.zshrc"
 alias gohome="cd ~/go/src/github.com/kwtucker" 
 alias gowork="cd ~/go/src/github.comcast.com/yggdrasil/go"
 
-alias goygg="cd ~/go/src/github.comcast.com/yggdrasil/go"
-alias gopillar="cd ~/go/src/github.comcast.com/viper-cog/pillar"
-alias golrmui="cd ~/go/src/github.comcast.com/lrm/ui"
-alias golrmadp="cd ~/go/src/github.comcast.com/lrm/adapter"
-alias golrmpub="cd ~/go/src/github.comcast.com/lrm/publisher"
-alias golrmesni="cd ~/go/src/github.comcast.com/lrm/esni"
-
 # ---- PHP ----
 alias composer="php /usr/local/bin/composer.phar"
 
