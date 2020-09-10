@@ -8,7 +8,7 @@ function kport() {
 	local pod=$(echo PODS)
 	local port=$(kubectl get pod ${pod} -o json | jq '.spec.containers | .[0].ports | .[0].containerPort')
 	echo "Forwarding traffic from ${pod}:${port} to localhost:${port}"
-	k port-forward ${pod} ${port}:${port} | bat -l log
+	kubectl port-forward ${pod} ${port}:${port} | bat -l log
 }
 
 function kip() {
