@@ -1,4 +1,4 @@
-MODULES = gnu zsh fzf kubernetes tmux whalebyte git golang bat nvim weechat
+MODULES = gnu zsh fzf kubernetes tmux whalebyte git golang bat nvim weechat docker
 
 CLEAN := $(addsuffix .clean,$(MODULES))
 
