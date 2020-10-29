@@ -3,14 +3,16 @@ include ../env.mk
 install: .ensure.xdg
 	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/zsh
 	mkdir -p $(XDG_CACHE_HOME)/zsh
-	mkdir -p $(XDG_DATA_HOME)/zsh/
+	mkdir -p $(XDG_CONFIG_HOME)/zsh
+	mkdir -p $(XDG_DATA_HOME)/zsh
 	antibody bundle < $(CURDIR)/bundle.txt > ${XDG_DATA_HOME}/zsh/plugins
-	antibody update
 	ln -sf $(CURDIR)/zshenv $(HOME)/.zshenv
+	# antibody update
 
 clean: .remove.xdg.module.zsh
 	rm -rf $(HOME)/.zshenv
 	rm -rf $(XDG_CONFIG_HOME)/zsh
 	rm -rf ${XDG_CACHE_HOME}/zsh
+	rm -rf $(XDG_DATA_HOME)/zsh
 
 .PHONY: install clean

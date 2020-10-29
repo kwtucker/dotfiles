@@ -1,3 +1,4 @@
+#! /usr/bin/env zsh
 # -- FZF --------------------
 # fe [FUZZY PATTERN] - Open the selected file with the default editor
 #   - Bypass fuzzy finder if there's only one match (--select-1)
