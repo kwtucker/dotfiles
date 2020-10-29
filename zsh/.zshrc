@@ -46,6 +46,8 @@ iterm2_print_user_vars() {
 
 ################################################################################
 # Load local configurations.
+[ -n "$PS1" ] && [ -s ${BASE16_SHELL}/profile_helper.sh ] && eval "$(${BASE16_SHELL}/profile_helper.sh)"
+[ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
 [ -f ${XDG_CONFIG_HOME}/zsh/local.zsh ] && . ${XDG_CONFIG_HOME}/zsh/local.zsh
 [ -f ${WHALEBYTE}/.secret ] && . ${WHALEBYTE}/.secret
 [ -f ${WHALEBYTE}/.env ] && . ${WHALEBYTE}/.env

@@ -21,3 +21,5 @@ export ZSH_CUSTOM=$ZSH/custom/
 export ZDOTDIR=$XDG_CONFIG_HOME/zsh/
 export ZSH_COMPDUMP=$XDG_DATA_HOME/zsh/zshCompletionDump
 export ZSH_CACHE_DIR=$XDG_CACHE_HOME/zsh/
+
+# export VSCODE_PORTABLE=$XDG_DATA_HOME/vscode

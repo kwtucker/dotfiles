@@ -61,3 +61,6 @@ brew 'xz'
 brew 'yarn'
 brew 'yq'
 brew 'zsh'
+brew 'prettier'
+brew 'node'
+
