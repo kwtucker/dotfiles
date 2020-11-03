@@ -1,17 +1,21 @@
-MODULES = gnu zsh fzf kubernetes tmux whalebyte git golang bat nvim weechat docker helm psql ripgrep
+MODULES = bin zsh gnu fzf kubernetes tmux whalebyte git golang bat nvim weechat docker psql ripgrep
 
 CLEAN := $(addsuffix .clean,$(MODULES))
 
 $(MODULES):
-	mkdir -p $(HOME)/bin
 	$(MAKE) -C $@
 
 $(CLEAN):
-	rm -rf $(HOME)/bin
 	$(MAKE) -C $(basename $@) clean
-
-all: $(MODULES)
+	
+all: $(MODULES) ## Make it all
 
 clean.all: $(CLEAN)
 
 .PHONY: $(MODULES) $(CLEAN) all clean.all
+
+help: ## Prints help for targets with comments
+	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+
+
