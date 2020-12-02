@@ -36,5 +36,6 @@ Temporary Items
 # yggdrasil
 *local*.yaml
 *ktucke214*.yaml
+## local make targets for deploying
 .localConfigs/
 
