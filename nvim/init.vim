@@ -41,6 +41,13 @@ Plug 'mbbill/undotree'
 call plug#end()
 
 filetype plugin indent on    " required
+
+" This will put the tagbar preview right under the file open with the preview
+" of the type.
+let g:tagbar_previewwin_pos = ""
+" This will auto preview the tagbar type reference.
+let g:tagbar_autopreview = 1
+" This is the go file tagbar layout.
 let g:tagbar_type_go = {
 	\ 'ctagstype' : 'go',
 	\ 'kinds'     : [

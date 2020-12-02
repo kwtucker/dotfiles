@@ -12,3 +12,5 @@ Brewfile.lock.json
 weechat/logs/
 weechat/weechat.log
 weechat/sec.conf
+
+helm/repositories*
