@@ -22,7 +22,9 @@ Plug 'deoplete-plugins/deoplete-go', { 'do': 'make'}
 Plug 'airblade/vim-gitgutter'
 Plug 'scrooloose/syntastic'
 Plug '/usr/local/opt/fzf'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+" Plug 'jeffkreeftmeijer/vim-numbertoggle'
 Plug 'wincent/ferret'
 Plug 'elzr/vim-json'
 Plug 'christoomey/vim-tmux-navigator'
@@ -75,6 +77,8 @@ let g:tagbar_type_go = {
 	\ 'ctagsbin'  : 'gotags',
 	\ 'ctagsargs' : '-sort -silent'
 \ }
+
+
 " Allow backspace in insert mode
 set backspace=indent,eol,start
 set hlsearch   "highlight search terms
@@ -95,6 +99,14 @@ if has("persistent_undo")
 	set undodir=$XDG_DATA_HOME/nvim/undo
 	set undofile
 endif
+
+set number relativenumber
+
+augroup numbertoggle
+  autocmd!
+  autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
+  autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
+augroup END
 
 " UndoTree
 nnoremap <leader>u :UndotreeShow<CR>
@@ -118,7 +130,7 @@ let g:netrw_banner = 0
 let g:netrw_liststyle = 3
 
 let g:fzf_prefer_tmux = 1
-
+let g:fzf_layout = { 'down': '~40%' }
 nnoremap <C-p> :Files<Cr>
 nnoremap <C-g> :Rg<Cr>
 
