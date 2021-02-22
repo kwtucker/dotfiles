@@ -39,3 +39,6 @@ Temporary Items
 ## local make targets for deploying
 .localConfigs/
 
+# Forgit
+forgit.json
+.commit
