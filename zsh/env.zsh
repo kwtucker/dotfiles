@@ -6,4 +6,3 @@ export BASE16_SHELL=${XDG_CONFIG_HOME}/zsh/base16-shell/
 export HISTSIZE=10000
 export SAVEHIST=${HISTSIZE}
 
-# export VSCODE_PORTABLE=$XDG_DATA_HOME/vscode

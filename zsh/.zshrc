@@ -40,7 +40,6 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 
 iterm2_print_user_vars() {
  iterm2_set_user_var kubeCurrentContext $(kubectl config current-context)
- iterm2_set_user_var kubeCurrentTillerNamespace $(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"$(kubectl config current-context)\")].context.namespace}")
  iterm2_set_user_var kubeCurrentNamespace $(kubectl config view --minify | grep namespace: | awk 'NR>0 {print $2}')
 }
 

@@ -39,14 +39,6 @@ function kenv() {
 	local server=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
 	echo "Context:    ${ctx}"
 	echo "Namespace:  ${cns}"
-	echo "Tiller:     $TILLER_NAMESPACE"
 	echo "Server:     ${server}"
 }
 
-function tns() {
-	local ctx=$(kubectl config current-context)
-	local cns=$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${ctx}\")].context.namespace}")
-	echo "${cns}" >! "${HOME}/.tiller_namespace"
-	export TILLER_NAMESPACE=${cns}
-	echo "Switched Tiller namespace to ${cns}"
-}
