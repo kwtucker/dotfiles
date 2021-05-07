@@ -15,7 +15,7 @@ function cleanenv() {
 	fi
 
 	if [[ `echo "$selection" | awk '{print tolower($0)}'` == 'y' ]]; then
-		notesB ; rm -rf ~/{.whalebyte,.ssh,go/src}
+		notesB ; rm -rf ~/{.whalebyte,.ssh,go/src/github.com/kwtucker}
 		return
 	fi
 }
@@ -24,24 +24,6 @@ function cleanenv() {
 function leave() {
 	cleanenv	
 }
-
-
-function helm-toggle() {
-    if [ -z "$1" ]; then
-        echo "helm client and Tiller (server side) versions always must match. Simply toggle between different Helm versions installed by brew".
-        echo
-        echo "Usage: helm-toggle <Helm version>"
-        echo
-        echo "installed helm versions are:"
-        brew info --json=v1  kubernetes-helm | jq -c '.[].installed[].version'
-				echo "current helm version is:"
-        brew info --json=v1  kubernetes-helm | jq '.[].linked_keg'
-    else
-        brew switch kubernetes-helm $1 > /dev/null # no appropriate error handling here if someone sets something silly
-    fi
-}
-
-
 
 # -- MISC ------------------
 #
