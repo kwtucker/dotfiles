@@ -8,6 +8,7 @@
 [alias]
 	pt = !git tag -l | xargs git tag -d && git fetch -t
 	sort = !git tag -l | sort -V
+	co = !git checkout -q $(git branch | fzf-tmux)
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
