@@ -28,6 +28,7 @@ else
   compinit -C $XDG_CACHE_HOME/zsh/zcompdump;
 fi;
 
+
 ################################################################################
 # Load Antibody Plugins
 source $XDG_DATA_HOME/zsh/plugins
