@@ -1,4 +1,6 @@
-MODULES = bin zsh gnu fzf kubernetes tmux whalebyte git golang bat nvim weechat docker psql ripgrep
+MODULES = \
+	bin zsh gnu python fzf kubernetes helm tmux \
+	whalebyte git golang bat nvim weechat docker psql ripgrep 
 
 CLEAN := $(addsuffix .clean,$(MODULES))
 

@@ -25,10 +25,8 @@ alias gowork="cd ~/go/src/github.comcast.com/yggdrasil/go"
 # ---- PHP ----
 alias composer="php /usr/local/bin/composer.phar"
 
-
-
 # ---- dotfile python ----
-alias python=/usr/local/bin/python3
+alias python=/usr/local/bin/python3.9
 alias pip=/usr/local/bin/pip3
 
 # ---- dotfile git pull ----

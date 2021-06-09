@@ -11,6 +11,11 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-markdown'
+Plug 'autozimu/LanguageClient-neovim', {
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
+Plug 'fannheyward/coc-pyright'
 if has('nvim')
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 else
@@ -24,7 +29,6 @@ Plug 'scrooloose/syntastic'
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-" Plug 'jeffkreeftmeijer/vim-numbertoggle'
 Plug 'wincent/ferret'
 Plug 'elzr/vim-json'
 Plug 'christoomey/vim-tmux-navigator'
@@ -221,18 +225,18 @@ autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
 au BufRead,BufNewFile *.go set filetype=go
 let g:go_def_mapping_enabled=0
 nmap <C-t> :TagbarToggle<CR>
-nmap <Leader>s :w <ENTER>
-nmap <Leader>ss :wq <ENTER>
+nmap <leader>s :w <ENTER>
+nmap <leader>ss :wq <ENTER>
 nmap <C-t> :TagbarToggle<CR>
 
 set clipboard=unnamed
 
 " Will un highlight the search results
-nmap <Leader>nh :nohlsearch <ENTER>
+nmap <leader>nh :nohlsearch <ENTER>
 
 " Adjust the split view
-nmap <Leader>> :20winc < <ENTER>
-nmap <Leader>< :20winc > <ENTER>
+nmap <leader>> :20winc < <ENTER>
+nmap <leader>< :20winc > <ENTER>
 
 set splitbelow
 set splitright
@@ -263,3 +267,9 @@ nnoremap <esc> :noh<return><esc>
 nnoremap <leader>n :cnext<CR>
 nnoremap <leader>m :cprevious<CR>
 nnoremap <leader>c :cclose<CR>
+
+" Fugitive diff mapping
+nnoremap <leader>gs :G<CR>
+nnoremap <leader>gh :diffget //2<CR>
+nnoremap <leader>gl :diffget //3<CR>
+
