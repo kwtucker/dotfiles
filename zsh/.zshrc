@@ -32,9 +32,6 @@ fi;
 # Load Antibody Plugins
 source $XDG_DATA_HOME/zsh/plugins
 
-# autoload -U promptinit; promptinit
-# prompt pure
-
 ################################################################################
 unset config_files 
 
