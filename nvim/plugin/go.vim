@@ -11,9 +11,8 @@ let g:go_def_mode='gopls'
 let g:go_info_mode='gopls'
 let g:go_def_mapping_enabled=0
 
-autocmd FileType go nmap <leader>r  <Plug>(go-run)
 autocmd FileType go nmap <leader>d  <Plug>(go-def)
-autocmd FileType go nmap <leader>f  <Plug>(go-referrers)
+autocmd FileType go nmap <leader>r  <Plug>(go-referrers)
 autocmd FileType go nmap <leader>t  <Plug>(go-test)
 autocmd FileType go nmap <leader>tc  <Plug>(go-coverage-toggle)
 
