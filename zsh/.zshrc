@@ -18,7 +18,6 @@ done
 for file in ${config_files:#*/env.zsh}; do
   source "$file"
 done
-
 ################################################################################
 # Initialize the autocompletion framework.
 autoload -Uz compinit
@@ -32,7 +31,9 @@ fi;
 ################################################################################
 # Load Antibody Plugins
 source $XDG_DATA_HOME/zsh/plugins
-source $XDG_CONFIG_HOME/oh-my-zsh/oh-my-zsh.sh
+
+# autoload -U promptinit; promptinit
+# prompt pure
 
 ################################################################################
 unset config_files 
