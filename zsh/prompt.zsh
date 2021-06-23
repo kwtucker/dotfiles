@@ -1,5 +1,4 @@
 #! /usr/bin/env zsh
-
 PURE_CMD_MAX_EXEC_TIME=10
 
 zstyle :prompt:pure:git:stash show yes

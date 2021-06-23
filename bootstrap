@@ -32,6 +32,7 @@ else
 fi
 
 brew bundle
+
+source "$XDG_CONFIG_HOME/zsh/.zshrc"
+
 make all
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-source $XDG_CONFIG_HOME/zsh/.zshrc
