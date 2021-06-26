@@ -2,6 +2,7 @@
 
 export DOTFILES="$HOME/.dotfiles"
 
+bindkey -e
 ################################################################################
 # All the ZSH files.
 typeset -U config_files
@@ -27,7 +28,6 @@ else
   compinit -C $XDG_CACHE_HOME/zsh/zcompdump;
 fi;
 
-
 ################################################################################
 # Load Antibody Plugins
 source $XDG_DATA_HOME/zsh/plugins
@@ -44,8 +44,8 @@ iterm2_print_user_vars() {
 
 ################################################################################
 # Load local configurations.
-[ -n "$PS1" ] && [ -s ${BASE16_SHELL}/profile_helper.sh ] && eval "$(${BASE16_SHELL}/profile_helper.sh)"
-[ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
+[ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh && enable-fzf-tab
 [ -f ${XDG_CONFIG_HOME}/zsh/local.zsh ] && . ${XDG_CONFIG_HOME}/zsh/local.zsh
 [ -f ${WHALEBYTE}/.secret ] && . ${WHALEBYTE}/.secret
 [ -f ${WHALEBYTE}/.env ] && . ${WHALEBYTE}/.env
+

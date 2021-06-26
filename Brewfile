@@ -14,9 +14,9 @@ tap 'getantibody/tap'
 ################################################################################
 cask 'alfred'
 cask 'discord'
-cask 'docker'
-cask 'iterm2'
-cask 'postman'
+# cask 'docker'
+# cask 'iterm2'
+# cask 'postman'
 
 
 ################################################################################
@@ -45,7 +45,6 @@ brew 'make'
 brew 'mongodb-community'
 brew 'nats-server'
 brew 'nmap'
-brew 'neovim'
 brew 'node'
 brew 'openssl'
 brew 'postgresql'
