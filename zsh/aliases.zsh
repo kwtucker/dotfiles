@@ -16,6 +16,7 @@ alias up="cd .. && ls -la |  awk '{print \$9,\$10}'"
 alias c='clear'
 alias v='nvim'
 alias vim='nvim'
+alias vi='nvim'
 alias zshrc="vim $DOTFILES/zsh/.zshrc"
 
 # ---- GO ----
@@ -33,7 +34,7 @@ alias pip=/usr/local/bin/pip3
 alias dotpull="pwd=`pwd` && cd $DOTFILES && git pull && sleep 6 && cd $pwd"
 
 # ---- dotfile git push ----
-alias dotpush="cd $DOTFILES && gaa && gcmsg 'update dotfiles' && git push origin master && cd -"
+alias dotpush="cd $DOTFILES && git add --all && git commit -m 'update dotfiles' && git push origin master && cd -"
 
 # ---- dotfile cd ----
 alias dot="cd $DOTFILES"
