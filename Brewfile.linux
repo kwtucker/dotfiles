@@ -2,22 +2,19 @@
 ################################################################################
 # Tap 
 ################################################################################
-tap 'mongodb/brew'
 tap 'homebrew/cask'
 tap 'homebrew/cask-drivers'
 tap 'homebrew/cask-fonts'
 tap 'homebrew/services'
 tap 'getantibody/tap'
 
+# tap 'mongodb/brew'
+
 ################################################################################
 # Cask 
 ################################################################################
-cask 'alfred'
-cask 'discord'
-# cask 'docker'
-# cask 'iterm2'
-# cask 'postman'
-
+cask 'docker'
+cask 'postman'
 
 ################################################################################
 # Simple brews
@@ -42,7 +39,6 @@ brew 'jq'
 brew 'lua@5.1'
 brew 'luarocks'
 brew 'make'
-brew 'mongodb-community'
 brew 'nats-server'
 brew 'nmap'
 brew 'node'
@@ -73,3 +69,5 @@ brew 'yarn'
 brew 'yq'
 brew 'zsh'
 
+
+# brew 'mongodb-community'

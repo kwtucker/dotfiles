@@ -5,6 +5,7 @@ set incsearch  "show search matches as you type
 set showmatch  "set show matching parenthesis
 set number
 set tabstop=2
+set expandtab
 set shiftwidth=2
 set pastetoggle=<f2>
 set statusline=%{fugitive#statusline()}

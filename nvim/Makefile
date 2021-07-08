@@ -6,8 +6,11 @@ install: .ensure.xdg
 	mkdir -p "${XDG_DATA_HOME}/nvim/${backup,swap,undo}"
 	nvim +PlugInstall +UpdateRemotePlugins +qa
 	pip3 install -U -r "requirements.txt"
-	npm install -g neovim
+	npm install -g \
+ 	  bash-language-server \
+  	neovim
 	${GEM_HOME}/gem install neovim
+	yarn global add vim-language-server
 
 clean: .remove.xdg.module.zsh
 	rm -rf $(XDG_CONFIG_HOME)/nvim
