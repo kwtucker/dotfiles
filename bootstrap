@@ -1,8 +1,4 @@
 #! /usr/bin/env bash
-
-echo "This file should be sourced..."
-echo ''
-
 export XDG_CONFIG_HOME=${HOME}/.config
 export XDG_CACHE_HOME=${HOME}/.cache
 export XDG_DATA_HOME=${HOME}/.local/share
@@ -22,8 +18,21 @@ source zsh/path.zsh
 echo "Setting up Homebrew..."
 echo ''
 
+UNAME=`uname`
 if test ! "$(command -v brew)"; then
-  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" | while read -r line; do echo "$line"; done
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  
+  if [ "$UNAME" = "Linux" ]; then
+    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ${XDG_CONFIG_HOME}/zsh/local.zsh
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+    sudo apt-get install build-essential
+    brew install gcc
+    brew bundle --file=Brewfile.linux
+
+  else if [ "$UNAME" == "Darwin" ]; then
+    brew bundle --file=Brewfile.darwin
+  fi
 else
   while read -r brw; do
     echo "${brw}"
@@ -31,8 +40,4 @@ else
   echo ''
 fi
 
-brew bundle
-
 source "$XDG_CONFIG_HOME/zsh/.zshrc"
-
-make all

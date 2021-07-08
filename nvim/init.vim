@@ -12,7 +12,6 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-markdown'
-Plug 'fannheyward/coc-pyright'
 if has('nvim')
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 else
@@ -21,6 +20,8 @@ else
   Plug 'roxma/vim-hug-neovim-rpc'
 endif
 Plug 'deoplete-plugins/deoplete-go', { 'do': 'make'}
+" Plug 'neovim/nvim-lspconfig'
+" Plug 'hrsh7th/nvim-compe'
 Plug 'airblade/vim-gitgutter'
 Plug 'scrooloose/syntastic'
 Plug '/usr/local/opt/fzf'
@@ -37,7 +38,6 @@ Plug 'stamblerre/gocode', {
 	\}
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'chriskempson/base16-vim'
 Plug 'drewtempelmeyer/palenight.vim'
 Plug 'majutsushi/tagbar'
 Plug 'posva/vim-vue'
