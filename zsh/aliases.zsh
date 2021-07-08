@@ -34,7 +34,7 @@ alias pip=/usr/local/bin/pip3
 alias dotpull="pwd=`pwd` && cd $DOTFILES && git pull && sleep 6 && cd $pwd"
 
 # ---- dotfile git push ----
-alias dotpush="cd $DOTFILES && git add --all && git commit -m 'update dotfiles' && git push origin master && cd -"
+alias dotpush="cd $DOTFILES && git add --all && git commit -m 'update dotfiles' && git push origin main && cd -"
 
 # ---- dotfile cd ----
 alias dot="cd $DOTFILES"
