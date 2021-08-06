@@ -17,3 +17,5 @@ weechat/sec.conf
 
 helm/repositories*
 
+fzf/fzf.zsh
+fzf/fzf.bash
