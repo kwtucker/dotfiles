@@ -12,26 +12,15 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-markdown'
-if has('nvim')
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-  Plug 'Shougo/deoplete.nvim'
-  Plug 'roxma/nvim-yarp'
-  Plug 'roxma/vim-hug-neovim-rpc'
-endif
-Plug 'deoplete-plugins/deoplete-go', { 'do': 'make'}
-" Plug 'neovim/nvim-lspconfig'
-" Plug 'hrsh7th/nvim-compe'
 Plug 'airblade/vim-gitgutter'
-Plug 'scrooloose/syntastic'
-Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+Plug 'junegunn/goyo.vim'
+Plug 'junegunn/limelight.vim'
 Plug 'wincent/ferret'
 Plug 'elzr/vim-json'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-Plug 'SirVer/ultisnips'
 Plug 'stamblerre/gocode', {
 	\	'rtp': 'nvim',
 	\ 'do': '~/.config/nvim/plugged/gocode/nvim/symlink.sh'
@@ -44,9 +33,21 @@ Plug 'posva/vim-vue'
 Plug 'prettier/vim-prettier'
 Plug 'othree/javascript-libraries-syntax.vim'
 Plug 'mbbill/undotree'
+
+if has('nvim')
+  Plug 'neovim/nvim-lspconfig'
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+  Plug 'hrsh7th/nvim-compe'
+  Plug 'nvim-lua/popup.nvim'
+  Plug 'nvim-lua/plenary.nvim'
+  Plug 'nvim-telescope/telescope.nvim'
+endif
+
 call plug#end()
 
 filetype plugin indent on    " required
+
+luafile ~/.config/nvim/lua/plugins/compe.lua
 
 " Leader is now ,
 let mapleader=' '

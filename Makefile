@@ -1,6 +1,6 @@
 MODULES = \
 	bin zsh gnu python fzf kubernetes helm tmux \
-	whalebyte git golang bat gem nvim weechat docker psql ripgrep 
+	whalebyte git golang bat gem nvim weechat docker psql ripgrep alacritty
 
 CLEAN := $(addsuffix .clean,$(MODULES))
 

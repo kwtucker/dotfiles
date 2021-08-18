@@ -23,14 +23,13 @@ if test ! "$(command -v brew)"; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   
   if [ "$UNAME" = "Linux" ]; then
+    linux-install.sh
     echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ${XDG_CONFIG_HOME}/zsh/local.zsh
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
-    sudo apt-get install build-essential
-    brew install gcc
     brew bundle --file=Brewfile.linux
 
-  else if [ "$UNAME" == "Darwin" ]; then
+  elif [ "$UNAME" == "Darwin" ]; then
     brew bundle --file=Brewfile.darwin
   fi
 else
