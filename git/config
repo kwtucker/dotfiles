@@ -1,20 +1,40 @@
 [include]
   path = config.local 
+
 [user]
   useConfigOnly = true
+
 [fetch]
   prune = true
   pruneTags = true	
+
+[pull]
+  rebase = true
+  tags = true
+
+[push]
+  default = nothing
+
 [alias]
+  br = branch
+  ci = commit
+  cm = !git add -A && git commit -m
+  co = checkout
+  cb = !git checkout $(git branch | fzf)
 	pt = !git tag -l | xargs git tag -d && git fetch -t
 	sort = !git tag -l | sort -V
+  st = status -sb
+  wip = commit -am "WIP"
+
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	required = true
 	process = git-lfs filter-process
+
 [url "git@bitbucket.org:"]
 	insteadOf = https://bitbucket.org/
+
 [url "git@github.com:"]
 	insteadOf = https://github.com/
 	
