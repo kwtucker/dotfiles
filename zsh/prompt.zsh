@@ -7,5 +7,5 @@ zstyle :prompt:pure:git:stash show yes
 zstyle :prompt:pure:path color '#BFBFBF'
 
 # # change the color for both `prompt:success` and `prompt:error`
-zstyle ':prompt:pure:prompt:*' color white
+zstyle ':prompt:pure:prompt:*' color cyan
 

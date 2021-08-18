@@ -4,7 +4,7 @@ install: .ensure.xdg
 	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/psql
 	mkdir -p $(XDG_CACHE_HOME)/psql
 
-clean:
+clean: .remove.xdg.module.psql
 	rm -rf $(XDG_CONFIG_HOME)/psql
 	rm -rf $(XDG_CACHE_HOME)/psql
 

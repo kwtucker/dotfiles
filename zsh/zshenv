@@ -8,16 +8,10 @@ export EVENT_NOKQUEUE=1
 export ENV=$USER
 
 # MISC.
-export BREWPATH=/usr/local/Cellar
 export CDPATH=$HOME/go/src
-export MONGOPATH="/usr/local/opt/mongodb-community@3.6/bin"
 export TEX=/Library/TeX/texbin
 
-# Path to your oh-my-zsh installation.
-export ZSH=$XDG_CONFIG_HOME/oh-my-zsh/
 export ZSH_THEME=""
 export ZSH_CUSTOM=$ZSH/custom/
 export ZDOTDIR=$XDG_CONFIG_HOME/zsh/
-export ZSH_COMPDUMP=$XDG_DATA_HOME/zsh/zshCompletionDump
 export ZSH_CACHE_DIR=$XDG_CACHE_HOME/zsh/
-

@@ -13,7 +13,7 @@ tap 'getantibody/tap'
 ################################################################################
 # Cask 
 ################################################################################
-cask 'docker'
+# cask 'docker'
 cask 'postman'
 
 ################################################################################
@@ -44,15 +44,13 @@ brew 'nmap'
 brew 'node'
 brew 'openssl'
 brew 'postgresql'
-brew 'postgis'
 brew 'prettier'
 brew 'python'
 brew 'rpm'
 brew 'ruby'
 brew 'rg'
-brew 'screen'
 brew 'shellcheck'
-brew 'telnet'
+brew 'stow'
 brew 'tig'
 brew 'tldr'
 brew 'tmux'
@@ -69,5 +67,3 @@ brew 'yarn'
 brew 'yq'
 brew 'zsh'
 
-
-# brew 'mongodb-community'

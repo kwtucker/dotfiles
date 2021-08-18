@@ -13,6 +13,7 @@ set noshowmode
 set laststatus=2
 " Update time for vim gutter
 set updatetime=250
+set encoding=utf-8
 
 " Turn off backup and set the undodir
 set nobackup
