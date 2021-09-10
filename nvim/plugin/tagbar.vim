@@ -4,7 +4,7 @@ nmap <C-t> :TagbarToggle<CR>
 " of the type.
 let g:tagbar_previewwin_pos = ""
 " This will auto preview the tagbar type reference.
-let g:tagbar_autopreview = 1
+let g:tagbar_autopreview = 0
 " This is the go file tagbar layout.
 let g:tagbar_type_go = {
 	\ 'ctagstype' : 'go',

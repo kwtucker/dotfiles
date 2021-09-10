@@ -49,3 +49,4 @@ iterm2_print_user_vars() {
 [ -f ${WHALEBYTE}/.secret ] && . ${WHALEBYTE}/.secret
 [ -f ${WHALEBYTE}/.env ] && . ${WHALEBYTE}/.env
 
+eval "$(direnv hook zsh)"
