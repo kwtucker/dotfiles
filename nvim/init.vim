@@ -13,6 +13,7 @@ Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-markdown'
 Plug 'airblade/vim-gitgutter'
+
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/goyo.vim'
@@ -41,6 +42,7 @@ if has('nvim')
   Plug 'nvim-lua/popup.nvim'
   Plug 'nvim-lua/plenary.nvim'
   Plug 'nvim-telescope/telescope.nvim'
+  Plug 'nvim-telescope/telescope-fzy-native.nvim'
 endif
 
 call plug#end()
@@ -74,9 +76,6 @@ vnoremap / /\v
 
 " Quick ESC
 imap jj <ESC>
-
-" Adds a line below.
-nmap oo o<Esc>k
 
 " Disables the arrow keys
 nnoremap <up>    <nop>
