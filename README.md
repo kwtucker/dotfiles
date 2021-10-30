@@ -15,10 +15,12 @@ mkdir -p ~/.whalebyte/{code,notes} ; touch ~/.whalebyte/.secret .env
 ##### 2. Setup dotfile components
 
 *NOTE*: Make sure if needed to create local files first:
- - git: [user] name and email and [url] instead of mapping
+ - modules: specify the modules to install outside the defaults. "LOCAL_MODULES = terraform"
+ - git: [user] name and email and [url] instead of mapping.
  - zsh: environment variables with usernames and tokens set.
 
 ```shell
+.dotfiles/modules.local.mk
 .dotfiles/git/config.local
 .dotfiles/zsh/local.zsh
 ```

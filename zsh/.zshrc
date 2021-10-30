@@ -35,13 +35,6 @@ source $XDG_DATA_HOME/zsh/plugins
 ################################################################################
 unset config_files 
 
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
-iterm2_print_user_vars() {
- iterm2_set_user_var kubeCurrentContext $(kubectl config current-context)
- iterm2_set_user_var kubeCurrentNamespace $(kubectl config view --minify | grep namespace: | awk 'NR>0 {print $2}')
-}
-
 ################################################################################
 # Load local configurations.
 [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh && enable-fzf-tab
@@ -49,4 +42,3 @@ iterm2_print_user_vars() {
 [ -f ${WHALEBYTE}/.secret ] && . ${WHALEBYTE}/.secret
 [ -f ${WHALEBYTE}/.env ] && . ${WHALEBYTE}/.env
 
-eval "$(direnv hook zsh)"

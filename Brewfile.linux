@@ -2,68 +2,19 @@
 ################################################################################
 # Tap 
 ################################################################################
-tap 'homebrew/cask'
-tap 'homebrew/cask-drivers'
-tap 'homebrew/cask-fonts'
 tap 'homebrew/services'
 tap 'getantibody/tap'
 
-# tap 'mongodb/brew'
 
 ################################################################################
-# Cask 
+# simple brews
 ################################################################################
-# cask 'docker'
-cask 'postman'
-
-################################################################################
-# Simple brews
-################################################################################
-brew 'ack'
-brew 'antibody'
-brew 'asciinema'
-brew 'bash'
-brew 'bat'
-brew 'ctags'
-brew 'exa'
-brew 'fzf'
-brew 'fd'
 brew 'gh'
-brew 'git'
-brew 'grep'
-brew 'gzip'
-brew 'go'
-brew 'golangci-lint'
-brew 'httpie'
-brew 'jq'
-brew 'lua@5.1'
-brew 'luarocks'
-brew 'make'
+brew 'fd'
 brew 'nats-server'
-brew 'nmap'
 brew 'node'
-brew 'openssl'
-brew 'postgresql'
 brew 'prettier'
-brew 'python'
-brew 'rpm'
-brew 'ruby'
-brew 'rg'
 brew 'shellcheck'
-brew 'stow'
-brew 'tig'
-brew 'tldr'
-brew 'tmux'
-brew 'tree'
-brew 'utf8proc'
-brew 'vault'
-brew 'vim'
-brew 'watch'
-brew 'wdiff'
-brew 'wget'
-brew 'weechat'
-brew 'xz'
 brew 'yarn'
 brew 'yq'
-brew 'zsh'
 
