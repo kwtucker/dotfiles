@@ -8,7 +8,7 @@ alias gco="git checkout"
 alias gp="git push"
 
 alias tig="tig --all"
-alias tis='\tig status'
+alias tis="\tig status"
 
 alias ghpr='gh pr view --web'
 alias ghr='gh repo view --web'
