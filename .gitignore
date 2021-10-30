@@ -3,10 +3,12 @@
 .netrwhist*
 .zcompdump
 
+local.zsh
+modules.local.mk
+
 nvim/autoload
 
 git/config.local
-zsh/local.zsh
 
 Brewfile.lock.json
 Brewfile.linux.lock.json
@@ -19,3 +21,5 @@ helm/repositories*
 
 fzf/fzf.zsh
 fzf/fzf.bash
+fzf/fzf/
+

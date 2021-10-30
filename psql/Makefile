@@ -5,7 +5,5 @@ install: .ensure.xdg
 	mkdir -p $(XDG_CACHE_HOME)/psql
 
 clean: .remove.xdg.module.psql
-	rm -rf $(XDG_CONFIG_HOME)/psql
-	rm -rf $(XDG_CACHE_HOME)/psql
 
 .PHONY: install clean

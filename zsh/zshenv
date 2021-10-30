@@ -12,6 +12,5 @@ export CDPATH=$HOME/go/src
 export TEX=/Library/TeX/texbin
 
 export ZSH_THEME=""
-export ZSH_CUSTOM=$ZSH/custom/
 export ZDOTDIR=$XDG_CONFIG_HOME/zsh/
 export ZSH_CACHE_DIR=$XDG_CACHE_HOME/zsh/
