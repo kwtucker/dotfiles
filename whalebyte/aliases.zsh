@@ -1,4 +1,4 @@
-alias wb="cd $WHALEBYTE"
+# alias wb="cd $WHALEBYTE"
 alias wbc="cd $WHALEBYTE/Code"
 alias wbs="vim $WHALEBYTE/.secret"
 alias wbe="vim $WHALEBYTE/.env"
