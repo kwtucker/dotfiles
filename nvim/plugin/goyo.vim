@@ -1,4 +1,4 @@
-let g:goyo_width = 120 
+" let g:goyo_width = 120 
 map <leader>gy :Goyo<CR>
 
 function! s:goyo_enter()
