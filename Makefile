@@ -2,7 +2,7 @@ include modules.local.mk
 
 MODULES = \
 		bin zsh whalebyte alacritty python fzf tmux git golang \
-	  bat gem nvim psql ripgrep homebrew $(LOCAL_MODULES)
+	  bat nvim psql ripgrep homebrew $(LOCAL_MODULES)
 
 CLEAN := $(addsuffix .clean,$(MODULES))
 
