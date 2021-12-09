@@ -38,6 +38,10 @@ Temporary Items
 *ktucke214*.yaml
 ktucke214*
 *.env
+
+# Direnv used mainly for terraform.
+*.envrc
+
 ## local make targets for deploying
 .localConfigs/
 

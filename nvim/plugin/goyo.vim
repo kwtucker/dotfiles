@@ -1,4 +1,4 @@
-" let g:goyo_width = 120 
+let g:goyo_width = 120 
 map <leader>gy :Goyo<CR>
 
 function! s:goyo_enter()
@@ -9,6 +9,8 @@ function! s:goyo_enter()
   set noshowmode
   set noshowcmd
   set scrolloff=999
+  set colorcolumn=999
+  set number 
 endfunction
 
 function! s:goyo_leave()
@@ -18,7 +20,9 @@ function! s:goyo_leave()
   endif
   set showmode
   set showcmd
-  set scrolloff=5
+  set scrolloff=8
+  set colorcolumn=80
+  set number relativenumber
 endfunction
 
 autocmd! User GoyoEnter nested call <SID>goyo_enter()

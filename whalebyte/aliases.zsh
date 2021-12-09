@@ -2,4 +2,4 @@
 alias wbc="cd $WHALEBYTE/Code"
 alias wbs="vim $WHALEBYTE/.secret"
 alias wbe="vim $WHALEBYTE/.env"
-alias wbn="vim $WHALEBYTE/notes"
+alias wbn="cd $WHALEBYTE/notes && vim ."
