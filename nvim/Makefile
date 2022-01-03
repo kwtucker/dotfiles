@@ -2,10 +2,10 @@ include ../env.mk
 
 install: .ensure.xdg
 	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/nvim
-	curl -sfLo "${XDG_CONFIG_HOME}/nvim/autoload/plug.vim" --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim >> /dev/null
-	mkdir -p "${XDG_DATA_HOME}/nvim/"{backup,swap,undo}
+	mkdir -p "${XDG_DATA_HOME}/nvim/backup"
+	mkdir -p "${XDG_DATA_HOME}/nvim/swap"
+	mkdir -p "${XDG_DATA_HOME}/nvim/undo"
 	brew install --HEAD  neovim
-	nvim +PlugInstall +UpdateRemotePlugins +qa
 	npm install -g \
 		bash-language-server
 	yarn global add vim-language-server

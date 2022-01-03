@@ -12,13 +12,14 @@ function install {
 }
 
 install build-essential
+install chromium-browser
 install procps
 install curl
 install file
 install git
 install gcc
 install htop
-install 1password
+install discord 
 install timeshift
 install neofetch
 install alacritty
@@ -26,7 +27,6 @@ install zsh
 install bat
 install bash
 install universal-ctags
-install exa
 install golang
 install gzip
 install httpie

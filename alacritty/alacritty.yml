@@ -53,24 +53,33 @@ scrolling: # Maximum number of lines in the scrollback buffer.  Specifying '0' w
 font:
   # The normal (roman) font face to use.
   normal:
-    family: Inconsolata for Powerline 
-    style: Medium 
+    family: "JetBrainsMonoNL Nerd Font" 
+    style: Regular 
+  bold:
+    family: "JetBrainsMonoNL Nerd Font" 
+    style: Bold 
+  bold_italic:
+    family: "JetBrainsMonoNL Nerd Font" 
+    style: Bold Italic 
+  italic:
+    family: "JetBrainsMonoNL Nerd Font" 
+    style: Italic 
 
   # Point size of the font
   size: 18.0   
 
   # Offset is the extra space around each character. offset.y can be thought of
   # as modifying the linespacing, and offset.x as modifying the letter spacing.
-  offset:
-    x: 1 
-    y: 1
+  # offset:
+  #  x: 1 
+  #  y: 1
 
   # Glyph offset determines the locations of the glyphs within their cells with
   # the default being at the bottom. Increase the x offset to move the glyph to
   # the right, increase the y offset to move the glyph upward.
-  glyph_offset:
-    x: 0
-    y: 0
+  #glyph_offset:
+  #  x: 0
+  #  y: 0
 
   # OS X only: use thin stroke font rendering. Thin strokes are suitable
   # for retina displays, but for non-retina you probably want this set to
