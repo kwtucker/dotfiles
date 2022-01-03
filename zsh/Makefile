@@ -7,7 +7,7 @@ install: .ensure.xdg
 	mkdir -p $(XDG_DATA_HOME)/zsh
 	mkdir -p $(XDG_RUNTIME_DIR)/zsh
 	curl -sfL "git.io/antibody" | sh -s - -b $(HOME)/bin
-	antibody bundle < $(CURDIR)/bundle.txt > ${XDG_DATA_HOME}/zsh/plugins
+	/home/kevin/bin/antibody bundle < $(CURDIR)/bundle.txt > ${XDG_DATA_HOME}/zsh/plugins
 	ln -sf $(CURDIR)/zshenv $(HOME)/.zshenv
 
 clean: .remove.xdg.module.zsh
