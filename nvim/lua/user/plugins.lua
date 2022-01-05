@@ -92,8 +92,6 @@ return packer.startup(function(use)
   }
   use "JoosepAlviste/nvim-ts-context-commentstring"
 
-  -- use { "fatih/vim-go", run = ":GoUpdateBinaries", opt = true, ft = "go" }
-
   -- Git
   use "lewis6991/gitsigns.nvim"
 
