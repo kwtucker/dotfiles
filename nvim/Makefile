@@ -13,7 +13,11 @@ install: .ensure.xdg
 		bash-language-server \
 		neovim
 	yarn global add vim-language-server
+	nvim +PackerClean +PackerSync +qa
 
 clean: .remove.xdg.module.nvim
 	brew uninstall tree-sitter luajit neovim
+	cargo uninstall stylua
+	npm uninstall -g bash-language-server neovim
+	yarn global remove vim-language-server
 .PHONY: install clean
