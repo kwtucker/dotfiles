@@ -8,9 +8,10 @@ install: .ensure.xdg
 	brew install --HEAD luajit
 	brew install --HEAD tree-sitter
 	brew install --HEAD neovim
+	cargo install stylua
 	npm install -g \
 		bash-language-server \
-                neovim
+		neovim
 	yarn global add vim-language-server
 
 clean: .remove.xdg.module.nvim
