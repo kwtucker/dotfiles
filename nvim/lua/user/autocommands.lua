@@ -29,12 +29,10 @@ vim.cmd [[
     autocmd User AlphaReady set showtabline=0 | autocmd BufUnload <buffer> set showtabline=2
   augroup end
 
-  autocmd BufWritePre go lua vim.lsp.buf.formatting()
-  autocmd BufWritePre go lua goimports(1000)
+  " Autoformat
+  augroup _lsp
+    autocmd!
+    autocmd BufWritePre * lua vim.lsp.buf.formatting()
+  augroup end
 ]]
 
--- Autoformat
--- augroup _lsp
---   autocmd!
---   autocmd BufWritePre * lua vim.lsp.buf.formatting()
--- augroup end
