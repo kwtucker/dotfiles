@@ -1,6 +1,6 @@
 local status_ok, lsp_installer = pcall(require, "nvim-lsp-installer")
 if not status_ok then
-	return
+	 return
 end
 
 -- Register a handler that will be called for all installed servers.
@@ -24,6 +24,11 @@ lsp_installer.on_server_ready(function(server)
 	if server.name == "gopls" then
 		local gopls_opts = require("user.lsp.settings.gopls")
 		opts = vim.tbl_deep_extend("force", gopls_opts, opts)
+	end
+
+	if server.name == "rust-analyzer" then
+		local rust_analyzer_opts = require("user.lsp.settings.rust-analyzer")
+		opts = vim.tbl_deep_extend("force", rust_analyzer_opts, opts)
 	end
 
 	-- This setup() function is exactly the same as lspconfig's setup function.
