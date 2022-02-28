@@ -8,7 +8,6 @@ install: .ensure.xdg
 	brew install --HEAD luajit
 	brew install --HEAD tree-sitter
 	brew install --HEAD neovim
-	cargo install stylua
 	npm install -g \
 		bash-language-server \
 		neovim

@@ -41,5 +41,4 @@ install tldr
 install tmux
 install vim
 install wdiff
-install weechat
 
