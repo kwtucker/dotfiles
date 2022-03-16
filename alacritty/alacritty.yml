@@ -18,6 +18,9 @@ window:
     columns: 160
     lines: 48
 
+  # Background opacity
+  background_opacity: 1.0
+
   # Adds this many blank pixels of padding around the window
   # Units are physical pixels; this is not DPI aware.
   # (change requires restart)
@@ -211,7 +214,7 @@ key_bindings:
   - { key: S, mods: Command|Shift, chars: "\x00\x5c" } # Vertical split
   - { key: H, mods: Command, chars: "\x00\x68" } # Move to left pane
   - { key: J, mods: Command, chars: "\x00\x6a" } # Move to top pane
-  - { key: K, mods: Command, chars: "\x00\x6a" } # Move to bottom pane
+  - { key: K, mods: Command, chars: "\x00\x6b" } # Move to bottom pane
   - { key: L, mods: Command, chars: "\x00\x6c" } # Move to right pane
   - { key: X, mods: Command, chars: "\x00\x78" } # Close pane
   - { key: Z, mods: Command, chars: "\x00\x7a" } # Zoom pane
