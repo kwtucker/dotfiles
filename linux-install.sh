@@ -23,6 +23,7 @@ install discord
 install timeshift
 install neofetch
 install alacritty
+install asdf
 install zsh
 install bat
 install bash

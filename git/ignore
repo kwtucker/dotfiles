@@ -35,9 +35,10 @@ Temporary Items
 
 # yggdrasil
 *local*.yaml
-*ktucke214*.yaml
-ktucke214*
 *.env
+
+# Homebrew
+Brewfile.darwin.lock.json
 
 # Direnv used mainly for terraform.
 *.envrc

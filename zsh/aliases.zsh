@@ -15,8 +15,8 @@ alias ll="exa -abghHliS"
 alias up="cd .. && ls -la |  awk '{print \$9,\$10}'"
 alias c='clear'
 alias v='nvim'
-alias vim='nvim'
 alias vi='nvim'
+alias vim='nvim'
 alias zshrc="vim $DOTFILES/zsh/.zshrc"
 
 # ---- GO ----
