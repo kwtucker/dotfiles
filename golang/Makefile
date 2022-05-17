@@ -5,6 +5,6 @@ install: .ensure.xdg
 	curl -sSfL "https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh" | sh -s -- -b ~/go/bin latest
 	
 clean: .remove.xdg.module.golang
-	rm ~/go/bin/golangci-lint 
+	rm ~/go/bin/golangci-lint
 
 .PHONY: install clean

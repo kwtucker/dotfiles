@@ -30,13 +30,13 @@ if test ! "$(command -v brew)"; then
     brew bundle --file=Brewfile.linux
 
   elif [ "$UNAME" == "Darwin" ]; then
-    brew bundle --file=Brewfile.darwin
+   /opt/homebrew/bin/brew bundle --file=Brewfile.darwin
   fi
 else
   while read -r brw; do
     echo "${brw}"
-  done < <(brew update)
+  done < <(/opt/homebrew/bin/brew update)
   echo ''
 fi
 
-source "$XDG_CONFIG_HOME/zsh/.zshrc"
+# source "$XDG_CONFIG_HOME/zsh/.zshrc"
