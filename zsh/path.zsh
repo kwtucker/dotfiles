@@ -10,6 +10,7 @@ PATH=${PATH}:${GEM_HOME}
 PATH=${PATH}:${GNU_BIN} 
 PATH=${PATH}:${TEX}
 PATH=${PATH}:${HOME}/.cargo/bin
+PATH=${PATH}:${HOME}/bin
 PATH=${PATH}:/opt/homebrew/bin
 PATH=${PATH}:/opt/homebrew/sbin
 PATH=${PATH}:/usr/local/bin

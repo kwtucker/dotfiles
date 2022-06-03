@@ -6,4 +6,5 @@ export XDG_RUNTIME_DIR=$HOME/tmp/runtime
 export ZSH_THEME=""
 export ZDOTDIR=$XDG_CONFIG_HOME/zsh/
 export ZSH_CACHE_DIR=$XDG_CACHE_HOME/zsh/
+. "$HOME/.asdf/asdf.sh"
 . "$HOME/.cargo/env"
