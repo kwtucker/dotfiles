@@ -21,7 +21,6 @@ alias zshrc="vim $DOTFILES/zsh/.zshrc"
 
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker" 
-alias gowork="cd ~/go/src/github.comcast.com/yggdrasil/go"
 
 # ---- PHP ----
 alias composer="php /usr/local/bin/composer.phar"
