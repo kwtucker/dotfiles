@@ -35,7 +35,8 @@ install jq
 install make
 install nmap
 install postgresql
-install python
+install python3
+install python3-pip
 install ripgrep
 install tig
 install tldr
