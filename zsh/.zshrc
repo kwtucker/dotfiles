@@ -38,7 +38,7 @@ unset config_files
 ################################################################################
 # Load local configurations.
 [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh && enable-fzf-tab
-[ -f ${XDG_CONFIG_HOME}/zsh/local.zsh ] && . ${XDG_CONFIG_HOME}/zsh/local.zsh
+[ -f ${XDG_CONFIG_HOME}/zsh/local ] && . ${XDG_CONFIG_HOME}/zsh/local
 [ -f ${WHALEBYTE}/.secret ] && . ${WHALEBYTE}/.secret
 [ -f ${WHALEBYTE}/.env ] && . ${WHALEBYTE}/.env
 

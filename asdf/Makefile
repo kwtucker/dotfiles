@@ -2,6 +2,7 @@ include ../env.mk
 
 install: .ensure.xdg
 	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/asdf
+	@touch ~/.tool-versions
 	@asdf plugin-add nodejs
 	asdf install nodejs latest
 	@asdf plugin-add golang
