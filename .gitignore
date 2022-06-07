@@ -3,7 +3,7 @@
 .netrwhist*
 .zcompdump
 
-local.zsh
+local*
 modules.local.mk
 
 nvim/autoload

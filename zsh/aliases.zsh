@@ -26,8 +26,8 @@ alias gohome="cd ~/go/src/github.com/kwtucker"
 alias composer="php /usr/local/bin/composer.phar"
 
 # ---- dotfile python ----
-alias python=/usr/local/bin/python3.9
-alias pip=/usr/local/bin/pip3
+# alias python=/usr/local/bin/python3.9
+# alias pip=/usr/local/bin/pip3
 
 # ---- dotfile git pull ----
 alias dotpull="pwd=`pwd` && cd $DOTFILES && git pull && sleep 6 && cd $pwd"
