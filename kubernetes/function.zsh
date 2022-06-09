@@ -4,6 +4,22 @@ function loadkubectl() {
 	fi
 }
 
+function kcron18() {
+	local cron=$(echo CRONS)
+  local job=${cron}-manual-$(date +%s)
+
+	echo "Creating Job from cron job ${cron} with name ${job}"
+  $HOME/bin/kubectl create job $job --from=cronjob/${cron} 
+}
+
+function kcron() {
+	local cron=$(echo CRONS)
+  local job=${cron}-manual-$(date +%s)
+
+	echo "Creating Job from cron job ${cron} with name ${job}"
+  kubectl create job $job --from=cronjob/${cron} 
+}
+
 function kport() {
 	local pod=$(echo PODS)
 	local port=$(kubectl get pod ${pod} -o json | jq '.spec.containers | .[0].ports | .[0].containerPort')
