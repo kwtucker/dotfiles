@@ -4,19 +4,10 @@ function loadkubectl() {
 	fi
 }
 
-function kcron18() {
-	local cron=$(echo CRONS)
-  local job=${cron}-manual-$(date +%s)
-
-	echo "Creating Job from cron job ${cron} with name ${job}"
-  $HOME/bin/kubectl create job $job --from=cronjob/${cron} 
-}
-
 function kcron() {
-	local cron=$(echo CRONS)
+  local cron=$(echo CRONS)
   local job=${cron}-manual-$(date +%s)
-
-	echo "Creating Job from cron job ${cron} with name ${job}"
+  echo "Creating Job from cron job ${cron} with name ${job}"
   kubectl create job $job --from=cronjob/${cron} 
 }
 
