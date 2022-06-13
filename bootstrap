@@ -24,7 +24,7 @@ if test ! "$(command -v brew)"; then
   
   if [ "$UNAME" = "Linux" ]; then
     linux-install.sh
-    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ${XDG_CONFIG_HOME}/zsh/local.zsh
+    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ${XDG_CONFIG_HOME}/zsh/local
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
     brew bundle --file=Brewfile.linux
