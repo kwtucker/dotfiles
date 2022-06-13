@@ -3,4 +3,4 @@ shell:
   args:
     - -l
     - -c
-    - 'tm wb'
+    - 'tmwb'

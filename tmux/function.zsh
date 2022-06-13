@@ -7,6 +7,11 @@ function tm() {
   session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | fzf --exit-0) &&  tmux $change -t "$session" || echo "No sessions found."
 }
 
+function tmwb() {
+  [[ -n "$TMUX" ]] && change="switch-client" || change="attach-session"
+  tmux $change -t "wb" 2>/dev/null || (tmux new-session -d -s "wb" && tmux $change -t "wb")
+}
+
 # zsh; needs setopt re_match_pcre. Kill session
 function tmk () {
     local sessions
