@@ -73,8 +73,8 @@ function install_dotfiles
 			or abort plugins
 	end
 
-	link_file $DOTFILES_ROOT/fish/bat/config $HOME/.config/bat/config backup
-		or abort bat
+	# link_file $DOTFILES_ROOT/fish/bat/config $HOME/.config/bat/config backup
+	# 	or abort bat
 	# link_file $DOTFILES_ROOT/ssh/config.dotfiles $HOME/.ssh/config.dotfiles backup
 	# 	or abort ssh
 end
@@ -87,9 +87,9 @@ install_dotfiles
 	and success 'dotfiles'
 	or abort 'dotfiles'
 
-setup_gitconfig
-	and success 'gitconfig'
-	or abort 'gitconfig'
+# setup_gitconfig
+# 	and success 'gitconfig'
+# 	or abort 'gitconfig'
 
 fisher update
 	and success 'plugins'
