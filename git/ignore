@@ -33,9 +33,10 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# yggdrasil
 *local*.yaml
 *.env
+*secret*
+*local*
 
 # Homebrew
 Brewfile.darwin.lock.json
