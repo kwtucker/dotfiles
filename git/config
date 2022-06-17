@@ -1,10 +1,8 @@
 [include]
-	path = /home/kevin/.gitconfig.local
+  path = config.local
 
 [user]
   useConfigOnly = true
-	email = kwtucker4@gmail.com
-	name = Kevin Tucker
 
 [fetch]
   prune = true
