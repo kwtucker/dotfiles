@@ -4,7 +4,7 @@ function loadkubectl() {
 	fi
 }
 
-function kcron() {
+function kmcron() {
   local cron=$(echo CRONS)
   local job=${cron}-manual-$(date +%s)
   echo "Creating Job from cron job ${cron} with name ${job}"
@@ -42,10 +42,12 @@ function kip() {
 
 function kenv() {
 	local ctx=$(kubectl config current-context)
-	local cns=$(kubectl config view --minify | grep namespace: | awk 'NR>0 {print $2}')
-	local server=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
-	echo "Context:    ${ctx}"
-	echo "Namespace:  ${cns}"
-	echo "Server:     ${server}"
+  local cns=$(kubectl config view --minify | grep namespace: | awk 'NR>0 {print $2}')
+  local server=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+  local version=$(kubectl version --short=true)
+  echo "Context:        ${ctx}"
+  echo "Namespace:      ${cns}"
+  echo "${version}"
+  echo "Server URL:     ${server}"
 }
 
