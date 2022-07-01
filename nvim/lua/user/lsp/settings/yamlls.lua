@@ -1,9 +1,9 @@
 return {
-  settings = {
-    yaml = {
-      format = {
-        bracketSpacing = false,
-      },
-    },
-  },
+	settings = {
+		yaml = {
+			format = {
+				bracketSpacing = false,
+			},
+		},
+	},
 }
