@@ -2,32 +2,6 @@
 # Functions 
 # -------------------------------------------------------------------
 
-# Environment ------------------
-#
-
-function cleanenv() {
-	echo -n "\nARE YOU SURE [N/y]: "
-	read  selection
-	echo
-	
-	if [[ $selection == '' || `echo "$selection" | awk '{print tolower($0)}'` == 'n' ]]; then
-		return
-	fi
-
-	if [[ `echo "$selection" | awk '{print tolower($0)}'` == 'y' ]]; then
-		notesB ; rm -rf ~/{.whalebyte,.ssh,go/src/github.com/kwtucker}
-		return
-	fi
-}
-
-
-function leave() {
-	cleanenv	
-}
-
-# -- MISC ------------------
-#
-
 # OSX stuffs
 if [ "$(uname -s)" = "Darwin" ]; then
   alias showfiles="defaults write com.apple.finder AppleShowAllFiles TRUE; killall Finder"
