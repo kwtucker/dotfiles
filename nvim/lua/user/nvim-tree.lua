@@ -128,9 +128,11 @@ nvim_tree.setup({
     mappings = {
       custom_only = false,
       list = {
+        { key = { "v", "|" }, cb = tree_cb("vsplit") },
+        { key = { "_", "-" }, cb = tree_cb("split") },
         { key = { "l", "<CR>", "o" }, cb = tree_cb("edit") },
         { key = "h", cb = tree_cb("close_node") },
-        { key = "v", cb = tree_cb("vsplit") },
+        { key = "R", cb = tree_cb("refresh") },
       },
     },
     number = false,
