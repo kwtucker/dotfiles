@@ -10,7 +10,7 @@ alias kds='k describe service SVC'
 alias kdj='k describe job JOBS'
 alias kdc='k describe cronjob CRONS'
 alias kcs='k config use-context CTX'
-alias kns='k config set-context --current --namespace NAMESPACES'
+alias kns='k config set-context --current --namespace NS'
 alias kgsa='k get pod PODS -o json | jq .spec.serviceAccount'
 alias kgsan='k get pod PODS -o json | jq .spec.serviceAccountName'
 
