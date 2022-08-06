@@ -83,6 +83,20 @@ curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
 	and success 'fisher'
 	or abort 'fisher'
 
+mkdir -p ~/.extra/functions/
+	and success '.extra/functions'
+	or abort '.extra/functions'
+
+mkdir -p ~/.extra/plugins/
+	and success '.extra/plugins'
+	or abort '.extra/plugins'
+
+for plugin in ~/.extra/plugins/*
+	if test -d $plugin
+		fisher install $plugin
+	end
+end
+
 install_dotfiles
 	and success 'dotfiles'
 	or abort 'dotfiles'
@@ -103,20 +117,6 @@ for installer in $DOTFILES_ROOT/**/install.fish
 	fish $installer
 		and success $installer
 		or abort $installer
-end
-
-mkdir -p ~/.extra/functions/
-	and success '.extra/functions'
-	or abort '.extra/functions'
-
-mkdir -p ~/.extra/plugins/
-	and success '.extra/plugins'
-	or abort '.extra/plugins'
-
-for plugin in ~/.extra/plugins/*
-	if test -d $plugin
-		fisher install $plugin
-	end
 end
 
 test (which fish) = $SHELL
