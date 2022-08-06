@@ -8,7 +8,7 @@ function cp_to_extra -d "copy to extra"
         and success "copied $src to $dest"
 end
 
-cp_to_extra $DOTFILES/fish/alacritty/alacritty.local.yml $HOME/.extra/alacritty/alacritty.local.yml
+cp_to_extra $DOTFILES/fish/alacritty/alacritty.local.yml $HOME/.extra/alacritty.local.yml
 
 link_file $DOTFILES/fish/alacritty/alacritty.defaults.yml $HOME/.config/alacritty/alacritty.defaults.yml backup
     or abort alacritty link
@@ -21,8 +21,8 @@ link_file $HOME/.extra/alacritty.local.yml $HOME/.config/alacritty/alacritty.yml
 
 switch (uname)
 case Darwin
-    cp_to_extra $DOTFILES/fish/alacritty/osx.shell.yml $HOME/.extra/alacritty/alacritty.shell.yml
+    cp_to_extra $DOTFILES/fish/alacritty/osx.shell.yml $HOME/.extra/alacritty.shell.yml
 case '*'
-    cp_to_extra  $DOTFILES/fish/alacritty/linux.shell.yml $HOME/.extra/alacritty/alacritty.shell.yml
+    cp_to_extra  $DOTFILES/fish/alacritty/linux.shell.yml $HOME/.extra/alacritty.shell.yml
 end
 
