@@ -87,9 +87,9 @@ install_dotfiles
 	and success 'dotfiles'
 	or abort 'dotfiles'
 
-# setup_gitconfig
-# 	and success 'gitconfig'
-# 	or abort 'gitconfig'
+setup_gitconfig
+	and success 'gitconfig'
+	or abort 'gitconfig'
 
 fisher update
 	and success 'plugins'
