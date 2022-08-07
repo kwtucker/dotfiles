@@ -8,7 +8,7 @@ function cp_to_extra -d "copy to extra"
         and success "copied $src to $dest"
 end
 
-link_file $DOTFILES/fish/tmux/ $HOME/.config/tmux/ backup
+link_file $DOTFILES/fish/tmux $HOME/.config/tmux backup
     or abort alacritty link
 
 
