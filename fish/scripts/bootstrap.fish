@@ -67,6 +67,7 @@ function set_xdg
   	set -U fish_user_paths XDG_CACHE_HOME={$HOME}/.cache $fish_user_paths
   	set -U fish_user_paths XDG_DATA_HOME={$HOME}/.local/share $fish_user_paths
   	set -U fish_user_paths XDG_RUNTIME_DIR={$HOME}/tmp/xdg_runtime $fish_user_paths
+end
 
 function install_dotfiles
 	for src in $DOTFILES_ROOT/fish/**/*.symlink
