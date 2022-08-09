@@ -62,7 +62,7 @@ function setup_gitconfig
 		or abort 'failed to setup git'
 end
 
-functiion set_xdg
+function set_xdg
 	set -U fish_user_paths XDG_CONFIG_HOME={$HOME}/.config $fish_user_paths
   	set -U fish_user_paths XDG_CACHE_HOME={$HOME}/.cache $fish_user_paths
   	set -U fish_user_paths XDG_DATA_HOME={$HOME}/.local/share $fish_user_paths
