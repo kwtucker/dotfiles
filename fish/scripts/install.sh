@@ -230,7 +230,6 @@ EOF
     fi
     exit 1
   fi
-  setup_xdg
   setup_dots
   exec fish -l ${DOTS}/fish/scripts/bootstrap.fish
 }
