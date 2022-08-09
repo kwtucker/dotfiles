@@ -1,6 +1,6 @@
 # Search or create tmux session.
-function tm -d "create or attach to tmux session."
-  [[ -n "$TMUX" ]] && change="switch-client" || change="attach-session"
+function tm -d "create or attach to tmux session." -a name
+  test -n "$TMUX" change="switch-client" || change="attach-session"
   if [ $1 ]; then
     tmux $change -t "$1" 2>/dev/null || (tmux new-session -d -s $1 && tmux $change -t "$1"); return
   fi
