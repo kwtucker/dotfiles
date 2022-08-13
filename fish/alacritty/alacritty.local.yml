@@ -1,5 +1,0 @@
-import:
-  - ~/.config/alacritty/alacritty.defaults.yml
-  - ~/.extra/alacritty.shell.yml
-
-# put your overrides below this line
