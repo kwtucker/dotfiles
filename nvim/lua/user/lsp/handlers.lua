@@ -79,7 +79,7 @@ local function lsp_keymaps(bufnr)
   buf_set_keymap("n", "[d", '<cmd>lua vim.diagnostic.goto_prev({ border = "rounded" })<CR>', opts)
   buf_set_keymap("n", "gl", '<cmd>lua vim.diagnostic.open_float({ border = "rounded" })<CR>', opts)
   buf_set_keymap("n", "]d", '<cmd>lua vim.diagnostic.goto_next({ border = "rounded" })<CR>', opts)
-  buf_set_keymap("n", "<leader>q", "<cmd>lua vim.diagnostic.setloclist()<CR>", opts)
+  buf_set_keymap("n", "<leader>;", "<cmd>lua vim.diagnostic.setloclist()<CR>", opts)
   vim.cmd([[ command! Format execute 'lua vim.lsp.buf.format()' ]])
 end
 
@@ -89,6 +89,10 @@ M.on_attach = function(client, bufnr)
   end
 
   if client.name == "gopls" then
+    client.server_capabilities.document_formatting = false
+  end
+
+  if client.name == "yamlls" then
     client.server_capabilities.document_formatting = false
   end
 

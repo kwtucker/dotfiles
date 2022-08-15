@@ -4,6 +4,7 @@ return {
       format = {
         bracketSpacing = false,
       },
+      -- validate = false,
     },
   },
 }
