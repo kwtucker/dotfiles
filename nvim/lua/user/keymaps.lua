@@ -39,10 +39,6 @@ keymap("n", "<S-h>", ":bprevious<CR>", opts)
 keymap("n", "<A-j>", "<Esc>:m .+1<CR>==gi", opts)
 keymap("n", "<A-k>", "<Esc>:m .-2<CR>==gi", opts)
 
--- Insert --
--- Press jk fast to enter
-keymap("i", "jj", "<ESC>", opts)
-
 -- Visual --
 -- Stay in indent mode
 keymap("v", "<", "<gv", opts)
@@ -60,9 +56,16 @@ keymap("x", "K", ":move '<-2<CR>gv-gv", opts)
 keymap("x", "<A-j>", ":move '>+1<CR>gv-gv", opts)
 keymap("x", "<A-k>", ":move '<-2<CR>gv-gv", opts)
 
--- Terminal --
--- Better terminal navigation
--- keymap("t", "<C-h>", "<C-\\><C-N><C-w>h", term_opts)
--- keymap("t", "<C-j>", "<C-\\><C-N><C-w>j", term_opts)
--- keymap("t", "<C-k>", "<C-\\><C-N><C-w>k", term_opts)
--- keymap("t", "<C-l>", "<C-\\><C-N><C-w>l", term_opts)
+-- Deleteing without register overwrite: Copy, delete, paste workflow
+keymap("n", "d", '"_d', opts)
+keymap("n", "D", '"_D', opts)
+keymap("v", "d", '"_d', opts)
+keymap("v", "D", '"_D', opts)
+keymap("n", "c", '"_c', opts)
+keymap("n", "C", '"_C', opts)
+keymap("v", "c", '"_c', opts)
+keymap("v", "C", '"_C', opts)
+keymap("n", "x", '"_x', opts)
+keymap("n", "X", '"_X', opts)
+keymap("v", "x", '"_x', opts)
+keymap("v", "X", '"_X', opts)
