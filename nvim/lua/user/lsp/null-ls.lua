@@ -37,5 +37,6 @@ null_ls.setup({
     formatting.stylua,
     formatting.gofmt,
     formatting.goimports,
+    formatting.terraform_fmt,
   },
 })
