@@ -5,7 +5,7 @@ export DOTFILES="$HOME/.dotfiles"
 bindkey -e
 ################################################################################
 # All the ZSH files.
-typeset -U config_files
+typeset config_files
 config_files=($XDG_CONFIG_HOME/*/*.zsh)
 
 ################################################################################

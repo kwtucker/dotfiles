@@ -15,7 +15,8 @@ null_ls.setup({
     diagnostics.staticcheck,
     diagnostics.flake8,
     formatting.prettier.with({
-      extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote", "--no-bracket-spacing" },
+      -- extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote", "--no-bracket-spacing" },
+      extra_args = { "--no-semi", "--no-bracket-spacing" },
       filetypes = {
         "html",
         "handlebars",
