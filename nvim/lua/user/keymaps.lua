@@ -28,8 +28,8 @@ keymap("n", "<C-l>", "<C-w>l", opts)
 -- Resize with arrows
 keymap("n", "<C-Up>", ":resize -2<CR>", opts)
 keymap("n", "<C-Down>", ":resize +2<CR>", opts)
-keymap("n", "<C-Left>", ":vertical resize -2<CR>", opts)
-keymap("n", "<C-Right>", ":vertical resize +2<CR>", opts)
+keymap("n", "<C-Left>", ":vertical resize +2<CR>", opts)
+keymap("n", "<C-Right>", ":vertical resize -2<CR>", opts)
 
 -- Navigate buffers
 keymap("n", "<S-l>", ":bnext<CR>", opts)
@@ -69,3 +69,17 @@ keymap("n", "x", '"_x', opts)
 keymap("n", "X", '"_X', opts)
 keymap("v", "x", '"_x', opts)
 keymap("v", "X", '"_X', opts)
+
+-- Use clipboard with leader only
+keymap("n", "<leader>d", "d", opts)
+keymap("n", "<leader>D", "D", opts)
+keymap("v", "<leader>d", "d", opts)
+keymap("v", "<leader>D", "D", opts)
+keymap("n", "<leader>c", "c", opts)
+keymap("n", "<leader>C", "C", opts)
+keymap("v", "<leader>c", "c", opts)
+keymap("v", "<leader>C", "C", opts)
+keymap("n", "<leader>x", "x", opts)
+keymap("n", "<leader>X", "X", opts)
+keymap("v", "<leader>x", "x", opts)
+keymap("v", "<leader>X", "X", opts)
