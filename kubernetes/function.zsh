@@ -13,10 +13,10 @@ function kfuzz() {
 # Exec into pods container.
 function ke() {
   local pod=$(echo PODS)
-  local container=$(kubectl get pod $pod -o json | jq '.spec.containers[].name' | tr -d '"' | sort -fd | FZF )
+  local container=$(kubectl get pod $pod -o json | jq '.spec.containers[].name' | tr -d '"' | FZF)
 
   echo "In $pod:$container"
-  kubectl exec $pod -c $container -it -- bash  
+  kubectl exec $pod -c $container -it -- bash
 }
 
 # Manually create job from cronjob.
