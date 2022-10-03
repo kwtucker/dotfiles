@@ -15,7 +15,7 @@ alias tfv='terraform validate -json | jq ".diagnostics|=sort_by(.range.filename)
     }
   ]
 }"'
-alias tfp='terraform plan | landscape'
+alias tfp='terraform plan'
 alias tfa='terraform apply'
 alias tfd='terraform destroy'
 alias tfs='terraform state'
