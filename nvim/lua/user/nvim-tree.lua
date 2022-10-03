@@ -88,7 +88,7 @@ nvim_tree.setup({
     ignore_list = {},
   },
   system_open = {
-    cmd = nil,
+    cmd = "",
     args = {},
   },
   filters = {
@@ -121,7 +121,6 @@ nvim_tree.setup({
   },
   view = {
     width = 30,
-    height = 30,
     hide_root_folder = false,
     side = "left",
     signcolumn = "yes",
