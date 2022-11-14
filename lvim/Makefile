@@ -1,8 +1,12 @@
 include ../env.mk
 
-install: .ensure.xdg
-	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/lvim
+install: 
+	mv $(XDG_CONFIG_HOME)/lvim/config.lua $(XDG_CONFIG_HOME)/lvim/config_backup.lua
+	ln -sfn $(CURDIR)/config.lua $(XDG_CONFIG_HOME)/lvim/config.lua
+	lvim +PackerClean +PackerSync +qa
 
-clean: .remove.xdg.module.nvim
-	rm -rf $(XDG_CONFIG_HOME)/lvim
+clean: 
+	rm -rf $(XDG_CONFIG_HOME)/lvim/config.lua
+	mv $(XDG_CONFIG_HOME)/lvim/config_backup.lua $(XDG_CONFIG_HOME)/lvim/config.lua
+	lvim +PackerClean +PackerSync +qa
 .PHONY: install clean
