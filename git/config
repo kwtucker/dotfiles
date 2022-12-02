@@ -23,12 +23,6 @@
   st = status -sb
   wip = commit -am "WIP"
 
-[filter "lfs"]
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	required = true
-	process = git-lfs filter-process
-
 [url "git@bitbucket.org:"]
 	insteadOf = https://bitbucket.org/
 
@@ -37,5 +31,3 @@
 	
 [init]
 	defaultBranch = main
-[dotfiles]
-	managed = true

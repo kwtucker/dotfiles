@@ -1,7 +1,6 @@
 lvim.plugins = {
 	"lunarvim/colorschemes",
 	"RRethy/nvim-base16",
-	"ellisonleao/gruvbox.nvim",
 	"nvim-treesitter/playground",
 	"nvim-treesitter/nvim-treesitter-textobjects",
 	"numToStr/Comment.nvim",
@@ -20,6 +19,7 @@ lvim.plugins = {
 	"sindrets/diffview.nvim",
 	"simrat39/rust-tools.nvim",
 	"olexsmir/gopher.nvim",
+	"ahmedkhalf/project.nvim",
 	{
 		"saecki/crates.nvim",
 		tag = "v0.3.0",

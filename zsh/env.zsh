@@ -5,7 +5,7 @@ export HISTFILE="${XDG_DATA_HOME}"/zsh/history
 export HISTSIZE=10000
 export SAVEHIST=${HISTSIZE}
 
-export EDITOR=nvim
+export EDITOR=lvim
 export EVENT_NOKQUEUE=1
 export ENV=$USER
 
