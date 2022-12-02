@@ -14,9 +14,9 @@ alias m="tldr"
 alias ll="exa -abghHliS"
 alias up="cd .. && ls -la |  awk '{print \$9,\$10}'"
 alias c='clear'
-alias v='nvim'
-alias vi='nvim'
-alias vim='nvim'
+alias v='lvim'
+alias vi='vim'
+alias vim='lvim'
 alias zshrc="vim $DOTFILES/zsh/.zshrc"
 
 # ---- GO ----
@@ -38,13 +38,13 @@ alias dotpush="cd $DOTFILES && git add --all && git commit -m 'update dotfiles' 
 # ---- dotfile cd ----
 alias dot="cd $DOTFILES"
 
-if [ $commands[exa] ]; then
+if [ ${commands[exa]} ]; then
   alias ls='exa'
   alias ll='exa -lg --git --time-style long-iso'
   alias la='exa -laag --git --time-style long-iso'
 else
   if [ "$(uname -s)" = "Darwin" ]; then
-    if [ $commands[gls] ]; then
+    if [ ${commands[gls]} ]; then
       alias ls="gls --color=tty --quoting-style=literal -h"
     else
       alias ls='ls -FG'
