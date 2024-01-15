@@ -1,4 +1,4 @@
-if [ $commands[kubectl] ]; then
+if [ ${commands[kubectl]} ]; then
   function kubectl() {
     source <(command kubectl completion zsh)
     command kubectl "$@"
@@ -7,13 +7,13 @@ fi
 
 # Fuzzy match a Kubernetes resource.
 function kfuzz() {
-  kubectl get "$1" | FZF
+  kubectl get "$1" | tfuzz 
 }
 
 # Exec into pods container.
 function ke() {
   local pod=$(echo PODS)
-  local container=$(kubectl get pod $pod -o json | jq '.spec.containers[].name' | tr -d '"' | FZF)
+  local container=$(kubectl get pod $pod -o json | jq '.spec.containers[].name' | tr -d '"' | tfuzz)
 
   echo "In $pod:$container"
   kubectl exec $pod -c $container -it -- bash
@@ -33,28 +33,6 @@ function kport() {
 	local port=$(kubectl get pod ${pod} -o json | jq '.spec.containers | .[0].ports | .[0].containerPort')
 	echo "Forwarding traffic from ${pod}:${port} to localhost:${port}"
 	kubectl port-forward ${pod} ${port}:${port} | bat -l log
-}
-
-function kip() {
-	local pod=$(kubectl get pod PODS | awk 'NR>1 {print $1}')
-	local node_ip=$(kubectl get pod $pod -o custom-columns=IP:.spec.nodeName | awk 'NR>1 {print $1}')
-	local serviceName=$(kubectl get pod $pod -o custom-columns=NAME:.spec.containers[0].name | awk 'NR>1 {print $1}')
-	local node_ports=$(kubectl get svc -o json ${serviceName} | jq -r '.spec.ports[] | "\(.name) \(.nodePort)"')
-
-	if [[ $(echo "${node_ports}" | awk '{print $2}') -eq null ]]; then
-		echo "no port for ${pod} pod. Try another one"
-		return
-	fi
-
-	if [[ $(echo "${node_ports}" | wc -l) -eq 1 ]]; then
-		echo "${node_ports}" \
-			| awk -v ip="${node_ip}" '{print "http://" ip ":"$2}' > >(cat) > >(tr -d '\n' | pbcopy)
-	else
-		echo "${node_ports}" \
-			| awk -v OFS='\t' -v ip="${node_ip}" '{print $1, " http://" ip ":"$2}' \
-			| fzf-tmux --cycle \
-			| awk '{print $2}' > >(cat) > >(tr -d '\n' | pbcopy)
-	fi
 }
 
 function kenv() {
