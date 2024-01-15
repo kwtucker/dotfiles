@@ -19,6 +19,7 @@ done
 for file in ${config_files:#*/env.zsh}; do
   source "$file"
 done
+
 ################################################################################
 # Initialize the autocompletion framework.
 autoload -Uz compinit

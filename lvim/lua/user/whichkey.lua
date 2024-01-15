@@ -1,9 +1,10 @@
 lvim.builtin.which_key.mappings["b"] = { "<cmd>Telescope buffers<cr>", "Buffers" }
-lvim.builtin.which_key.mappings["v"] = { "<cmd>vsplit<cr>", "vsplit" }
+lvim.builtin.which_key.mappings["v"] = { "<cmd>vnew<cr>", "vnew" }
 lvim.builtin.which_key.mappings["h"] = { "<cmd>nohlsearch<cr>", "nohl" }
 lvim.builtin.which_key.mappings["q"] = { '<cmd>lua require("user.functions").smart_quit()<CR>', "Quit" }
 lvim.builtin.which_key.mappings["/"] = { '<cmd>lua require("Comment.api").toggle.linewise.current()<CR>', "Comment" }
 lvim.builtin.which_key.mappings["c"] = { "<cmd>Bdelete!<CR>", "Close Buffer" }
+lvim.builtin.which_key.mappings["z"] = { "<cmd>ZenMode<CR>", "ZenMode" }
 lvim.builtin.which_key.mappings["r"] = {
   name = "Replace",
   r = { "<cmd>lua require('spectre').open()<cr>", "Replace" },
@@ -19,7 +20,6 @@ lvim.builtin.which_key.mappings["f"] = {
   s = { "<cmd>Telescope grep_string<cr>", "Find String" },
   h = { "<cmd>Telescope help_tags<cr>", "Help" },
   H = { "<cmd>Telescope highlights<cr>", "Highlights" },
-  i = { "<cmd>lua require('telescope').extensions.media_files.media_files()<cr>", "Media" },
   l = { "<cmd>Telescope resume<cr>", "Last Search" },
   M = { "<cmd>Telescope man_pages<cr>", "Man Pages" },
   r = { "<cmd>Telescope oldfiles<cr>", "Recent File" },
@@ -91,16 +91,6 @@ lvim.builtin.which_key.mappings["l"] = {
   t = { '<cmd>lua require("user.functions").toggle_diagnostics()<cr>', "Toggle Diagnostics" },
   u = { "<cmd>LuaSnipUnlinkCurrent<cr>", "Unlink Snippet" },
 }
--- lvim.builtin.which_key.mappings["t"] = {
--- 	name = "Tab",
--- 	t = {
--- 		"<cmd>lua require('telescope').extensions['telescope-tabs'].list_tabs(require('telescope.themes').get_dropdown{previewer = false, initial_mode='normal', prompt_title='Tabs'})<cr>",
--- 		"Find Tab",
--- 	},
--- 	n = { "<cmd>tabnew %<cr>", "New Tab" },
--- 	c = { "<cmd>tabclose<cr>", "Close Tab" },
--- 	o = { "<cmd>tabonly<cr>", "Only Tab" },
--- }
 
 lvim.builtin.which_key.mappings["t"] = {
   name = "Terminal",
@@ -120,9 +110,6 @@ lvim.builtin.which_key.mappings["o"] = {
   C = { "<cmd>lua lvim.builtin.cmp.active = true<cr>", "Completion on" },
   w = { '<cmd>lua require("user.functions").toggle_option("wrap")<cr>', "Wrap" },
   r = { '<cmd>lua require("user.functions").toggle_option("relativenumber")<cr>', "Relative" },
-  -- l = { '<cmd>lua require("user.functions").toggle_option("cursorline")<cr>', "Cursorline" },
-  -- s = { '<cmd>lua require("user.functions").toggle_option("spell")<cr>', "Spell" },
-  -- t = { '<cmd>lua require("user.functions").toggle_tabline()<cr>', "Tabline" },
 }
 
 -- lvim.builtin.which_key.mappings[";"] = nil

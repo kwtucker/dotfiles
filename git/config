@@ -1,6 +1,12 @@
 [include]
 	path = ~/.config/git/config.local
 
+[core]
+  excludesFile = ~/.config/git/ignore 
+
+[init]
+  defaultBranch = main
+
 [fetch]
   prune = true
   pruneTags = true	
@@ -11,6 +17,12 @@
 
 [push]
   default = nothing
+
+[merge]
+  tool = vscode
+
+[mergetool "vscode"]
+  cmd = code --wait $MERGED
 
 [alias]
   br = branch
@@ -23,11 +35,3 @@
   st = status -sb
   wip = commit -am "WIP"
 
-[url "git@bitbucket.org:"]
-	insteadOf = https://bitbucket.org/
-
-[url "git@github.com:"]
-	insteadOf = https://github.com/
-	
-[init]
-	defaultBranch = main

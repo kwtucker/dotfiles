@@ -6,7 +6,6 @@ PATH=${PATH}:${GOROOT}/bin
 PATH=${PATH}:${GOBIN}
 PATH=${PATH}:${GOPATH}/bin
 PATH=${PATH}:${CDPATH}
-PATH=${PATH}:${GEM_HOME}
 PATH=${PATH}:${GNU_BIN} 
 PATH=${PATH}:${TEX}
 PATH=${PATH}:${HOME}/.cargo/bin
