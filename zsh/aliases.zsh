@@ -13,9 +13,9 @@ alias m="tldr"
 
 alias ll="exa -abghHliS"
 alias c='clear'
-alias v='lvim'
-alias vi='vim'
-alias vim='lvim'
+alias v='nvim'
+alias vi='nvim'
+alias vim='nvim'
 alias zshrc='vim $DOTFILES/zsh/.zshrc'
 
 # ---- GO ----
