@@ -2,15 +2,16 @@ require("user.lsp.languages.go")
 require("user.lsp.languages.rust")
 require("user.lsp.languages.sh")
 
-lvim.lsp.diagnostics.virtual_text = false
+vim.lsp.diagnostics.virtual_text = false
+vim.lsp.diagnostics.float.focusable = true
 
--- if you don't want all the parsers change this to a table of the ones you want
 lvim.builtin.treesitter.ensure_installed = {
-	"go",
+  "go",
 }
 
 local formatters = require("lvim.lsp.null-ls.formatters")
 formatters.setup({
-	{ command = "stylua", filetypes = { "lua" } },
-	{ command = "shfmt", filetypes = { "sh", "zsh" } },
+  -- { command = "stylua",   filetypes = { "lua" } },
+  { command = "shfmt",    filetypes = { "sh", "zsh" } },
+  { command = "deno_fmt", filetypes = { "markdown" } }
 })

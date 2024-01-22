@@ -2,12 +2,14 @@ SYSTEM_PATH=${PATH}
 unset PATH
 
 PATH=~/bin
-PATH=${PATH}:${GOROOT}/bin
+# PATH=${PATH}:${GOROOT}/bin
+
 PATH=${PATH}:${GOBIN}
+PATH=${PATH}:/usr/local/go/bin
 PATH=${PATH}:${GOPATH}/bin
 PATH=${PATH}:${CDPATH}
-PATH=${PATH}:${GEM_HOME}
-PATH=${PATH}:${GNU_BIN} 
+# PATH=${PATH}:${GEM_HOME}
+# PATH=${PATH}:${GNU_BIN}
 PATH=${PATH}:${TEX}
 PATH=${PATH}:${HOME}/.cargo/bin
 PATH=${PATH}:/opt/homebrew/bin
