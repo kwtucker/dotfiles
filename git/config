@@ -34,5 +34,8 @@
 [mergetool "vscode"]
 	cmd = "code --wait"
 
+[url "git@github.com:"]
+  insteadOf = https://github.com/
+
 [url "git://"]
 	insteadOf = https://
