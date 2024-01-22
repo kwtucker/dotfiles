@@ -4,7 +4,7 @@
 	excludesFile = ~/.config/git/ignore
 
 [init]
-	defaultBranch = main
+  defaultBranch = main
 
 [alias]
   br = branch
@@ -33,12 +33,6 @@
 
 [mergetool "vscode"]
 	cmd = "code --wait"
-
-[url "git@bitbucket.org:"]
-	insteadOf = https://bitbucket.org/
-
-[url "git@github.com:"]
-	insteadOf = https://github.com/
 
 [url "git://"]
 	insteadOf = https://

@@ -1,6 +1,10 @@
 include ../env.mk
 
 install:
+	mv $(XDG_CONFIG_HOME)/lvim{,.bak}
+	mv $(XDG_DATA_HOME)/lvim{,.bak}
+	mv ~/.local/state/lvim{,.bak}
+	mv $(XDG_CACHE_HOME)~/.cache/lvim{,.bak}
 	mv $(XDG_CONFIG_HOME)/lvim $(XDG_CONFIG_HOME)/lvim-backup
 	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)
 

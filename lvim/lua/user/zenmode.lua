@@ -36,8 +36,7 @@ zen.setup({
     tmux = { enabled = false },     -- disables the tmux statusline
   },
   -- callback where you can add custom code when the Zen window opens
-  on_open = function(win)
-  end,
+  on_open = function() end,
   -- callback where you can add custom code when the Zen window closes
   on_close = function()
   end,

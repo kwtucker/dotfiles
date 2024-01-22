@@ -2,7 +2,6 @@ shell:
   program: /bin/zsh
   args:
     - -l
-
 # Any items in the `env` entry below will be added as
 # environment variables. Some entries may override variables
 # set by alacritty it self.
@@ -38,7 +37,6 @@ window:
   # Window decorations
   # Setting this to false will result in window without borders and title bar.
   decorations: full
-
 
   opacity: 1.0
 
@@ -169,7 +167,7 @@ cursor:
   # the style of the active value of the normal cursor.
   #
   # See `cursor.style` for available options.
-  vi_mode_style: 
+  vi_mode_style:
     shape: Block
 
 # Live config reload (changes require restart)

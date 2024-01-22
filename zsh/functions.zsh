@@ -2,6 +2,10 @@
 # Functions 
 # -------------------------------------------------------------------
 
+function up() {
+  cd .. && ls -la |  awk '{print \$9,\$10}'
+}
+
 # OSX stuffs
 if [ "$(uname -s)" = "Darwin" ]; then
   alias showfiles="defaults write com.apple.finder AppleShowAllFiles TRUE; killall Finder"

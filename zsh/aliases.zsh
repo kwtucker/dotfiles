@@ -11,12 +11,11 @@ alias ....="cd ../../.."
 alias m="tldr"
 
 alias ll="exa -abghHliS"
-alias up="cd .. && ls -la |  awk '{print \$9,\$10}'"
 alias c='clear'
-alias v='lvim'
-alias vi='vim'
-alias vim='lvim'
-alias zshrc="vim $DOTFILES/zsh/.zshrc"
+alias v='nvim'
+alias vi='nvim'
+alias vim='nvim'
+alias zshrc='vim $DOTFILES/zsh/.zshrc'
 
 # ---- GO ----
 alias gohome="cd ~/go/src/github.com/kwtucker"
@@ -25,10 +24,10 @@ alias gohome="cd ~/go/src/github.com/kwtucker"
 alias dotpull="pwd=$(pwd) && cd $DOTFILES && git pull && sleep 6 && cd $pwd"
 
 # ---- dotfile git push ----
-alias dotpush="cd $DOTFILES && git add --all && git commit -m 'update dotfiles' && git push origin main && cd -"
+alias dotpush='cd $DOTFILES && git add --all && git commit -m "update dotfiles" && git push origin main && cd -'
 
 # ---- dotfile cd ----
-alias dot="cd $DOTFILES"
+alias dot='cd $DOTFILES'
 
 if [ ${commands[exa]} ]; then
 	alias ls='exa'

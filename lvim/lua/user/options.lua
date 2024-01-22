@@ -2,7 +2,7 @@ lvim.colorscheme = "onenord"
 lvim.log.level = "warn"
 lvim.format_on_save.enabled = false
 lvim.builtin.alpha.active = true
-lvim.builtin.illuminate.active = true
+lvim.builtin.illuminate.active = false
 lvim.builtin.bufferline.active = false
 lvim.builtin.alpha.mode = "dashboard"
 lvim.builtin.terminal.active = true
@@ -53,6 +53,31 @@ lvim.builtin.lualine.sections.lualine_y = {
 
 lvim.builtin.lualine.sections.lualine_z = {
   components.location,
+}
+
+local components = require("lvim.core.lualine.components")
+lvim.builtin.lualine.sections.lualine_b = {
+	components.branch,
+}
+
+lvim.builtin.lualine.sections.lualine_c = {
+	components.diff,
+	components.filename,
+}
+
+lvim.builtin.lualine.sections.lualine_x = {
+	components.diagnostics,
+	components.lsp,
+	components.treesitter,
+	components.filetype,
+}
+
+lvim.builtin.lualine.sections.lualine_y = {
+	components.spaces,
+}
+
+lvim.builtin.lualine.sections.lualine_z = {
+	components.location,
 }
 
 local options = {
