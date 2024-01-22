@@ -1,4 +1,4 @@
-if [ $commands[kubectl] ]; then
+if [ ${commands[kubectl]} ]; then
   function kubectl() {
     source <(command kubectl completion zsh)
     command kubectl "$@"
@@ -7,7 +7,7 @@ fi
 
 # Fuzzy match a Kubernetes resource.
 function kfuzz() {
-  kubectl get "$1" | FZF
+  kubectl get "$1" | tfuzz
 }
 
 # Exec into pods container.

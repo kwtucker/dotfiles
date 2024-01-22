@@ -10,8 +10,10 @@ alias tfv='terraform validate -json | jq ".diagnostics|=sort_by(.range.filename)
       severity: .severity, 
       summary: .summary,
       detail: .detail,
+      code: .snippet.code,
+      context: .snippet.context,
       filename: .range.filename,
-      start_line: .range.start.line
+      line: .range.start.line
     }
   ]
 }"'
