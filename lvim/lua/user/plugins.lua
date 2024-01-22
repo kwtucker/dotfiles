@@ -18,13 +18,12 @@ lvim.plugins = {
   "TimUntersberger/neogit",
   "sindrets/diffview.nvim",
   "simrat39/rust-tools.nvim",
+  "nvim-lua/plenary.nvim",
   "olexsmir/gopher.nvim",
   "ahmedkhalf/project.nvim",
   "neovim/nvim-lspconfig",
   {
     "saecki/crates.nvim",
-    version = "v0.3.0",
-    dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
       require("crates").setup({
         null_ls = {
