@@ -6,10 +6,8 @@ return {
       require("window-picker").setup({
 
         -- whether to show 'Pick window:' prompt
-        show_prompt = false,
+        show_prompt = true,
 
-        -- prompt message to show to get the user input
-        prompt_message = "Pick window: ",
         filter_rules = {
           -- when there is only one window available to pick from, use that window
           -- without prompting the user to select
