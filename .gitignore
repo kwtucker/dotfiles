@@ -23,4 +23,6 @@ fzf/fzf.zsh
 fzf/fzf.bash
 fzf/fzf/
 
+tmux/plugins
+
 packer_compiled.lua
