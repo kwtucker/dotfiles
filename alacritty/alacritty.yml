@@ -84,28 +84,13 @@ font:
   #  x: 0
   #  y: 0
 
-schemes:
-  onedark: &onedark
-    primary:
-      background: '#282c34'
-      foreground: '#abb2bf'
-    # cursor:
-    #   text:       CellBackground
-    #   cursor:     '#528bff' # syntax-cursor-color
-    selection:
-      text: CellForeground
-      background: '#3e4451' # syntax-selection-color
-    normal:
-      black: '#5c6370' # mono-3
-      red: '#e06c75' # red 1
-      green: '#98c379'
-      yellow: '#e5c07b' # orange 2
-      blue: '#61afef'
-      magenta: '#c678dd'
-      cyan: '#56b6c2'
-      white: '#828997' # mono-2
-
-colors: *onedark
+# Colors 
+import:
+  # uncomment the flavour you want below:
+ # - ~/.config/alacritty/catppuccin/catppuccin-mocha.yml
+ # - ~/.config/alacritty/catppuccin/catppuccin-macchiato.yml
+ - ~/.config/alacritty/catppuccin/catppuccin-frappe.yml
+ # - ~/.config/alacritty/catppuccin/catppuccin-latte.yml
 
 debug:
   # Should display the render timer
