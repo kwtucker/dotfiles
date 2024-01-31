@@ -3,6 +3,7 @@ return {
     "williamboman/mason.nvim",
     opts = {
       ensure_installed = {
+        "black",
         "codelldb",
         "eslint-lsp",
         "gofumpt",
@@ -20,6 +21,7 @@ return {
         "staticcheck",
         "stylua",
         "taplo",
+        "terraform-ls",
         "typescript-language-server",
         "yaml-language-server",
       },
