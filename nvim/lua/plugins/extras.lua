@@ -3,6 +3,7 @@ return {
   { import = "lazyvim.plugins.extras.linting.eslint" },
   { import = "lazyvim.plugins.extras.formatting.prettier" },
   { import = "lazyvim.plugins.extras.lsp.none-ls" },
+  { import = "nvim-tree/nvim-web-devicons" },
   {
     "L3MON4D3/LuaSnip",
     keys = function()
