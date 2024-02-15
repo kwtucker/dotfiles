@@ -1,8 +1,7 @@
 include ../env.mk
 
 install: .ensure.xdg
-	@mkdir -p $(HOME)/bin
-	ln -sf $(CURDIR) $(HOME)/bin
+	@mkdir -p $(HOME)/.local/bin
 
 clean: .remove.xdg.module.bin
 	rm -rf $(HOME)/bin

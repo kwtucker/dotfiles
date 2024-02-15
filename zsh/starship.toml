@@ -1,0 +1,174 @@
+palette = "catppuccin_frappe"
+
+[character]
+success_symbol = "[❯](teal)"
+error_symbol = "[❯](maroon)"
+vimcmd_symbol = "[❮](green)"
+
+[directory]
+truncation_length = 3
+truncate_to_repo = false
+read_only = " "
+style = "bold subtext0"
+
+
+[palettes.catppuccin_frappe]
+rosewater = "#f2d5cf"
+flamingo = "#eebebe"
+pink = "#f4b8e4"
+mauve = "#ca9ee6"
+red = "#e78284"
+maroon = "#ea999c"
+peach = "#ef9f76"
+yellow = "#e5c890"
+green = "#a6d189"
+teal = "#81c8be"
+sky = "#99d1db"
+sapphire = "#85c1dc"
+blue = "#8caaee"
+lavender = "#babbf1"
+text = "#c6d0f5"
+subtext1 = "#b5bfe2"
+subtext0 = "#a5adce"
+overlay2 = "#949cbb"
+overlay1 = "#838ba7"
+overlay0 = "#737994"
+surface2 = "#626880"
+surface1 = "#51576d"
+surface0 = "#414559"
+base = "#303446"
+mantle = "#292c3c"
+crust = "#232634"
+
+[aws]
+disabled = true
+
+[cmake]
+disabled = true
+
+[cmd_duration]
+min_time = 500
+format = "[$duration]($style) "
+
+[conda]
+disabled = true
+
+[crystal]
+disabled = true
+
+[dart]
+disabled = true
+
+# [directory]
+# read_only = " "
+# truncate_to_repo = false
+
+[docker_context]
+disabled = true
+
+[dotnet]
+disabled = true
+
+[elixir]
+disabled = true
+
+[elm]
+disabled = true
+
+[erlang]
+disabled = true
+
+[gcloud]
+disabled = true
+
+[git_branch]
+symbol = " "
+style = "bold rosewater"
+format = '[$symbol$branch(:$remote_branch)]($style) '
+
+[git_status]
+format = "[$ahead_behind$untracked$modified]($style) "
+
+[golang]
+format = '[($version )($mod_version )]($style)'
+
+[helm]
+disabled = true
+
+[java]
+disabled = true
+
+[jobs]
+disabled = true
+
+[julia]
+disabled = true
+
+[kotlin]
+disabled = true
+
+[kubernetes]
+disabled = true
+
+[lua]
+disabled = true
+
+[nim]
+disabled = true
+
+[nix_shell]
+disabled = true
+
+[nodejs]
+disabled = true
+
+[ocaml]
+disabled = true
+
+[openstack]
+disabled = true
+
+[package]
+disabled = true
+
+[perl]
+disabled = true
+
+[php]
+disabled = true
+
+[purescript]
+disabled = true
+
+[python]
+disabled = true
+
+[ruby]
+disabled = true
+
+[rust]
+format = '[symbol(version )](style)'
+
+[scala]
+disabled = true
+
+[shlvl]
+disabled = true
+
+[singularity]
+disabled = true
+
+[swift]
+disabled = true
+
+[terraform]
+format = "[$symbol$workspace]($style)"
+
+[vagrant]
+disabled = true
+
+[zig]
+disabled = true
+
+[username]
+format = "[$user]($style)@"

@@ -2,5 +2,4 @@ zsh-users/zsh-syntax-highlighting
 zsh-users/zsh-autosuggestions
 paulirish/git-open
 mafredri/zsh-async
-sindresorhus/pure
 Aloxaf/fzf-tab
