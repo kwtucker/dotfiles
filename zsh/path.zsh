@@ -2,11 +2,7 @@ SYSTEM_PATH=${PATH}
 unset PATH
 
 PATH=~/bin
-# PATH=${PATH}:${GOROOT}/bin
-
-PATH=${PATH}:${GOBIN}
 PATH=${PATH}:/usr/local/go/bin
-PATH=${PATH}:${GOPATH}/bin
 PATH=${PATH}:${CDPATH}
 PATH=${PATH}:${GNU_BIN} 
 PATH=${PATH}:${TEX}
