@@ -8,6 +8,7 @@ install: .ensure.xdg
 	mkdir -p $(XDG_RUNTIME_DIR)/zsh
 	curl -sS https://starship.rs/install.sh | sh
 	curl -sfL git.io/antibody | sh -s - -b ~/.local/bin 
+	rm ${XDG_DATA_HOME}/zsh/plugins
 	antibody bundle < $(CURDIR)/bundle.txt > ${XDG_DATA_HOME}/zsh/plugins
 	ln -sf $(CURDIR)/zshenv $(HOME)/.zshenv
 
