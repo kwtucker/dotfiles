@@ -1,7 +1,7 @@
 SYSTEM_PATH=${PATH}
 unset PATH
 
-PATH=~/bin
+PATH=${PATH}:${HOME}/bin
 PATH=${PATH}:/usr/local/go/bin
 PATH=${PATH}:${CDPATH}
 PATH=${PATH}:${GNU_BIN} 
