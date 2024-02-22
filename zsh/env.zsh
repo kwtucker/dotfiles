@@ -16,5 +16,3 @@ export TEX=/Library/TeX/texbin
 # Prompt
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/zsh/starship.toml"
 eval "$(starship init zsh)"
-
-eval "$(direnv hook zsh)"

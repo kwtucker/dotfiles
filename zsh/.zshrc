@@ -29,8 +29,13 @@ else
 fi;
 
 ################################################################################
-# Load Antibody Plugins
-source $XDG_DATA_HOME/zsh/plugins
+# Load Antigen Plugins
+source $XDG_CONFIG_HOME/zsh/antigen.zsh
+antigen bundle git
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle zsh-users/zsh-autosuggestions
+antigen bundle paulirish/git-open
+antigen bundle Aloxaf/fzf-tab
 
 ###############################################################################
 unset config_files 
