@@ -1,5 +1,0 @@
-zsh-users/zsh-syntax-highlighting
-zsh-users/zsh-autosuggestions
-paulirish/git-open
-mafredri/zsh-async
-Aloxaf/fzf-tab

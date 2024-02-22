@@ -1,10 +1,11 @@
 palette = "catppuccin_frappe"
 right_format = """$aws$terraform$kubernetes"""
+continuation_prompt = '▶▶ '
 
 [aws]
-format = '$symbol [($profile )]($style)/ '
+format = '[$symbol($profile )(\($region\) )(\[$duration\] )]($style)'
 style = 'bold blue'
-symbol = " "
+symbol = '  '
 
 [character]
 success_symbol = "[❯](teal)"
@@ -15,35 +16,30 @@ vimcmd_symbol = "[❮](green)"
 disabled = true
 
 [directory]
-truncation_length = 3
-truncate_to_repo = false
-read_only = " "
 style = "bold subtext0"
 
 [docker_context]
 disabled = true
 
 [git_branch]
-symbol = ""
+symbol = ' '
 style = "bold rosewater"
-format = '$symbol [$branch(:$remote_branch)]($style)'
+format = '[$symbol$branch(:$remote_branch)]($style)'
 
 [git_status]
 format = ' [$ahead_behind$untracked$modified]($style)'
 up_to_date = '[✓](green)'
 
 [golang]
-symbol = ""
-format = ' $symbol [$version ($mod_version )]($style)'
+disabled = true
+symbol = ' '
+format = '[$symbol$version ($mod_version )]($style)'
 
 [kubernetes]
-format = '$symbol [$context(\[$namespace\])]($style)'
-symbol = ' '
+format = '[$symbol$context(\[$namespace\])]($style)'
+symbol = '  '
 disabled = false
 style = "bold lavender"
-
-[line_break]
-disabled = true
 
 [palettes.catppuccin_frappe]
 rosewater = "#f2d5cf"

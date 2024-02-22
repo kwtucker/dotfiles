@@ -3,6 +3,7 @@ unset PATH
 
 PATH=${PATH}:${HOME}/bin
 PATH=${PATH}:/usr/local/go/bin
+PATH=${PATH}:${HOME}/go/bin
 PATH=${PATH}:${CDPATH}
 PATH=${PATH}:${GNU_BIN} 
 PATH=${PATH}:${TEX}
