@@ -56,16 +56,16 @@ scrolling: # Maximum number of lines in the scrollback buffer.  Specifying '0' w
 font:
   # The normal (roman) font face to use.
   normal:
-    family: 'JetBrainsMonoNL Nerd Font'
+    family: 'JetBrainsMono Nerd Font'
     style: Regular
   bold:
-    family: 'JetBrainsMonoNL Nerd Font'
+    family: 'JetBrainsMono Nerd Font'
     style: Bold
   bold_italic:
-    family: 'JetBrainsMonoNL Nerd Font'
+    family: 'JetBrainsMono Nerd Font'
     style: Bold Italic
   italic:
-    family: 'JetBrainsMonoNL Nerd Font'
+    family: 'JetBrainsMono Nerd Font'
     style: Italic
 
   # Point size of the font

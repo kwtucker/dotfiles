@@ -40,6 +40,7 @@ antigen bundle Aloxaf/fzf-tab
 ###############################################################################
 unset config_files 
 
+eval "$(direnv hook zsh)"
 ################################################################################
 # Load local configurations.
 [ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
