@@ -2,6 +2,7 @@ return {
   {
     "ThePrimeagen/harpoon",
     branch = "harpoon2",
+    lazy = true,
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-telescope/telescope.nvim",
@@ -35,13 +36,13 @@ return {
     end,
     -- stylua: ignore
     keys = {
-      { "<leader>ha", function() require("harpoon"):list():append() end, desc = "Harpoon file", },
-      { "<leader>he", function() local harpoon = require("harpoon") harpoon.ui:toggle_quick_menu(harpoon:list()) end, desc = "Harpoon quick menu", },
-      { "<leader>h1", function() require("harpoon"):list():select(1) end, desc = "Harpoon to file 1", },
-      { "<leader>h2", function() require("harpoon"):list():select(2) end, desc = "Harpoon to file 2", },
-      { "<leader>h3", function() require("harpoon"):list():select(3) end, desc = "Harpoon to file 3", },
-      { "<leader>h4", function() require("harpoon"):list():select(4) end, desc = "Harpoon to file 4", },
-      { "<leader>h5", function() require("harpoon"):list():select(5) end, desc = "Harpoon to file 5", },
+      { "n", "<leader>ha", "<cmd>lua require('harpoon').list():add()<CR>", { noremap = true, silent = true, desc = "Harpoon file" } },
+      { "n", "<leader>he", "<cmd>lua require('harpoon').ui:toggle_quick_menu(require('harpoon').list())<CR>", { noremap = true, silent = true, desc = "Harpoon quick menu" } },
+      { "n", "<leader>hh1", "<cmd>lua require('harpoon').list():select(1)<CR>", { noremap = true, silent = true, desc = "Harpoon to file 1" } },
+      { "n", "<leader>h2", "<cmd>lua require('harpoon').list():select(2)<CR>", { noremap = true, silent = true, desc = "Harpoon to file 2" } },
+      { "n", "<leader>h3", "<cmd>lua require('harpoon').list():select(3)<CR>", { noremap = true, silent = true, desc = "Harpoon to file 3" } },
+      { "n", "<leader>h4", "<cmd>lua require('harpoon').list():select(4)<CR>", { noremap = true, silent = true, desc = "Harpoon to file 4" } },
+      { "n", "<leader>h5", "<cmd>lua require('harpoon').list():select(5)<CR>", { noremap = true, silent = true, desc = "Harpoon to file 5" } },
     },
   },
 }
