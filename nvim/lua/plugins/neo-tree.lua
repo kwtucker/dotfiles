@@ -8,6 +8,9 @@ return {
       "MunifTanjim/nui.nvim",
       "s1n7ax/nvim-window-picker",
     },
+    keys = {
+      { "<leader>ge", false },
+    },
     opts = {
       close_if_last_window = true,
       window = {

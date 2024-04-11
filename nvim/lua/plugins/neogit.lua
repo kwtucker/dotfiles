@@ -9,14 +9,14 @@ return {
       "nvim-telescope/telescope.nvim", -- optional
       "ibhagwan/fzf-lua", -- optional
     },
-    event = "VeryLazy",
     config = true,
-    -- stylua: ignore
     keys = {
-      { "n", "<leader>gg", "<cmd>lua require('neogit').open()<CR>", { noremap = true, silent = true, desc = "Neogit Open" } },
-      { "n", "<leader>gc", "<cmd>lua require('neogit').open({ 'commit' })<CR>", { noremap = true, silent = true, desc = "Neogit Commit" } },
-      { "n", "<leader>gp", "<cmd>lua require('neogit').open({ 'pull' })<CR>", { noremap = true, silent = true, desc = "Neogit Pull" } },
-      { "n", "<leader>gP", "<cmd>lua require('neogit').open({ 'push' })<CR>", { noremap = true, silent = true, desc = "Neogit Push" } },
+      { "<leader>gs", "<cmd>Neogit<cr>", desc = "Status", mode = "n" },
+      { "<leader>gc", "<cmd>Neogit commit<cr>", desc = "Commit", mode = "n" },
+      { "<leader>gp", "<cmd>Neogit pull<cr>", desc = "Pull", mode = "n" },
+      { "<leader>gP", "<cmd>Neogit push<cr>", desc = "Push", mode = "n" },
+      { "<leader>gb", "<cmd>Telescope git_branches<cr>", desc = "Git Branches", mode = "n" },
+      { "<leader>gB", "<cmd>G blame_line<cr>", desc = "Git Blame", mode = "n" },
     },
   },
 }
