@@ -3,15 +3,19 @@ return {
     "epwalsh/obsidian.nvim",
     version = "*", -- recommended, use latest release instead of latest commit
     lazy = true,
-    ft = "markdown",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
 
     keys = {
       { "<leader>on", "<cmd>ObsidianNew<cr>", desc = "New Obsidian note", mode = "n" },
       { "<leader>oo", "<cmd>ObsidianSearch<cr>", desc = "Search Obsidian notes", mode = "n" },
       { "<leader>os", "<cmd>ObsidianQuickSwitch<cr>", desc = "Quick Switch", mode = "n" },
       { "<leader>ob", "<cmd>ObsidianBacklinks<cr>", desc = "Show location list of backlinks", mode = "n" },
-      { "<leader>ot", "<cmd>ObsidianTemplate<cr>", desc = "Follow link under cursor", mode = "n" },
+      { "<leader>ot", "<cmd>ObsidianTemplate<cr>", desc = "Insert Template", mode = "n" },
     },
+
+    -- Only load obsidian.nvim for markdown files in your vault:
     event = {
       -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
       "BufReadPre "
@@ -19,9 +23,7 @@ return {
         .. ".whalebyte/notes/**.md",
       "BufNewFile  " .. vim.fn.expand("~") .. ".whalebyte/notes/**.md",
     },
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
+
     opts = {
       workspaces = {
         {
@@ -33,7 +35,12 @@ return {
         nvim_cmp = true,
         min_chars = 2,
       },
+
+      -- Where to put new notes. Valid options are
+      --  * "current_dir" - put new notes in same directory as the current buffer.
+      --  * "notes_subdir" - put new notes in the default notes subdirectory.
       new_notes_location = "current_dir",
+
       wiki_link_func = function(opts)
         if opts.id == nil then
           return string.format("[[%s]]", opts.label)
@@ -48,11 +55,11 @@ return {
         -- Optional, if you keep daily notes in a separate directory.
         folder = "06 - Daily",
         -- Optional, if you want to change the date format for the ID of daily notes.
-        date_format = "%Y-%m-%d",
+        date_format = "%Y%m%d",
         -- Optional, if you want to change the date format of the default alias of daily notes.
         alias_format = "%B %-d, %Y",
         -- Optional, if you want to automatically insert a template from your template directory like 'daily.md'
-        template = nil,
+        template = "99 - Meta/Templates/(TEMPLATE) Daily.md",
       },
 
       mappings = {
@@ -70,19 +77,6 @@ return {
           end,
           opts = { buffer = true },
         },
-        -- Create a new newsletter issue
-        -- ["<leader>onn"] = {
-        --   action = function()
-        --     return require("obsidian").commands.new_note("Newsletter-Issue")
-        --   end,
-        --   opts = { buffer = true },
-        -- },
-        -- ["<leader>ont"] = {
-        --   action = function()
-        --     return require("obsidian").util.insert_template("Newsletter-Issue")
-        --   end,
-        --   opts = { buffer = true },
-        -- },
       },
 
       note_frontmatter_func = function(note)
@@ -117,10 +111,10 @@ return {
       end,
 
       templates = {
-        subdir = "00 - Meta/Templates",
+        subdir = "99 - Meta/Templates",
         date_format = "%Y-%m-%d-%a",
         time_format = "%H:%M",
-        tags = "",
+        tags = "🌱",
       },
     },
   },
