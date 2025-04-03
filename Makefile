@@ -2,7 +2,7 @@
 
 MODULES = \
 		bin zsh whalebyte alacritty python fzf tmux git golang \
-	  bat lvim nvim psql ripgrep rust homebrew $(LOCAL_MODULES)
+	  bat nvim psql ripgrep rust homebrew $(LOCAL_MODULES)
 
 CLEAN := $(addsuffix .clean,$(MODULES))
 

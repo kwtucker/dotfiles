@@ -6,5 +6,6 @@ export SHELL="/bin/zsh"
 export ZSH_THEME=""
 export ZDOTDIR=$XDG_CONFIG_HOME/zsh/
 export ZSH_CACHE_DIR=$XDG_CACHE_HOME/zsh/
+export PATH="/Users/kevin.tucker@divvypay.com/.rd/bin:$PATH"
 
 . "$HOME/.cargo/env"

@@ -4,8 +4,10 @@ unset PATH
 PATH=${PATH}:${HOME}/bin
 PATH=${PATH}:/usr/local/go/bin
 PATH=${PATH}:${HOME}/go/bin
+PATH=${PATH}:${HOME}/.rd/bin
+PATH=${PATH}:${HOME}/.tfenv/bin
 PATH=${PATH}:${CDPATH}
-PATH=${PATH}:${GNU_BIN} 
+PATH=${PATH}:${GNU_BIN}
 PATH=${PATH}:${TEX}
 PATH=${PATH}:${HOME}/.cargo/bin
 PATH=${PATH}:/opt/homebrew/bin
