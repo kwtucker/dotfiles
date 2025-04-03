@@ -33,9 +33,9 @@ return {
           -- statusline will be shown only if 'laststatus' == 3
           laststatus = 0, -- turn off the statusline in zen mode
         },
-        twilight = { enabled = true }, -- enable to start Twilight when zen mode opens
+        twilight = { enabled = false }, -- enable to start Twilight when zen mode opens
         gitsigns = { enabled = false }, -- disables git signs
-        tmux = { enabled = false }, -- disables the tmux statusline
+        tmux = { enabled = true }, -- disables the tmux statusline
         -- this will change the font size on alacritty when in zen mode
         -- requires  Alacritty Version 0.10.0 or higher
         -- uses `alacritty msg` subcommand to change font size

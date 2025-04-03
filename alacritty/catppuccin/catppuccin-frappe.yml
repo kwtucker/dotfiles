@@ -19,13 +19,13 @@ colors:
     search:
         matches:
             foreground: "#303446" # base
-            background: "#A5ADCE" # subtext0
+            background: "#F2D5CF" # rosewater
         focused_match:
             foreground: "#303446" # base
-            background: "#A6D189" # green
+            background: "#E78284" # red 
         footer_bar:
             foreground: "#303446" # base
-            background: "#A5ADCE" # subtext0
+            background: "#F2D5CF" # rosewater
 
     # Keyboard regex hints
     hints:

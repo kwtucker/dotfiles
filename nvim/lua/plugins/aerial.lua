@@ -3,7 +3,7 @@ return {
     "stevearc/aerial.nvim",
     opts = {},
     keys = {
-      { "<leader>aa", ":AerialToggle!<CR>", desc = "Aerial Toggle" },
+      { "<leader>t", ":AerialToggle!<CR>", desc = "Aerial Toggle" },
     },
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
