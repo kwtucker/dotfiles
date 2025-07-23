@@ -6,6 +6,7 @@ continuation_prompt = '▶▶ '
 format = '[$symbol($profile )(\($region\) )(\[$duration\] )]($style)'
 style = 'bold blue'
 symbol = '  '
+disabled = true
 
 [character]
 success_symbol = "[❯](teal)"
@@ -38,7 +39,7 @@ format = '[$symbol$version ($mod_version )]($style)'
 [kubernetes]
 format = '[$symbol$context(\[$namespace\])]($style)'
 symbol = '  '
-disabled = false
+disabled = true 
 style = "bold lavender"
 
 [palettes.catppuccin_frappe]
