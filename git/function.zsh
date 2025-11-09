@@ -10,6 +10,7 @@ BRANCHES() {
 deletebranch() {
   git branch -D "$(BRANCHES)"
 }
+
 # deletetag 1.0.0
 deletetag() {
 	git push origin :$1 && git tag -d $1
