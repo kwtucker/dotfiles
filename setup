@@ -5,13 +5,15 @@ export XDG_CACHE_HOME=${HOME}/.cache
 export XDG_DATA_HOME=${HOME}/.local/share
 export XDG_RUNTIME_DIR=${HOME}/tmp/xdg_runtime
 
-mkdir -p $(XDG_CONFIG_HOME)
-mkdir -p $(XDG_CACHE_HOME)
-mkdir -p $(XDG_DATA_HOME)
-mkdir -p $(XDG_RUNTIME_DIR)
+mkdir -p "$XDG_CONFIG_HOME"
+mkdir -p "$XDG_CACHE_HOME"
+mkdir -p "$XDG_DATA_HOME"
+mkdir -p "$XDG_RUNTIME_DIR"
+
+mkdir -p "$XDG_CONFIG_HOME"/nixpkgs
 
 ln -sf "$PWD/nvim" "$XDG_CONFIG_HOME"/nvim
+ln -sf "$PWD/config.nix" "$XDG_CONFIG_HOME"/nixpkgs/config.nix
 
 # install Nix packages from config.nix
-mkdir -p $(XDG_CONFIG_HOME)/nixpkgs
 nix-env -iA nixpkgs.myPackages
