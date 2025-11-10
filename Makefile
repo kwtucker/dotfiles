@@ -1,8 +1,10 @@
 # include modules.local.mk
 
+		# bin zsh whalebyte alacritty python fzf tmux git golang \
+	  # bat nvim psql ripgrep rust homebrew $(LOCAL_MODULES)
 MODULES = \
-		bin zsh whalebyte alacritty python fzf tmux git golang \
-	  bat nvim psql ripgrep rust homebrew $(LOCAL_MODULES)
+		bin zsh whalebyte alacritty fzf tmux git golang \
+	  bat nvim psql ripgrep $(LOCAL_MODULES)
 
 CLEAN := $(addsuffix .clean,$(MODULES))
 
