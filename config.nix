@@ -5,6 +5,7 @@
       paths = [
         pkgs.neovim
         pkgs.go
+        pkgs.golangci-lint
         pkgs.rustup
         pkgs.tmux
         pkgs.nodejs_24
