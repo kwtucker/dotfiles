@@ -13,7 +13,6 @@
         pkgs.fd
         pkgs.ripgrep
         pkgs.lazygit
-        pkgs.terraform
         pkgs.kubectl
         pkgs.helm
         pkgs.k9s
@@ -23,7 +22,6 @@
         pkgs.age
         pkgs.bat
         pkgs.eza
-        pkgs.zsh
       ];
     };
   };
