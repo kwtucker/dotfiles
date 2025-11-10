@@ -15,7 +15,8 @@ $(CLEAN):
 	$(MAKE) -C $(basename $@) clean
 
 local:
-	[ ! -e "modules.local.mk" ] touch "modules.local.mk"
+	test -e modules.local.mk || touch modules.local.mk
+
 all: $(MODULES) ## Make it all
 
 clean.all: $(CLEAN)
