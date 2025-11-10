@@ -15,28 +15,28 @@ echo ''
 
 source zsh/path.zsh
 
-echo "Setting up Homebrew..."
-echo ''
+# echo "Setting up Homebrew..."
+# echo ''
 
-UNAME=`uname`
-if test ! "$(command -v brew)"; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  
-  if [ "$UNAME" = "Linux" ]; then
-    linux-install.sh
-    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ${XDG_CONFIG_HOME}/zsh/local
-    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-
-    brew bundle --file=Brewfile.linux
-
-  elif [ "$UNAME" == "Darwin" ]; then
-   /opt/homebrew/bin/brew bundle --file=Brewfile.darwin
-  fi
-else
-  while read -r brw; do
-    echo "${brw}"
-  done < <(/opt/homebrew/bin/brew update)
-  echo ''
-fi
+# UNAME=`uname`
+# if test ! "$(command -v brew)"; then
+#   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+#
+#   if [ "$UNAME" = "Linux" ]; then
+#     linux-install.sh
+#     echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ${XDG_CONFIG_HOME}/zsh/local
+#     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+#
+#     brew bundle --file=Brewfile.linux
+#
+#   elif [ "$UNAME" == "Darwin" ]; then
+#    /opt/homebrew/bin/brew bundle --file=Brewfile.darwin
+#   fi
+# else
+#   while read -r brw; do
+#     echo "${brw}"
+#   done < <(/opt/homebrew/bin/brew update)
+#   echo ''
+# fi
 
 # source "$XDG_CONFIG_HOME/zsh/.zshrc"

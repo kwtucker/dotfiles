@@ -3,26 +3,26 @@
     myPackages = pkgs.buildEnv {
       name = "whalebyte-tools";
       paths = [
-        neovim
-        go
-        rust
-        tmux
-        nodejs_22
-        starship
-        fd
-        ripgrep
-        lazygit
-        terraform
-        kubectl
-        helm
-        k9s
-        jq
-        fzf
-        sops
-        age
-        bat
-        exa
-        zsh
+        pkgs.neovim
+        pkgs.go
+        pkgs.rustup
+        pkgs.tmux
+        pkgs.nodejs_24
+        pkgs.starship
+        pkgs.fd
+        pkgs.ripgrep
+        pkgs.lazygit
+        pkgs.terraform
+        pkgs.kubectl
+        pkgs.helm
+        pkgs.k9s
+        pkgs.jq
+        pkgs.fzf
+        pkgs.sops
+        pkgs.age
+        pkgs.bat
+        pkgs.eza
+        pkgs.zsh
       ];
     };
   };

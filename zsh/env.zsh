@@ -11,7 +11,6 @@ export ENV=$USER
 
 # MISC.
 export CDPATH=$HOME/go/src
-export TEX=/Library/TeX/texbin
 
 # Prompt
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/zsh/starship.toml"
