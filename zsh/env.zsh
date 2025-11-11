@@ -2,7 +2,7 @@
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 export HIST_STAMPS="mm/dd/yyyy"
 export HISTFILE="${XDG_DATA_HOME}"/zsh/history
-export HISTSIZE=10000
+export HISTSIZE=999999999
 export SAVEHIST=${HISTSIZE}
 
 export EDITOR=nvim
