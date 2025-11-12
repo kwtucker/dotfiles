@@ -1,9 +1,9 @@
 include ../env.mk
 
-install: .ensure.xdg
+install:
 	@mkdir -p $(HOME)/.local/bin
 
-clean: .remove.xdg.module.bin
+clean:
 	rm -rf $(HOME)/.local/bin
 
 .PHONY: install clean
