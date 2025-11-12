@@ -1,15 +1,26 @@
-include ../env.mk
+XDG_CONFIG_HOME ?= $(HOME)/.config
+XDG_CACHE_HOME  ?= $(HOME)/.cache
+XDG_DATA_HOME   ?= $(HOME)/.local/share
+XDG_RUNTIME_DIR ?= $(HOME)/.local/run
 
-install: .ensure.xdg
-	git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv
-	mkdir -p $(XDG_CACHE_HOME)/terraform/plugin-cache
-	mkdir -p $(XDG_DATA_HOME)/terraform
-	mkdir -p $(XDG_RUNTIME_DIR)/terraform
-	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/terraform
-	go install github.com/terraform-docs/terraform-docs@v0.19.0
-
-clean: .remove.xdg.module.terraform
-	rm -rf $(XDG_RUNTIME_DIR)/terraform
-	rm ~/go/bin/terraform-docs
+MODULE_NAME := terraform 
 
 .PHONY: install clean
+
+install:
+	@echo "Installing $(MODULE_NAME) dotfiles..."
+	@mkdir -p $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+	@mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)/plugin-cache
+	@mkdir -p $(XDG_DATA_HOME)/$(MODULE_NAME)
+	@mkdir -p $(XDG_RUNTIME_DIR)/$(MODULE_NAME)
+	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+	@go install github.com/terraform-docs/terraform-docs@v0.19.0
+
+clean:
+	@echo "Cleaning $(MODULE_NAME) data..."
+	@rm -rf $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+	@rm -rf $(XDG_CACHE_HOME)/$(MODULE_NAME)
+	@rm -rf $(XDG_DATA_HOME)/$(MODULE_NAME)
+	@rm -rf $(XDG_RUNTIME_DIR)/$(MODULE_NAME)
+	@rm ~/go/bin/terraform-docs
+	@echo "✅ $(MODULE_NAME) cleaned."
