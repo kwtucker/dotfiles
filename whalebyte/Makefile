@@ -7,6 +7,5 @@ install: .ensure.xdg
 	touch ~/.whalebyte/.env ~/.whalebyte/.secret
 
 clean: .remove.xdg.module.whalebyte
-	rm -rf $(XDG_CONFIG_HOME)/whalebyte
 
 .PHONY: install clean
