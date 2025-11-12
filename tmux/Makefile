@@ -1,12 +1,29 @@
-include ../env.mk
+XDG_CONFIG_HOME ?= $(HOME)/.config
+XDG_CACHE_HOME  ?= $(HOME)/.cache
+XDG_DATA_HOME   ?= $(HOME)/.local/share
+XDG_RUNTIME_DIR ?= $(HOME)/.local/run
 
-install: .ensure.xdg
-	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/tmux
-	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-	~/.tmux/plugins/tpm/scripts/install_plugins.sh
-	# If already in a tmux session run:
-	tmux source-file ~/.config/tmux/tmux.conf
-
-clean: .remove.xdg.module.tmux
+MODULE_NAME := tmux 
 
 .PHONY: install clean
+
+install:
+	@echo "Installing $(MODULE_NAME) dotfiles..."
+	@mkdir -p $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+	@mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)
+	@mkdir -p $(XDG_DATA_HOME)/$(MODULE_NAME)
+	@mkdir -p $(XDG_RUNTIME_DIR)/$(MODULE_NAME)
+	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+	@git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+	@~/.tmux/plugins/tpm/scripts/install_plugins.sh
+	# If already in a tmux session run:
+	@tmux source-file ~/.config/tmux/tmux.conf
+	@echo "✅ $(MODULE_NAME) installed."
+
+clean:
+	@echo "Cleaning $(MODULE_NAME) data..."
+	@rm -rf $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+	@rm -rf $(XDG_CACHE_HOME)/$(MODULE_NAME)
+	@rm -rf $(XDG_DATA_HOME)/$(MODULE_NAME)
+	@rm -rf $(XDG_RUNTIME_DIR)/$(MODULE_NAME)
+	@echo "✅ $(MODULE_NAME) cleaned."

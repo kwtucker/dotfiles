@@ -1,9 +1,14 @@
-include ../env.mk
+MODULE_NAME := rust
 
-install: 
-	@curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
-	cargo install stylua
-
-clean: 
-	rustup self uninstall
 .PHONY: install clean
+
+install:
+	@echo "Installing $(MODULE_NAME) dotfiles..."
+	@curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
+	@cargo install stylua
+	@echo "✅ $(MODULE_NAME) installed."
+
+clean:
+	@echo "Cleaning $(MODULE_NAME) data..."
+	@rustup self uninstall
+	@echo "✅ $(MODULE_NAME) cleaned."
