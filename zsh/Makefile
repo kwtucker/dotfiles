@@ -12,9 +12,6 @@ install: .ensure.xdg
 
 clean: .remove.xdg.module.zsh
 	rm -rf $(HOME)/.zshenv
-	rm -rf $(XDG_CONFIG_HOME)/zsh
-	rm -rf $(XDG_CACHE_HOME)/zsh
-	rm -rf $(XDG_DATA_HOME)/zsh
 	rm -rf $(XDG_RUNTIME_DIR)/zsh
 	sh -c 'rm "$(command -v 'starship')"'
 	rm ~/.local/bin/antibody

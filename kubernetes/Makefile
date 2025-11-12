@@ -8,7 +8,6 @@ install: .ensure.xdg $(HOME)/bin/$(KUBECTL)
 	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/kubernetes
 
 clean: .remove.xdg.module.kubernetes
-	rm -rf $(XDG_CONFIG_HOME)/kubernetes
 	rm -rf $(HOME)/.local/bin/kubectl
 
 $(HOME)/bin/$(KUBECTL):

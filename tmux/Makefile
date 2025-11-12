@@ -8,6 +8,5 @@ install: .ensure.xdg
 	tmux source-file ~/.config/tmux/tmux.conf
 
 clean: .remove.xdg.module.tmux
-	rm -rf $(XDG_CONFIG_HOME)/tmux
 
 .PHONY: install clean

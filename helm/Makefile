@@ -8,7 +8,6 @@ install: .ensure.xdg $(HOME)/bin/$(HELM)
 	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/helm
 
 clean: .remove.xdg.module.helm
-	rm -rf $(XDG_CONFIG_HOME)/helm
 	rm -rf $(HOME)/bin/helm
 	rm -rf $(HOME)/bin/$(HELM)
 

@@ -4,6 +4,5 @@ install: .ensure.xdg
 	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/docker
 
 clean: .remove.xdg.module.docker
-	rm -rf $(XDG_CONFIG_HOME)/docker
 
 .PHONY: install clean

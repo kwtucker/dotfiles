@@ -9,9 +9,6 @@ install: .ensure.xdg
 	go install github.com/terraform-docs/terraform-docs@v0.19.0
 
 clean: .remove.xdg.module.terraform
-	rm -rf $(XDG_CACHE_HOME)/terraform
-	rm -rf $(XDG_CONFIG_HOME)/terraform
-	rm -rf $(XDG_DATA_HOME)/terraform
 	rm -rf $(XDG_RUNTIME_DIR)/terraform
 	rm ~/go/bin/terraform-docs
 
