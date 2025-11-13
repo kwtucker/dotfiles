@@ -11,16 +11,18 @@ TPM_DIR := $(HOME)/.tmux/plugins/tpm
 install:
 	@echo "Installing $(MODULE_NAME) dotfiles..."
 	@mkdir -p $(HOME)/.tmux/plugins
-	mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)
-	mkdir -p $(XDG_DATA_HOME)/$(MODULE_NAME)
-	mkdir -p $(XDG_RUNTIME_DIR)/$(MODULE_NAME)
-	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+	@mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)
+	@mkdir -p $(XDG_DATA_HOME)/$(MODULE_NAME)
+	@mkdir -p $(XDG_RUNTIME_DIR)/$(MODULE_NAME)
+	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@if [ ! -d "$(TPM_DIR)" ]; then \
 	  git clone https://github.com/tmux-plugins/tpm "$(TPM_DIR)"; \
 	fi
 	@"$(TPM_DIR)/scripts/install_plugins.sh" || true
 	tmux source-file $(XDG_CONFIG_HOME)/tmux/tmux.conf
+	./scripts/kubenv.sh
 	@echo "✅ $(MODULE_NAME) installed."
+
 
 clean:
 	@echo "Cleaning $(MODULE_NAME) data..."

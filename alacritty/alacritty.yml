@@ -1,7 +1,10 @@
 shell:
   program: /bin/zsh
   args:
-    - -l
+    - -i
+    - -c
+    - 'tm; exec zsh'
+
 # Any items in the `env` entry below will be added as
 # environment variables. Some entries may override variables
 # set by alacritty it self.
