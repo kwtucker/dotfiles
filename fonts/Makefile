@@ -3,7 +3,7 @@ XDG_CACHE_HOME  ?= $(HOME)/.cache
 XDG_DATA_HOME   ?= $(HOME)/.local/share
 XDG_RUNTIME_DIR ?= $(HOME)/.local/run
 
-MODULE_NAME := fonts 
+MODULE_NAME := fonts
 
 .PHONY: install clean
 

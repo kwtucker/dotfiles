@@ -9,7 +9,6 @@ MODULE_NAME := zsh
 
 install:
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	@mkdir -p $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)
 	@mkdir -p $(XDG_DATA_HOME)/$(MODULE_NAME)
 	@mkdir -p $(XDG_RUNTIME_DIR)/$(MODULE_NAME)
