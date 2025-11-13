@@ -3,7 +3,7 @@ XDG_CACHE_HOME  ?= $(HOME)/.cache
 XDG_DATA_HOME   ?= $(HOME)/.local/share
 XDG_RUNTIME_DIR ?= $(HOME)/.local/run
 
-MODULE_NAME := helm 
+MODULE_NAME := helm
 HELM_VERSION = 3.19.0
 HELM_URL = https://get.helm.sh/helm-v$(HELM_VERSION)-darwin-amd64.tar.gz
 HELM = helm-$(HELM_VERSION)
@@ -12,7 +12,6 @@ HELM = helm-$(HELM_VERSION)
 
 install: $(HOME)/bin/$(HELM)
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	@mkdir -p $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)
 	@mkdir -p $(XDG_DATA_HOME)/$(MODULE_NAME)
 	@mkdir -p $(XDG_RUNTIME_DIR)/$(MODULE_NAME)

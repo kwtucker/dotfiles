@@ -3,7 +3,7 @@ XDG_CACHE_HOME  ?= $(HOME)/.cache
 XDG_DATA_HOME   ?= $(HOME)/.local/share
 XDG_RUNTIME_DIR ?= $(HOME)/.local/run
 
-MODULE_NAME := kubernetes 
+MODULE_NAME := kubernetes
 KUBECTL_VERSION = 1.34.1
 KUBECTL_URL = https://storage.googleapis.com/kubernetes-release/release/v$(KUBECTL_VERSION)/bin/darwin/amd64/kubectl
 KUBECTL = kubectl-$(KUBECTL_VERSION)
@@ -12,7 +12,6 @@ KUBECTL = kubectl-$(KUBECTL_VERSION)
 
 install: $(HOME)/bin/$(KUBECTL)
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	@mkdir -p $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)
 	@mkdir -p $(XDG_DATA_HOME)/$(MODULE_NAME)
 	@mkdir -p $(XDG_RUNTIME_DIR)/$(MODULE_NAME)

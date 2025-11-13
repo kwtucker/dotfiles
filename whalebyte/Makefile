@@ -9,11 +9,10 @@ MODULE_NAME := whalebyte
 
 install:
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	@mkdir -p $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)
 	@mkdir -p $(XDG_DATA_HOME)/$(MODULE_NAME)
 	@mkdir -p $(XDG_RUNTIME_DIR)/$(MODULE_NAME)
-	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/whalebyte
+	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@mkdir -p ~/.whalebyte/notes
 	@mkdir -p ~/.whalebyte/code
 	@touch ~/.whalebyte/.env ~/.whalebyte/.secret
