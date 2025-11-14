@@ -18,9 +18,10 @@ install:
 	@if [ ! -d "$(TPM_DIR)" ]; then \
 	  git clone https://github.com/tmux-plugins/tpm "$(TPM_DIR)"; \
 	fi
+	mkdir -p $(XDG_CONFIG_HOME)/tmux/plugins/catppuccin
+	git clone -b v2.1.3 https://github.com/catppuccin/tmux.git $(XDG_CONFIG_HOME)/tmux/plugins/catppuccin/tmux
 	@"$(TPM_DIR)/scripts/install_plugins.sh" || true
 	tmux source-file $(XDG_CONFIG_HOME)/tmux/tmux.conf
-	./scripts/kubenv.sh
 	@echo "✅ $(MODULE_NAME) installed."
 
 
