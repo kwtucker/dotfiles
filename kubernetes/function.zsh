@@ -1,9 +1,9 @@
-if [ ${commands[kubectl]} ]; then
-  function kubectl() {
-    source <(command kubectl completion zsh)
-    command kubectl "$@"
-  }
-fi
+# if [ ${commands[kubectl]} ]; then
+#   function kubectl() {
+#     source <(command kubectl completion zsh)
+#     command kubectl "$@"
+#   }
+# fi
 
 # Fuzzy match a Kubernetes resource.
 function kfuzz() {
