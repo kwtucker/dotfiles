@@ -25,7 +25,7 @@ ifeq ($(UNAME_S),Darwin)
 endif
 
 # Phony targets
-.PHONY: install check_rancher clean install_docker_debug list_versions use_version
+.PHONY: install check_rancher clean list_versions use_version
 
 # Main install target
 install: check_rancher
@@ -51,15 +51,6 @@ install: check_rancher
 	fi
 
 	@echo "✅ Docker install complete."
-
-# Debug target to see variables
-install_docker_debug:
-	@echo "=== Docker Debug Install ==="
-	@echo "OS: $(DOCKER_OS)"
-	@echo "Version: $(DOCKER_VERSION)"
-	@echo "Arch: $(DOCKER_ARCH)"
-	@echo "Install dir: $(DOCKER_INSTALL_DIR)"
-	@echo "URL: $(DOCKER_URL)"
 
 # Only warn if Rancher Docker exists
 check_rancher:
