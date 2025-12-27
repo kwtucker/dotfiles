@@ -1,7 +1,6 @@
 XDG_CONFIG_HOME ?= $(HOME)/.config
 XDG_CACHE_HOME  ?= $(HOME)/.cache
 XDG_DATA_HOME   ?= $(HOME)/.local/share
-XDG_RUNTIME_DIR ?= $(HOME)/.local/run
 
 MODULE_NAME := tmux
 TPM_DIR := $(HOME)/.tmux/plugins/tpm
@@ -13,7 +12,6 @@ install:
 	@mkdir -p $(HOME)/.tmux/plugins
 	@mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)
 	@mkdir -p $(XDG_DATA_HOME)/$(MODULE_NAME)
-	@mkdir -p $(XDG_RUNTIME_DIR)/$(MODULE_NAME)
 	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@if [ ! -d "$(TPM_DIR)" ]; then \
 	  git clone https://github.com/tmux-plugins/tpm "$(TPM_DIR)"; \
@@ -30,6 +28,5 @@ clean:
 	@rm -rf $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@rm -rf $(XDG_CACHE_HOME)/$(MODULE_NAME)
 	@rm -rf $(XDG_DATA_HOME)/$(MODULE_NAME)
-	@rm -rf $(XDG_RUNTIME_DIR)/$(MODULE_NAME)
 	@rm -rf $(HOME)/.tmux/plugins
 	@echo "✅ $(MODULE_NAME) cleaned."

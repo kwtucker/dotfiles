@@ -1,7 +1,7 @@
 # include modules.local.mk
 
 MODULES = \
-	  bin zsh whalebyte alacritty fzf tmux git golang kubectl helm docker \
+	  bin zsh whalebyte alacritty fzf tmux git golang kubernetes helm docker \
 	  bat nvim psql ripgrep $(LOCAL_MODULES)
 
 CLEAN := $(addsuffix .clean,$(MODULES))

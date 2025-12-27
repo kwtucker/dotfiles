@@ -1,17 +1,12 @@
-#! /usr/bin/env bash
+#!/usr/bin/env zsh
 export XDG_CONFIG_HOME=${HOME}/.config
 export XDG_CACHE_HOME=${HOME}/.cache
 export XDG_DATA_HOME=${HOME}/.local/share
-export XDG_RUNTIME_DIR=${HOME}/tmp/xdg_runtime
 
 while read -r env; do
   echo "Sourcing $env"
   source "${env}"
 done < <(find . -name env.zsh)
-echo ''
-
-echo "Setting PATH..."
-echo ''
 
 source zsh/path.zsh
 
