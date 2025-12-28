@@ -1,7 +1,10 @@
 [include]
 	path = ~/.config/git/config.local
+
 [core]
 	excludesFile = ~/.config/git/ignore
+  autocrlf = input
+  whitespace = trailing-space,space-before-tab
 
 [init]
   defaultBranch = main
@@ -9,30 +12,33 @@
 [alias]
   br = branch
   ci = commit
-  cm = !git add -A && git commit -m
+  cm = "!f() { git add -A && git commit -m \"$*\"; }; f"
   co = checkout
-  cb = !git checkout $(git branch | fzf)
-	pt = !git tag -l | xargs git tag -d && git fetch -t
-	sort = !git tag -l | sort -V
+  cb = "!f() { \
+        b=$(git for-each-ref --format='%(refname:short)' refs/heads refs/remotes | sed 's#^origin/##' | sort -u | fzf) && \
+        [ -n \"$b\" ] && git checkout \"$b\"; \
+        }; f"
+  pt = fetch --prune --prune-tags
+  sort = "!f() { git tag -l \"$@\" | sort -V; }; f"
   st = status -sb
-  wip = commit -am "WIP"
+  wip = "!f() { git add -A && (git commit -m 'WIP' || git commit --amend -m 'WIP'); }; f"
+  amend = commit --amend --no-edit
 
 [fetch]
   prune = true
-  pruneTags = true	
+  pruneTags = true
 
 [pull]
   rebase = true
-  tags = true
 
 [push]
-  default = nothing
+  default = simple
 
 [merge]
-	tool = vscode
+  tool = vscode
 
 [mergetool "vscode"]
-	cmd = "code --wait"
+  cmd = "code --wait"
 
 [url "git@github.com:"]
   insteadOf = https://github.com/
