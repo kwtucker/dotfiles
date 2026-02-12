@@ -1,17 +1,13 @@
-XDG_CONFIG_HOME ?= $(HOME)/.config
-XDG_CACHE_HOME  ?= $(HOME)/.cache
-XDG_DATA_HOME   ?= $(HOME)/.local/share
+include ../env.mk
 
 MODULE_NAME := tmux
 TPM_DIR := $(HOME)/.tmux/plugins/tpm
 
 .PHONY: install clean
 
-install:
+install: .ensure.xdg.tmux
 	@echo "Installing $(MODULE_NAME) dotfiles..."
 	@mkdir -p $(HOME)/.tmux/plugins
-	@mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)
-	@mkdir -p $(XDG_DATA_HOME)/$(MODULE_NAME)
 	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@if [ ! -d "$(TPM_DIR)" ]; then \
 	  git clone https://github.com/tmux-plugins/tpm "$(TPM_DIR)"; \
@@ -23,10 +19,7 @@ install:
 	@echo "✅ $(MODULE_NAME) installed."
 
 
-clean:
+clean: .remove.xdg.tmux
 	@echo "Cleaning $(MODULE_NAME) data..."
-	@rm -rf $(XDG_CONFIG_HOME)/$(MODULE_NAME)
-	@rm -rf $(XDG_CACHE_HOME)/$(MODULE_NAME)
-	@rm -rf $(XDG_DATA_HOME)/$(MODULE_NAME)
 	@rm -rf $(HOME)/.tmux/plugins
 	@echo "✅ $(MODULE_NAME) cleaned."

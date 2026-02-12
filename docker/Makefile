@@ -1,6 +1,4 @@
-XDG_CONFIG_HOME ?= $(HOME)/.config
-XDG_CACHE_HOME  ?= $(HOME)/.cache
-XDG_DATA_HOME   ?= $(HOME)/.local/share
+include ../env.mk
 
 # Docker settings
 MODULE_NAME := docker
@@ -27,12 +25,9 @@ endif
 .PHONY: install check_rancher clean list_versions use_version
 
 # Main install target
-install: check_rancher
+install: .ensure.xdg.docker check_rancher
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	@mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)
-	@mkdir -p $(XDG_DATA_HOME)/$(MODULE_NAME)
 	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
-
 	@echo "Installing Docker $(DOCKER_VERSION) for $(DOCKER_OS)/$(DOCKER_ARCH)..."
 	@mkdir -p $(DOCKER_INSTALL_DIR)
 	@curl -fSL $(DOCKER_URL) -o /tmp/docker-$(DOCKER_VERSION).tgz || (echo "❌ Download failed!"; exit 1)
@@ -42,12 +37,10 @@ install: check_rancher
 	@ln -sfn $(DOCKER_BIN) $(LOCAL_BIN)/docker
 	@echo "Manual Docker installed at $(DOCKER_BIN)"
 	@echo "Active Docker symlink: $(LOCAL_BIN)/docker → $(DOCKER_BIN)"
-
 	@if [ -x "$(HOME)/.rd/bin/docker" ]; then \
 		echo "ℹ️  Rancher Desktop docker detected at ~/.rd/bin/docker"; \
 		echo "Use 'alias rancher-docker=~/.rd/bin/docker' to run it"; \
 	fi
-
 	@echo "✅ Docker install complete."
 
 # Only warn if Rancher Docker exists
@@ -77,11 +70,8 @@ endif
 	fi
 
 # Clean up installed binaries
-clean:
+clean: .remove.xdg.docker
 	@echo "Cleaning $(MODULE_NAME) data..."
-	@rm -rf $(XDG_CONFIG_HOME)/$(MODULE_NAME)
-	@rm -rf $(XDG_CACHE_HOME)/$(MODULE_NAME)
-	@rm -rf $(XDG_DATA_HOME)/$(MODULE_NAME)
 	@rm -rf $(DOCKER_INSTALL_BASE)
 	@rm -f $(LOCAL_BIN)/docker
 	@echo "✅ Docker cleaned."

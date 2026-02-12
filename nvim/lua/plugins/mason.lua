@@ -6,6 +6,7 @@ return {
         "docker-compose-language-service",
         "dockerfile-language-server",
         "eslint-lsp",
+        "elixir-ls",
         "glow",
         "gofumpt",
         "goimports",

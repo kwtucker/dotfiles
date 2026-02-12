@@ -1,7 +1,4 @@
-# XDG base directories
-XDG_CONFIG_HOME ?= $(HOME)/.config
-XDG_CACHE_HOME  ?= $(HOME)/.cache
-XDG_DATA_HOME   ?= $(HOME)/.local/share
+include ../env.mk
 
 # Detect OS
 UNAME_S := $(shell uname -s)
@@ -28,10 +25,8 @@ LOCAL_BIN = $(HOME)/.local/bin
 
 .PHONY: install install_helm clean list_versions use_version check_rancher
 
-install: check_rancher install_helm
+install: .ensure.xdg.helm check_rancher install_helm
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	@mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)
-	@mkdir -p $(XDG_DATA_HOME)/$(MODULE_NAME)
 	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@echo "Helm installed at $(HELM_BIN)"
 	@echo "Active Helm: $(LOCAL_BIN)/helm → $(HELM_BIN)"
@@ -48,24 +43,18 @@ check_rancher:
 
 install_helm:
 	@echo "Installing Helm $(HELM_VERSION)..."
-
 	# Create versioned directory
 	@mkdir -p $(HELM_INSTALL_DIR)
-
 	# Download and extract the tarball
-	@curl -sL $(HELM_URL) | tar xz -C $(HELM_INSTALL_DIR) --strip-components=1 $(HELM_OS)-$(HELM_ARCH)/helm
-
+	@curl -fL $(HELM_URL) | tar xz -C $(HELM_INSTALL_DIR) --strip-components=1 $(HELM_OS)-$(HELM_ARCH)/helm
 	@chmod +x $(HELM_BIN)
-
+	@$(HELM_BIN) version --short >/dev/null
 	# Ensure ~/.local/bin exists
 	@mkdir -p $(LOCAL_BIN)
-
 	# Symlink stable helm to this version
 	@ln -sfn $(HELM_BIN) $(LOCAL_BIN)/helm
-
 	# Remove old helm-* binaries in ~/.local/bin
 	@find $(LOCAL_BIN) -maxdepth 1 -type f -name "helm-*" -delete 2>/dev/null || true
-
 	@echo "Helm $(HELM_VERSION) installed."
 	@echo "Active: $(LOCAL_BIN)/helm → $(HELM_BIN)"
 
@@ -83,11 +72,8 @@ use_version:
 	@ln -sfn $(HELM_BASE_DIR)/$(v)/helm $(LOCAL_BIN)/helm
 	@echo "Now using Helm $(v)."
 
-clean:
+clean: .remove.xdg.helm
 	@echo "Cleaning Helm installation…"
-	@rm -rf $(XDG_CONFIG_HOME)/$(MODULE_NAME)
-	@rm -rf $(XDG_CACHE_HOME)/$(MODULE_NAME)
-	@rm -rf $(XDG_DATA_HOME)/$(MODULE_NAME)
 	@rm -rf $(HELM_BASE_DIR)
 	@rm -f $(LOCAL_BIN)/helm
 	@echo "✅ Helm cleaned."
