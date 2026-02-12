@@ -10,7 +10,7 @@ MODULES = \
 
 CLEAN := $(addsuffix .clean,$(MODULES))
 
-$(MODULES): local
+$(MODULES):
 	$(MAKE) -C $@ install
 
 $(CLEAN):
@@ -18,9 +18,19 @@ $(CLEAN):
 
 all: $(MODULES) ## Make it all
 
-clean.all: $(CLEAN)
+clean.all: $(CLEAN) ## Clean all modules
 
 .PHONY: $(MODULES) $(CLEAN) all clean.all
 
-help: ## Prints help for targets with comments
-	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+help: ## Show this help message
+	@echo "Available targets:"; \
+	echo; \
+	awk 'BEGIN {FS="##"; printf "\x1b[1;34m%-20s\x1b[0m %s\n","Target","Description"; print "-------------------- ----------------------------"} /^[a-zA-Z0-9_.-]+:/ && $$1 !~ /^\./ {split($$1,parts,":"); target=parts[1]; gsub(/^[ \t]+|[ \t]+$$/,"",target); desc=($$2?$$2:"No description"); gsub(/^[ \t]+/,"",desc); printf "\x1b[36m%-20s\x1b[0m %s\n",target,desc}' $(MAKEFILE_LIST); \
+	echo; \
+	echo "Usage:"; \
+	echo "  make <target>       # Run a specific target"; \
+	echo "  make all            # Install all modules"; \
+	echo "  make clean.all      # Clean all modules"; \
+	echo "  make <module>.clean # Clean a specific module, e.g. 'make zsh.clean'"
+

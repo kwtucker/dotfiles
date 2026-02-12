@@ -37,8 +37,8 @@ make all
 | ---------------- | ------------------------------------------------- |
 | `make all`       | Install all modules                               |
 | `make clean.all` | Remove all installed modules and files            |
-| `[module]`       | Install a specific module (e.g., `make zsh`)      |
-| `[module].clean` | Clean a specific module (e.g., `make nvim.clean`) |
+| `make [module]`       | Install a specific module (e.g., `make zsh`)      |
+| `make [module].clean` | Clean a specific module (e.g., `make nvim.clean`) |
 | `make help`      | List all available targets                        |
 
 
