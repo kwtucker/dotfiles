@@ -5,7 +5,7 @@ SHELL := /bin/bash
 -include modules.local.mk
 
 MODULES = \
-	  bin zsh whalebyte alacritty fzf tmux git golang kubernetes helm docker \
+	  bin zsh alacritty fzf tmux git golang kubernetes helm docker \
 	  bat nvim psql ripgrep $(LOCAL_MODULES)
 
 CLEAN := $(addsuffix .clean,$(MODULES))

@@ -1,16 +1,14 @@
 # .Files
+> Modular, portable, XDG-compliant dotfiles for Zsh, Neovim, tmux, Git, and other developer tools.
+## 🚀 Installation
 
-## Clone
+### 1. Clone the Repository
 
-```shell
-git clone git@github.com:kwtucker/dotfiles ~/.dotfiles
+```bash
+git clone git@github.com:kwtucker/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
 ```
 
-### 1. Create the ~/.whalebyte directory
-
-```shell
-mkdir -p ~/.whalebyte/{code,notes} ; touch ~/.whalebyte/.secret .env
-```
 
 ### 2. Setup dotfile components
 
@@ -23,14 +21,26 @@ _NOTE_: Make sure if needed to create local files first:
 ```shell
 .dotfiles/modules.local.mk
 .dotfiles/git/config.local
-.dotfiles/zsh/local.zsh
+.dotfiles/zsh/local
 ```
 
-### 3. Install Dotfiles
+### 3. Bootstrap All Modules
 
 ```shell
-cd ~/.dotfiles && . ./bootstrap
+make all
 ```
+
+
+## ⚡ Makefile Commands
+
+| Target           | Description                                       |
+| ---------------- | ------------------------------------------------- |
+| `make all`       | Install all modules                               |
+| `make clean.all` | Remove all installed modules and files            |
+| `[module]`       | Install a specific module (e.g., `make zsh`)      |
+| `[module].clean` | Clean a specific module (e.g., `make nvim.clean`) |
+| `make help`      | List all available targets                        |
+
 
 ## Credits
 
