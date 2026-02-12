@@ -1,7 +1,4 @@
-# XDG base directories
-XDG_CONFIG_HOME ?= $(HOME)/.config
-XDG_CACHE_HOME  ?= $(HOME)/.cache
-XDG_DATA_HOME   ?= $(HOME)/.local/share
+include ../env.mk
 
 # Detect OS
 UNAME_S := $(shell uname -s)
@@ -15,7 +12,7 @@ endif
 MODULE_NAME := kubernetes
 
 # kubectl settings
-KUBECTL_VERSION ?= 1.34.1
+KUBECTL_VERSION ?= 1.31.0
 KUBECTL_ARCH := amd64
 KUBECTL_URL = https://storage.googleapis.com/kubernetes-release/release/v$(KUBECTL_VERSION)/bin/$(KUBECTL_OS)/$(KUBECTL_ARCH)/kubectl
 
@@ -28,10 +25,8 @@ LOCAL_BIN = $(HOME)/.local/bin
 
 .PHONY: install install_kubectl clean list_versions use_version check_rancher
 
-install: check_rancher install_kubectl
+install: .ensure.xdg.kubernetes check_rancher install_kubectl
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	@mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)
-	@mkdir -p $(XDG_DATA_HOME)/$(MODULE_NAME)
 	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@echo "kubectl installed at $(KUBECTL_BIN)"
 	@echo "Active kubectl: $(LOCAL_BIN)/kubectl → $(KUBECTL_BIN)"
@@ -53,8 +48,10 @@ install_kubectl:
 	@mkdir -p $(KUBECTL_INSTALL_DIR)
 
 	# Download kubectl into the version directory
-	@curl -L $(KUBECTL_URL) -o $(KUBECTL_BIN)
+	@curl -fL $(KUBECTL_URL) -o $(KUBECTL_BIN)
 	@chmod +x $(KUBECTL_BIN)
+
+	@$(KUBECTL_BIN) version --client --short >/dev/null
 
 	# Ensure ~/.local/bin exists
 	@mkdir -p $(LOCAL_BIN)
@@ -82,11 +79,8 @@ use_version:
 	@ln -sfn $(KUBECTL_BASE_DIR)/$(v)/kubectl $(LOCAL_BIN)/kubectl
 	@echo "Now using kubectl $(v)."
 
-clean:
+clean: .remove.xdg.kubernetes
 	@echo "Cleaning kubectl installation…"
-	@rm -rf $(XDG_CONFIG_HOME)/$(MODULE_NAME)
-	@rm -rf $(XDG_CACHE_HOME)/$(MODULE_NAME)
-	@rm -rf $(XDG_DATA_HOME)/$(MODULE_NAME)
 	@rm -rf $(KUBECTL_BASE_DIR)
 	@rm -f $(LOCAL_BIN)/kubectl
 	@echo "✅ kubectl cleaned."

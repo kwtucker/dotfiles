@@ -1,23 +1,16 @@
-XDG_CONFIG_HOME ?= $(HOME)/.config
-XDG_CACHE_HOME  ?= $(HOME)/.cache
-XDG_DATA_HOME   ?= $(HOME)/.local/share
+include ../env.mk
 
 MODULE_NAME := whalebyte
 
 .PHONY: install clean
 
-install:
+install: .ensure.xdg.whalebyte
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	@mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)
-	@mkdir -p $(XDG_DATA_HOME)/$(MODULE_NAME)
 	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@mkdir -p ~/.whalebyte/code
 	@touch ~/.whalebyte/.env ~/.whalebyte/.secret
 	@echo "✅ $(MODULE_NAME) installed."
 
-clean:
+clean: .remove.xdg.whalebyte
 	@echo "Cleaning $(MODULE_NAME) data..."
-	@rm -rf $(XDG_CONFIG_HOME)/$(MODULE_NAME)
-	@rm -rf $(XDG_CACHE_HOME)/$(MODULE_NAME)
-	@rm -rf $(XDG_DATA_HOME)/$(MODULE_NAME)
 	@echo "✅ $(MODULE_NAME) cleaned."
