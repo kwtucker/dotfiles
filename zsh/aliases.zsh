@@ -29,10 +29,10 @@ alias dotpush='cd $DOTFILES && git add --all && git commit -m "update dotfiles" 
 # ---- dotfile cd ----
 alias dot='cd $DOTFILES'
 
-if [ ${commands[exa]} ]; then
-	alias ls='exa'
-	alias ll='exa -lg --git --time-style long-iso'
-	alias la='exa -laag --git --time-style long-iso'
+if [ ${commands[eza]} ]; then
+	alias ls='eza'
+	alias ll='eza -lg --git --time-style long-iso'
+	alias la='eza -laag --git --time-style long-iso'
 else
 	if [ "$(uname -s)" = "Darwin" ]; then
 		if [ ${commands[gls]} ]; then
