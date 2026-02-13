@@ -9,11 +9,22 @@ install: .ensure.xdg.tmux
 	@echo "Installing $(MODULE_NAME) dotfiles..."
 	@mkdir -p $(HOME)/.tmux/plugins
 	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
-	@if [ ! -d "$(TPM_DIR)" ]; then \
-	  git clone https://github.com/tmux-plugins/tpm "$(TPM_DIR)"; \
+	# Install or update TPM
+	@if [ ! -d "$(TPM_DIR)/.git" ]; then \
+		echo "📥 Cloning TPM..."; \
+		git clone https://github.com/tmux-plugins/tpm "$(TPM_DIR)"; \
+	else \
+		echo "🔄 Updating TPM..."; \
+		git -C "$(TPM_DIR)" pull --ff-only; \
 	fi
-	mkdir -p $(XDG_CONFIG_HOME)/tmux/plugins/catppuccin
-	git clone -b v2.1.3 https://github.com/catppuccin/tmux.git $(XDG_CONFIG_HOME)/tmux/plugins/catppuccin/tmux
+	# Install plugins if tmux is running
+	@if command -v tmux >/dev/null && tmux info >/dev/null 2>&1; then \
+			echo "🔌 Installing tmux plugins via TPM..."; \
+			"$(TPM_DIR)/scripts/install_plugins.sh"; \
+			tmux source-file "$(XDG_CONFIG_HOME)/tmux/tmux.conf"; \
+	else \
+			echo "ℹ️ tmux not running — skipping plugin install"; \
+	fi
 	@"$(TPM_DIR)/scripts/install_plugins.sh" || true
 	tmux source-file $(XDG_CONFIG_HOME)/tmux/tmux.conf
 	@echo "✅ $(MODULE_NAME) installed."
