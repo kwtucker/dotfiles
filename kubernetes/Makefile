@@ -51,7 +51,7 @@ install_kubectl:
 	@curl -fL $(KUBECTL_URL) -o $(KUBECTL_BIN)
 	@chmod +x $(KUBECTL_BIN)
 
-	@$(KUBECTL_BIN) version --client --short >/dev/null
+	@$(KUBECTL_BIN) version --client >/dev/null
 
 	# Ensure ~/.local/bin exists
 	@mkdir -p $(LOCAL_BIN)
