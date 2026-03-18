@@ -7,7 +7,6 @@ return {
         "dockerfile-language-server",
         "eslint-lsp",
         "elixir-ls",
-        "glow",
         "gofumpt",
         "goimports",
         "golangci-lint",
@@ -52,6 +51,7 @@ return {
               compositeLiteralFields = false,
               parameterNames = false,
             },
+            gofumpt = true,
             staticcheck = true,
             completeUnimported = true,
             buildFlags = { "-tags=unit,integration" },
@@ -64,7 +64,6 @@ return {
           end
           local opts = { noremap = true, silent = true }
 
-          -- Example keybindings
           buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
           buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
           buf_set_keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
