@@ -1,8 +1,13 @@
 return {
-  -- add gruvbox
-  { "ellisonleao/gruvbox.nvim" },
+  {
+    "LazyVim/LazyVim",
+    opts = {
+      colorscheme = "catppuccin",
+    },
+  },
   {
     "catppuccin/nvim",
+    priority = 1000,
     lazy = true,
     name = "catppuccin",
     opts = {
@@ -22,8 +27,8 @@ return {
         mason = true,
         markdown = true,
         mini = {
-          enabled = true,
-          indentscope_color = "lavender",
+          enabled = false,
+          indentscope_color = "",
         },
         native_lsp = {
           enabled = true,
