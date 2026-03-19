@@ -13,7 +13,6 @@ nix-env -iA nixpkgs.myPackages
 
 make all
 
-# Start Zsh if available
 if [ -x "$(command -v zsh)" ] && [ -z "$ZSH_VERSION" ]; then
-  exec zsh
+  exec zsh || exec bash
 fi
