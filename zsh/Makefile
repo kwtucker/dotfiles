@@ -33,6 +33,7 @@ install: .ensure.xdg.zsh
 	fi
 	# ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	# @curl -sS https://starship.rs/install.sh | sh
+	@mkdir -p $(LOCAL_BIN)
 	@curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir $(LOCAL_BIN)
 	@curl -L git.io/antigen > antigen.zsh
 	@ln -sf $(CURDIR)/zshenv $(HOME)/.zshenv
