@@ -17,7 +17,7 @@ mkdir -p "$XDG_CONFIG_HOME/nixpkgs"
 ln -sf "$PWD/nix/config.nix" "$XDG_CONFIG_HOME/nixpkgs/config.nix"
 
 echo "🔹 Installing Nix packages"
-nix-env -iA nixpkgs.myPackages || echo "⚠️ nix-env failed (maybe packages already installed)"
+nix-env -iA myPackages || echo "⚠️ nix-env failed (maybe packages already installed)"
 
 ln -sf "$PWD/.bashrc" "$HOME/.bashrc"
 
