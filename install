@@ -12,3 +12,8 @@ ln -sf "$PWD/nix/config.nix" "$XDG_CONFIG_HOME"/nixpkgs/config.nix
 nix-env -iA nixpkgs.myPackages
 
 make all
+
+# Start Zsh if available
+if [ -x "$(command -v zsh)" ] && [ -z "$ZSH_VERSION" ]; then
+  exec zsh
+fi
