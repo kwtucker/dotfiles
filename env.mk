@@ -11,10 +11,9 @@ XDG_DIRS := $(XDG_CONFIG_HOME) $(XDG_CACHE_HOME) $(XDG_DATA_HOME)
 	@echo "Creating XDG dirs for $*"
 	@for dir in $(XDG_DIRS); do \
 		mkdir -p "$$dir"; \
-		# Create module subdir only if module name is not empty
 		if [ -n "$*" ]; then \
 			mkdir -p "$$dir/$*"; \
-		fi \
+		fi; \
 	done
 
 .remove.xdg.%:
