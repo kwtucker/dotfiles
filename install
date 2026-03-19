@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "RUNNING FULL INSTALL"
+set -x
+
 make
 
 export XDG_CONFIG_HOME="$HOME/.config"
