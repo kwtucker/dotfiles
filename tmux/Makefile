@@ -25,8 +25,7 @@ install: .ensure.xdg.tmux
 	else \
 			echo "ℹ️ tmux not running — skipping plugin install"; \
 	fi
-	@"$(TPM_DIR)/scripts/install_plugins.sh" || true
-	tmux source-file $(XDG_CONFIG_HOME)/tmux/tmux.conf
+
 	@echo "✅ $(MODULE_NAME) installed."
 
 
