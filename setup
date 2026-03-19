@@ -1,0 +1,11 @@
+#!/bin/bash
+
+make
+
+export XDG_CONFIG_HOME="$HOME/.config"
+
+mkdir -p "$XDG_CONFIG_HOME"/nixpkgs
+
+ln -sf "$PWD/config.nix" "$XDG_CONFIG_HOME"/nixpkgs/config.nix
+
+nix-env -iA nixpkgs.myPackages
