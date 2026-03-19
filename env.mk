@@ -14,7 +14,7 @@ XDG_DIRS := $(XDG_CONFIG_HOME) $(XDG_CACHE_HOME) $(XDG_DATA_HOME)
 		if [ -n "$*" ]; then \
 			mkdir -p "$$dir/$*"; \
 		fi; \
-	done
+	done;
 
 .remove.xdg.%:
 	@echo "Removing XDG dirs for $*"
