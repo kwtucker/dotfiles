@@ -42,7 +42,7 @@ install: .ensure.xdg.zsh
 	# Link zshenv
 	@ln -sf $(CURDIR)/zshenv $(HOME)/.zshenv
 	# Set default shell (optional)
-	@$(MAKE) set-default-shell
+	# @$(MAKE) set-default-shell
 	@echo "✅ $(MODULE_NAME) installed."
 
 clean: .remove.xdg.zsh
