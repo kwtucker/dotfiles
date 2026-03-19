@@ -3,7 +3,7 @@
 echo "RUNNING FULL INSTALL"
 set -x
 
-make
+make all
 
 export XDG_CONFIG_HOME="$HOME/.config"
 
