@@ -1,18 +1,33 @@
 #!/bin/bash
-
-echo "RUNNING FULL INSTALL"
+set -euo pipefail
 set -x
 
-export XDG_CONFIG_HOME="$HOME/.config"
+echo "🔹 Running full DevPod install"
 
-mkdir -p "$XDG_CONFIG_HOME"/nixpkgs
+# XDG directories
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 
-ln -sf "$PWD/nix/config.nix" "$XDG_CONFIG_HOME"/nixpkgs/config.nix
+mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME"
 
-nix-env -iA nixpkgs.myPackages
+# Nix setup
+echo "🔹 Setting up Nix configuration"
+mkdir -p "$XDG_CONFIG_HOME/nixpkgs"
+ln -sf "$PWD/nix/config.nix" "$XDG_CONFIG_HOME/nixpkgs/config.nix"
 
-make all
+echo "🔹 Installing Nix packages"
+nix-env -iA nixpkgs.myPackages || echo "⚠️ nix-env failed (maybe packages already installed)"
 
-if [ -x "$(command -v zsh)" ] && [ -z "$ZSH_VERSION" ]; then
-  exec zsh || exec bash
+# Install all dotfiles modules
+echo "🔹 Installing dotfiles modules"
+make all || echo "⚠️ make all failed, continuing anyway"
+
+# Start Zsh if available, otherwise fallback to Bash
+if command -v zsh >/dev/null && [ -z "${ZSH_VERSION-}" ]; then
+  echo "🚀 Starting Zsh shell in DevPod..."
+  exec zsh
+else
+  echo "ℹ️ Zsh not found, falling back to Bash"
+  exec bash
 fi
