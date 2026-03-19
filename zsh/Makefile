@@ -29,6 +29,7 @@ install: .ensure.xdg.zsh
 	if [ -t 0 ]; then \
 		echo "Installing Starship interactively..."; \
 		curl -sS https://starship.rs/install.sh | sh; \
+		@$(MAKE) set-default-shell
 	else \
 		echo "No TTY detected, installing Starship locally..."; \
 		mkdir -p "$$HOME/.local/bin"; \
@@ -36,7 +37,6 @@ install: .ensure.xdg.zsh
 	fi
 	@curl -L git.io/antigen > antigen.zsh
 	@ln -sf $(CURDIR)/zshenv $(HOME)/.zshenv
-	@$(MAKE) set-default-shell
 	@echo "✅ $(MODULE_NAME) installed."
 
 clean: .remove.xdg.zsh
