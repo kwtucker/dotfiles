@@ -24,17 +24,16 @@ install: .ensure.xdg.zsh
 	@echo "Installing $(MODULE_NAME) dotfiles..."
 	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	# @curl -sS https://starship.rs/install.sh | sh
-	# Install Starship non-interactively if no TTY
-	# Starship installation (detect TTY at runtime)
-	if [ -t 0 ]; then \
-		echo "Installing Starship interactively..."; \
-		curl -sS https://starship.rs/install.sh | sh; \
+		# Install Starship non-interactively if no TTY
+	ifeq ($(shell test -t 0 && echo yes),yes)
+		@curl -sS https://starship.rs/install.sh | sh
 		@$(MAKE) set-default-shell
-	else \
-		echo "No TTY detected, installing Starship locally..."; \
-		mkdir -p "$$HOME/.local/bin"; \
-		curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir "$$HOME/.local/bin"; \
-	fi
+	else
+		@echo "No TTY detected, installing Starship locally..."
+		@mkdir -p $(HOME)/.local/bin
+		@curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir $(HOME)/.local/bin
+		@export PATH="$(HOME)/.local/bin:$$PATH"
+	endif
 	@curl -L git.io/antigen > antigen.zsh
 	@ln -sf $(CURDIR)/zshenv $(HOME)/.zshenv
 	@echo "✅ $(MODULE_NAME) installed."
