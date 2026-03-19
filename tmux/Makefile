@@ -8,7 +8,7 @@ TPM_DIR := $(HOME)/.tmux/plugins/tpm
 install: .ensure.xdg.tmux
 	@echo "Installing $(MODULE_NAME) dotfiles..."
 	@mkdir -p $(HOME)/.tmux/plugins
-	@ln -sfn $(CURDIR)/* $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	# Install or update TPM
 	@if [ ! -d "$(TPM_DIR)/.git" ]; then \
 		echo "📥 Cloning TPM..."; \

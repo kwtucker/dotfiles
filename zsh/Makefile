@@ -22,7 +22,7 @@ set-default-shell:
 
 install: .ensure.xdg.zsh
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	# @curl -sS https://starship.rs/install.sh | sh
 	@curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir $(HOME)/.local/bin
 	@curl -L git.io/antigen > antigen.zsh
