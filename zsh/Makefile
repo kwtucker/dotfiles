@@ -25,17 +25,21 @@ set-default-shell:
 
 install: .ensure.xdg.zsh
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	# Link module to XDG config if not already linked
-	@if [ ! -L "$(ZSH_DIR)" ]; then \
-		ln -sfn $(CURDIR) $(ZSH_DIR); \
-		echo "🔗 Linked $(CURDIR) -> $(ZSH_DIR)"; \
-	else \
-		echo "✅ $(ZSH_DIR) already linked"; \
+	# Remove existing directory if it's not a symlink
+	@if [ -d "$(ZSH_DIR)" ] && [ ! -L "$(ZSH_DIR)" ]; then \
+		echo "⚠️  Removing existing directory $(ZSH_DIR)"; \
+		rm -rf "$(ZSH_DIR)"; \
 	fi
+	# Create symlink
+	@ln -sfn $(CURDIR) $(ZSH_DIR)
+	@echo "🔗 Linked $(CURDIR) -> $(ZSH_DIR)"
 	# Ensure local bin exists
 	@mkdir -p $(LOCAL_BIN)
+	# Install Starship non-interactively
 	@curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir $(LOCAL_BIN)
+	# Install Antigen
 	@curl -L git.io/antigen -o $(ZSH_DIR)/antigen.zsh
+	# Link zshenv
 	@ln -sf $(CURDIR)/zshenv $(HOME)/.zshenv
 	# Set default shell (optional)
 	@$(MAKE) set-default-shell
