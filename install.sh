@@ -19,6 +19,7 @@ ln -sf "$PWD/nix/config.nix" "$XDG_CONFIG_HOME/nixpkgs/config.nix"
 echo "🔹 Installing Nix packages"
 nix-env -iA nixpkgs.myPackages || echo "⚠️ nix-env failed (maybe packages already installed)"
 
+ln -sf "$PWD/.bashrc" "~/"
 # Install all dotfiles modules
 echo "🔹 Installing dotfiles modules"
 make all || echo "⚠️ make all failed, continuing anyway"
