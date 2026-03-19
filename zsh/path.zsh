@@ -11,6 +11,7 @@ PATH=${PATH}:${HOME}/.cargo/bin
 PATH=${PATH}:/opt/homebrew/bin
 PATH=${PATH}:/opt/homebrew/sbin
 PATH=${PATH}:${HOME}/.rd/bin
+PATH=${PATH}:${HOME}/.nix-profile/bin
 PATH=${PATH}:/usr/local/bin
 PATH=${PATH}:/usr/local/sbin
 PATH=${PATH}:/usr/bin
