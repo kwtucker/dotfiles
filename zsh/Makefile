@@ -1,6 +1,8 @@
 include ../env.mk
 
 MODULE_NAME := zsh
+ZSH_DIR := $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+LOCAL_BIN := $(HOME)/.local/bin
 
 .PHONY: set-default-shell install clean
 
@@ -22,9 +24,16 @@ set-default-shell:
 
 install: .ensure.xdg.zsh
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+	# Symlink module directory to XDG config, only if it's not already linked
+	@if [ ! -L "$(ZSH_DIR)" ]; then \
+		ln -sfn $(CURDIR) $(ZSH_DIR); \
+		echo "Linked $(CURDIR) -> $(ZSH_DIR)"; \
+	else \
+		echo "✅ $(ZSH_DIR) already linked"; \
+	fi
+	# ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	# @curl -sS https://starship.rs/install.sh | sh
-	@curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir $(HOME)/.local/bin
+	@curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir $(LOCAL_BIN)
 	@curl -L git.io/antigen > antigen.zsh
 	@ln -sf $(CURDIR)/zshenv $(HOME)/.zshenv
 	# @$(MAKE) set-default-shell
@@ -33,6 +42,6 @@ install: .ensure.xdg.zsh
 clean: .remove.xdg.zsh
 	@echo "Cleaning $(MODULE_NAME) data..."
 	@rm -rf $(HOME)/.zshenv
-	@sh -c 'rm "$(command -v 'starship')"'
-	@rm ~/.local/bin/antibody
+	@rm -f $(LOCAL_BIN)/starship
+	@rm -f $(ZSH_DIR)/antigen.zsh
 	@echo "✅ $(MODULE_NAME) cleaned."
