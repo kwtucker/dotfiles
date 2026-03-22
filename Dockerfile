@@ -63,6 +63,15 @@ RUN userdel -r ubuntu 2>/dev/null || true \
     && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} \
     && chmod 0440 /etc/sudoers.d/${USERNAME}
 
+# --- Pre-trust mise config locations so no prompt ever appears ---
+RUN mkdir -p /opt/mise/config     && printf "[settings]
+yes = true
+not_found_auto_install = false
+" > /opt/mise/config/config.toml     && mkdir -p /root/.config/mise     && printf "[settings]
+yes = true
+not_found_auto_install = false
+" > /root/.config/mise/config.toml
+
 # --- Shell activation for all users ---
 RUN echo 'export MISE_DATA_DIR=/opt/mise/data' >> /etc/profile.d/mise.sh \
     && echo 'export MISE_CONFIG_DIR=/opt/mise/config' >> /etc/profile.d/mise.sh \
