@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # install — works in all three contexts:
 #   1. Bare Linux server / Tailscale VPS (full install)
 #   2. DevPod --dotfiles flag (full install into fresh workspace)
