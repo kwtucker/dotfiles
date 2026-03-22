@@ -42,3 +42,11 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     vim.lsp.buf.format({ async = false })
   end,
 })
+
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function()
+    if require("lazy.status").has_updates() then
+      require("lazy").update({ show = false })
+    end
+  end,
+})
