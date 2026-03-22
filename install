@@ -1,28 +1,81 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# install — works in all three contexts:
+#   1. Bare Linux server / Tailscale VPS (full install)
+#   2. DevPod --dotfiles flag (full install into fresh workspace)
+#   3. Pre-built Docker image (tools already present, symlinks only)
 set -euo pipefail
-set -x
 
-echo "🔹 Running full DevPod install"
+BOLD='\033[1m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RESET='\033[0m'
+step() { echo -e "\n${BOLD}▶ $*${RESET}"; }
+ok() { echo -e "  ${GREEN}✓${RESET} $*"; }
+skip() { echo -e "  ${YELLOW}↷${RESET} $* (skipping)"; }
 
-# XDG directories
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+step "dotfiles install — $(hostname)"
+echo "  dir: $DOTFILES_DIR"
+
+# ── XDG ───────────────────────────────────────────────────────────────────────
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
-
 mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME"
 
-# Nix setup
-echo "🔹 Setting up Nix configuration"
-mkdir -p "$XDG_CONFIG_HOME/nixpkgs"
-ln -sf "$PWD/nix/config.nix" "$XDG_CONFIG_HOME/nixpkgs/config.nix"
+# ── Detect context ─────────────────────────────────────────────────────────────
+# If mise + key tools are already on PATH we're inside a pre-built image.
+# Skip the slow install — just lay symlinks.
+TOOLS_PRESENT=false
+if command -v mise &>/dev/null && command -v nvim &>/dev/null && command -v go &>/dev/null; then
+  TOOLS_PRESENT=true
+fi
 
-echo "🔹 Installing Nix packages"
-nix-env -iA nixpkgs.myPackages || echo "⚠️ nix-env failed (maybe packages already installed)"
+# ── Mise ───────────────────────────────────────────────────────────────────────
+step "mise"
+if [ "$TOOLS_PRESENT" = true ]; then
+  skip "tools already present (pre-built image)"
+else
+  if ! command -v mise &>/dev/null; then
+    echo "  installing mise..."
+    curl https://mise.run | sh
+    export PATH="$HOME/.local/bin:$PATH"
+    ok "mise installed"
+  else
+    ok "mise already present"
+  fi
 
-ln -sf "$PWD/.bashrc" "$HOME/.bashrc"
+  MISE_CONFIG_DIR="$XDG_CONFIG_HOME/mise"
+  mkdir -p "$MISE_CONFIG_DIR"
+  ln -sf "$DOTFILES_DIR/mise.toml" "$MISE_CONFIG_DIR/config.toml"
+  ok "mise config linked"
 
-export PATH=$HOME/.nix-profile/bin:$PATH
+  step "installing tools via mise"
+  eval "$(mise activate bash)" 2>/dev/null || true
+  mise install --yes
+  ok "all tools installed"
+fi
 
-# Install all dotfiles modules
-echo "🔹 Installing dotfiles modules"
-make all || echo "⚠️ make all failed, continuing anyway"
+export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
+
+# ── Dotfile modules ────────────────────────────────────────────────────────────
+step "dotfile modules"
+make -C "$DOTFILES_DIR" all
+ok "modules installed"
+
+# ── Shell activation ───────────────────────────────────────────────────────────
+# .bashrc is already symlinked by the zsh/git/etc modules above and launches zsh.
+# Just ensure mise activates inside zsh.
+step "shell"
+ZSHRC="$HOME/.zshrc"
+MISE_LINE='eval "$(mise activate zsh)"'
+
+if [ -f "$ZSHRC" ] && grep -qF "$MISE_LINE" "$ZSHRC" 2>/dev/null; then
+  skip "mise activation already in .zshrc"
+elif [ -f "$ZSHRC" ]; then
+  printf '\n# mise — added by dotfiles/install\n%s\n' "$MISE_LINE" >>"$ZSHRC"
+  ok "mise activation added to .zshrc"
+fi
+
+echo -e "\n${GREEN}${BOLD}✅ done.${RESET} Open a new shell or: source ~/.zshrc\n"

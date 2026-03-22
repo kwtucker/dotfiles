@@ -1,0 +1,38 @@
+# mise.toml — single source of truth for all CLI tools and runtimes.
+# Replaces nix/config.nix.
+#
+# Update a tool: change the version here, commit, push.
+# CI rebuilds the image automatically.
+# On a live container/VPS: run `mise install` to apply.
+
+[tools]
+# ── Runtimes ──────────────────────────────────────────────────────────────────
+go   = "1.23.4"
+node = "22.9.0"       # required by Mason (LSP installer inside neovim)
+
+# ── Kubernetes / Infra ────────────────────────────────────────────────────────
+kubectl   = "1.30.3"
+helm      = "3.15.4"
+terraform = "1.9.5"
+
+# ── Neovim + shell tooling ────────────────────────────────────────────────────
+# aqua backend pulls static binaries — no compilation, fast installs.
+"aqua:neovim/neovim"         = "0.10.1"
+"aqua:junegunn/fzf"          = "0.54.3"
+"aqua:BurntSushi/ripgrep"    = "14.1.1"   # telescope live grep
+"aqua:sharkdp/fd"            = "10.1.0"   # telescope file finder
+"aqua:sharkdp/bat"           = "0.24.0"
+"aqua:jesseduffield/lazygit" = "0.43.1"
+"aqua:cli/cli"               = "2.52.0"   # gh
+
+# ── LSP servers ───────────────────────────────────────────────────────────────
+# These are installed by mise so they're available before neovim/Mason runs.
+# Mason can still manage its own copies inside neovim — these just ensure
+# the LSPs work immediately on first launch without a Mason sync step.
+"aqua:golang/tools/gopls"               = "0.16.1"
+"aqua:hashicorp/terraform-ls"           = "0.35.0"
+"aqua:terraform-linters/tflint"         = "0.53.0"
+"aqua:lighttiger2505/golangci-lint"     = "1.60.3"
+
+[settings]
+not_found_auto_install = false
