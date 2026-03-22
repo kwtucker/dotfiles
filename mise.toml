@@ -26,13 +26,10 @@ terraform = "1.9.5"
 "aqua:cli/cli"               = "2.52.0"   # gh
 
 # ── LSP servers ───────────────────────────────────────────────────────────────
-# These are installed by mise so they're available before neovim/Mason runs.
-# Mason can still manage its own copies inside neovim — these just ensure
-# the LSPs work immediately on first launch without a Mason sync step.
-"go:golang.org/x/tools/gopls"           = "0.16.1"
-"aqua:hashicorp/terraform-ls"           = "0.35.0"
-"aqua:terraform-linters/tflint"         = "0.53.0"
-"ubi:golangci/golangci-lint"            = "1.60.3"
+"go:golang.org/x/tools/gopls"       = "latest"
+"aqua:hashicorp/terraform-ls"       = "0.35.0"
+"aqua:terraform-linters/tflint"     = "0.53.0"
+"github:golangci/golangci-lint"     = "1.60.3"
 
 [settings]
 not_found_auto_install = false
