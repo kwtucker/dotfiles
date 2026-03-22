@@ -39,18 +39,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
-# --- Install mise system-wide so any user can access tools ---
-# Tools go to /opt/mise so they survive regardless of which user DevPod picks
+# --- Install mise system-wide ---
 ENV MISE_DATA_DIR=/opt/mise/data
 ENV MISE_CONFIG_DIR=/opt/mise/config
 ENV MISE_INSTALL_PATH=/usr/local/bin/mise
+ENV MISE_YES=1
+
 RUN curl https://mise.run | sh \
     && chmod -R a+rx /usr/local/bin/mise
 
-# --- Copy mise config and pre-install all tools as root ---
+# --- Write global mise config so trust prompts never appear ---
+RUN mkdir -p /opt/mise/config \
+    && echo '[settings]' > /opt/mise/config/config.toml \
+    && echo 'yes = true' >> /opt/mise/config/config.toml \
+    && echo 'not_found_auto_install = false' >> /opt/mise/config/config.toml \
+    && mkdir -p /root/.config/mise \
+    && cp /opt/mise/config/config.toml /root/.config/mise/config.toml
+
+# --- Pre-install all tools ---
 COPY mise.toml /opt/mise/config/config.toml
-RUN MISE_YES=1 mise install --yes \
-    && MISE_YES=1 mise exec node -- npm install -g neovim \
+RUN mise install --yes \
+    && mise exec node -- npm install -g neovim \
     && chmod -R a+rx /opt/mise/data
 
 ENV PATH=/opt/mise/data/shims:/opt/mise/data/installs/node/22.9.0/bin:/usr/local/bin:$PATH
@@ -63,24 +72,21 @@ RUN userdel -r ubuntu 2>/dev/null || true \
     && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} \
     && chmod 0440 /etc/sudoers.d/${USERNAME}
 
-# --- Pre-trust mise config locations so no prompt ever appears ---
-RUN mkdir -p /opt/mise/config     && printf "[settings]
-yes = true
-not_found_auto_install = false
-" > /opt/mise/config/config.toml     && mkdir -p /root/.config/mise     && printf "[settings]
-yes = true
-not_found_auto_install = false
-" > /root/.config/mise/config.toml
+# --- Write mise config for all users ---
+RUN mkdir -p /etc/skel/.config/mise \
+    && echo '[settings]' > /etc/skel/.config/mise/config.toml \
+    && echo 'yes = true' >> /etc/skel/.config/mise/config.toml \
+    && echo 'not_found_auto_install = false' >> /etc/skel/.config/mise/config.toml
 
 # --- Shell activation for all users ---
-RUN echo 'export MISE_DATA_DIR=/opt/mise/data' >> /etc/profile.d/mise.sh \
+RUN echo 'export MISE_DATA_DIR=/opt/mise/data' > /etc/profile.d/mise.sh \
     && echo 'export MISE_CONFIG_DIR=/opt/mise/config' >> /etc/profile.d/mise.sh \
+    && echo 'export MISE_YES=1' >> /etc/profile.d/mise.sh \
     && echo 'export PATH=/opt/mise/data/shims:/usr/local/bin:$PATH' >> /etc/profile.d/mise.sh \
     && echo 'eval "$(mise activate bash)"' >> /etc/bash.bashrc \
     && echo 'eval "$(mise activate zsh)"' >> /etc/zsh/zshenv \
     && chmod a+rx /etc/profile.d/mise.sh
 
-ENV MISE_YES=1
 ENV TERM=xterm-256color
 ENV COLORTERM=truecolor
 
