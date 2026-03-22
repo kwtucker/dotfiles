@@ -1,0 +1,4 @@
+{
+  "image": "ghcr.io/kwtucker/dotfiles-devenv:latest",
+  "remoteUser": "dev"
+}

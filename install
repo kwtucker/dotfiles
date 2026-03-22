@@ -59,6 +59,9 @@ fi
 
 export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
+# Trust all mise configs so interactive prompts never appear
+mise trust --all 2>/dev/null || true
+
 # ── Dotfile modules ────────────────────────────────────────────────────────────
 step "dotfile modules"
 make -C "$DOTFILES_DIR" all
