@@ -34,10 +34,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     openssh-client \
     xclip \
     locales \
+    python3 \
+    python3-pip \
     && locale-gen en_US.UTF-8 \
     && rm -rf /var/lib/apt/lists/*
 
 ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+
+# --- Python provider for neovim (luarocks needs it) ---
+RUN pip3 install --break-system-packages pynvim
 
 # --- Install mise system-wide ---
 ENV MISE_DATA_DIR=/opt/mise/data
@@ -87,6 +92,10 @@ RUN echo 'export MISE_DATA_DIR=/opt/mise/data' > /etc/profile.d/mise.sh \
     && echo 'eval "$(mise activate zsh)"' >> /etc/zsh/zshenv \
     && chmod a+rx /etc/profile.d/mise.sh
 
+# Create XDG_RUNTIME_DIR for neovim server socket
+RUN mkdir -p /run/user/1000 && chmod 700 /run/user/1000 && chown 1000:1000 /run/user/1000
+
+ENV XDG_RUNTIME_DIR=/run/user/1000
 ENV TERM=xterm-256color
 ENV COLORTERM=truecolor
 
