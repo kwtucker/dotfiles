@@ -40,7 +40,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
 # --- Non-root user ---
-RUN groupadd --gid ${USER_GID} ${USERNAME} \
+# Ubuntu 24.04 ships with a default 'ubuntu' user at UID 1000 - remove it first
+RUN userdel -r ubuntu 2>/dev/null || true \
+    && groupadd --gid ${USER_GID} ${USERNAME} \
     && useradd --uid ${USER_UID} --gid ${USER_GID} -m -s /bin/zsh ${USERNAME} \
     && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} \
     && chmod 0440 /etc/sudoers.d/${USERNAME}
