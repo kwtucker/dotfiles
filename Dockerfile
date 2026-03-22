@@ -66,6 +66,7 @@ RUN mise exec node -- npm install -g neovim
 RUN printf '\neval "$(mise activate zsh)"\n' >> $HOME/.zshrc \
     && printf '\neval "$(mise activate bash)"\n' >> $HOME/.bashrc
 
+ENV MISE_YES=1
 ENV TERM=xterm-256color
 ENV COLORTERM=truecolor
 
