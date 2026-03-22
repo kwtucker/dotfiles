@@ -50,17 +50,18 @@ RUN userdel -r ubuntu 2>/dev/null || true \
 USER ${USERNAME}
 WORKDIR /home/${USERNAME}
 
-# --- Mise install + tools in one step so PATH is consistent ---
+# --- Mise install + tools ---
+# Use $HOME since ARGs are not expanded in RUN shell commands the same way
 COPY --chown=${USERNAME} mise.toml /home/${USERNAME}/.config/mise/config.toml
 RUN curl https://mise.run | sh \
-    && /home/${USERNAME}/.local/bin/mise install --yes \
-    && /home/${USERNAME}/.local/bin/mise exec node -- npm install -g neovim
+    && $HOME/.local/bin/mise install --yes \
+    && $HOME/.local/bin/mise exec node -- npm install -g neovim
 
 ENV PATH=/home/${USERNAME}/.local/bin:/home/${USERNAME}/.local/share/mise/shims:$PATH
 
 # --- Shell activation ---
-RUN printf '\neval "$(mise activate zsh)"\n' >> /home/${USERNAME}/.zshrc \
-    && printf '\neval "$(mise activate bash)"\n' >> /home/${USERNAME}/.bashrc
+RUN printf '\neval "$(mise activate zsh)"\n' >> $HOME/.zshrc \
+    && printf '\neval "$(mise activate bash)"\n' >> $HOME/.bashrc
 
 ENV TERM=xterm-256color
 ENV COLORTERM=truecolor
