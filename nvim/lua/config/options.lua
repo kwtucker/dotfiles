@@ -4,6 +4,7 @@
 -- This file is automatically loaded by plugins.core
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
+vim.g.highlight.priorities.semantic_tokens = 0
 
 -- LazyVim auto format
 vim.g.autoformat = true
