@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # install — works in all three contexts:
 #   1. Bare Linux server / Tailscale VPS (full install)
 #   2. DevPod --dotfiles flag (full install into fresh workspace)
@@ -59,13 +59,12 @@ fi
 
 export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
-# Write global mise config and trust all configs explicitly
+# Link mise.toml as the global mise config (contains both tools and settings)
 mkdir -p "$XDG_CONFIG_HOME/mise"
-cat >"$XDG_CONFIG_HOME/mise/config.toml" <<MISEEOF
-[settings]
-yes = true
-not_found_auto_install = false
-MISEEOF
+ln -sf "$DOTFILES_DIR/mise.toml" "$XDG_CONFIG_HOME/mise/config.toml"
+
+# Fix permissions on all mise-installed binaries (aqua backend sometimes misses this)
+find "$HOME/.local/share/mise/installs" -type f -exec chmod +x {} + 2>/dev/null || true
 
 # Trust all possible mise config locations up front
 MISE_YES=1 mise trust "$DOTFILES_DIR/mise.toml" 2>/dev/null || true

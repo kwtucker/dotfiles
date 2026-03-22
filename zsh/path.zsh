@@ -3,6 +3,8 @@ unset PATH
 
 PATH=${PATH}:${HOME}/bin
 PATH=${PATH}:${HOME}/.local/bin
+PATH=${PATH}:${HOME}/.local/share/mise/shims    # mise shims (local install)
+PATH=${PATH}:/opt/mise/data/shims
 PATH=${PATH}:/usr/local/go/bin
 PATH=${PATH}:${HOME}/go/bin
 PATH=${PATH}:${HOME}/.tfenv/bin
