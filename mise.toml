@@ -36,3 +36,4 @@ terraform = "1.9.5"
 
 [settings]
 not_found_auto_install = false
+yes = true
