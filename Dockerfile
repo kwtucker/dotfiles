@@ -50,20 +50,13 @@ RUN userdel -r ubuntu 2>/dev/null || true \
 USER ${USERNAME}
 WORKDIR /home/${USERNAME}
 
-# --- Mise ---
-RUN curl https://mise.run | sh
+# --- Mise install + tools in one step so PATH is consistent ---
+COPY --chown=${USERNAME} mise.toml /home/${USERNAME}/.config/mise/config.toml
+RUN curl https://mise.run | sh \
+    && /home/${USERNAME}/.local/bin/mise install --yes \
+    && /home/${USERNAME}/.local/bin/mise exec node -- npm install -g neovim
 
 ENV PATH=/home/${USERNAME}/.local/bin:/home/${USERNAME}/.local/share/mise/shims:$PATH
-
-# --- Pre-install all tools ---
-# Baked into the image so neovim's first launch has gopls, ripgrep,
-# fd, node etc. immediately available - no waiting for Mason to sync.
-COPY --chown=${USERNAME} mise.toml /home/${USERNAME}/.config/mise/config.toml
-RUN mise install --yes
-
-# --- npm global: neovim node provider ---
-# Required by plugins that use the neovim node client (e.g. copilot.vim)
-RUN mise exec node -- npm install -g neovim
 
 # --- Shell activation ---
 RUN printf '\neval "$(mise activate zsh)"\n' >> /home/${USERNAME}/.zshrc \
