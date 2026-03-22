@@ -65,7 +65,8 @@ RUN mkdir -p /opt/mise/config \
 COPY mise.toml /opt/mise/config/config.toml
 RUN mise install --yes \
     && mise exec node -- npm install -g neovim \
-    && chmod -R a+rx /opt/mise/data
+    && chmod -R a+rx /opt/mise/data \
+    && find /opt/mise/data/installs -type f -name "*" -exec chmod a+rx {} +
 
 ENV PATH=/opt/mise/data/shims:/opt/mise/data/installs/node/22.9.0/bin:/usr/local/bin:$PATH
 

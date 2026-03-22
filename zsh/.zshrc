@@ -42,9 +42,10 @@ unset config_files
 
 # eval "$(direnv hook zsh)"
 ################################################################################
-[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/fzf/fzf.zsh" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/fzf/fzf.zsh"
-[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/fzf/fzf/shell/key-bindings.zsh" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/fzf/fzf/shell/key-bindings.zsh"
-[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/fzf/fzf/shell/completion.zsh" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/fzf/fzf/shell/completion.zsh"
+# fzf shell integration — generated from mise-installed binary
+if command -v fzf &>/dev/null; then
+  source <(fzf --zsh)
+fi
 [ -f ${XDG_CONFIG_HOME}/zsh/local ] && . ${XDG_CONFIG_HOME}/zsh/local
 [ -f ${WHALEBYTE}/.secret ] && . ${WHALEBYTE}/.secret
 [ -f ${WHALEBYTE}/.env ] && . ${WHALEBYTE}/.env
