@@ -59,7 +59,15 @@ fi
 
 export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
-# Trust the dotfiles and workspace mise configs explicitly
+# Write global mise config to auto-trust and suppress prompts
+mkdir -p "$XDG_CONFIG_HOME/mise"
+cat >"$XDG_CONFIG_HOME/mise/config.toml" <<MISEEOF
+[settings]
+yes = true
+not_found_auto_install = false
+MISEEOF
+
+# Trust the dotfiles mise.toml explicitly
 MISE_YES=1 mise trust "$DOTFILES_DIR/mise.toml" 2>/dev/null || true
 MISE_YES=1 mise trust --all 2>/dev/null || true
 
