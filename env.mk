@@ -8,16 +8,13 @@ XDG_DIRS := $(XDG_CONFIG_HOME) $(XDG_CACHE_HOME) $(XDG_DATA_HOME)
 
 .PHONY: .ensure.xdg .remove.xdg
 
-# Create base XDG dirs and optional module subdir
+# Create base XDG dirs and module subdirs under cache/data only.
+# Config dirs are symlinks — never pre-create them here.
 .ensure.xdg.%:
-	@echo "Ensuring base XDG dirs for $*"
-	@sh -c '\
-	for dir in $(XDG_DIRS); do \
-	    mkdir -p "$$dir"; \
-	    if [ -n "$*" ]; then \
-	        mkdir -p "$$dir/$*"; \
-	    fi; \
-	done'
+	@echo "Ensuring XDG dirs for $*"
+	@mkdir -p "$(XDG_CONFIG_HOME)"
+	@mkdir -p "$(XDG_CACHE_HOME)/$*"
+	@mkdir -p "$(XDG_DATA_HOME)/$*"
 
 # Remove module-specific XDG dirs only (does not remove base XDG dirs)
 .remove.xdg.%:
