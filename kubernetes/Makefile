@@ -23,7 +23,7 @@ KUBECTL_BIN = $(KUBECTL_INSTALL_DIR)/kubectl
 
 LOCAL_BIN = $(HOME)/.local/bin
 
-.PHONY: install install_kubectl clean list_versions use_version check_rancher
+.PHONY: install install_kubectl clean completions list_versions use_version check_rancher
 
 install: .ensure.xdg.kubernetes check_rancher install_kubectl
 	@echo "Installing $(MODULE_NAME) dotfiles..."
@@ -39,6 +39,14 @@ check_rancher:
 		echo "    Use: alias rancher-kubectl=~/.rd/bin/kubectl"; \
 	else \
 		echo "ℹ️  No Rancher kubectl detected."; \
+	fi
+
+completions:
+	@if command -v kubectl >/dev/null 2>&1; then \
+		echo "Installing kubectl completions..."; \
+		$(KUBECTL_BIN) completion zsh > $(ZSH_COMPLETIONS_DIR)/_kubectl; \
+	else \
+		echo "⚠️  kubectl not installed, skipping completions"; \
 	fi
 
 install_kubectl:
