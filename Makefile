@@ -5,13 +5,18 @@ SHELL := /bin/bash
 -include modules.local.mk
 
 MODULES = \
-	  bin zsh alacritty fzf tmux git golang kubernetes helm docker \
+	  bin zsh alacritty fzf tmux git golang kubernetes helm terraform docker \
 	  bat nvim psql ripgrep $(LOCAL_MODULES)
 
 CLEAN := $(addsuffix .clean,$(MODULES))
 
 $(MODULES):
 	$(MAKE) -C $@ install
+	@if grep -qE '^\.PHONY:.*completions|^completions:' $@/Makefile 2>/dev/null; then \
+		$(MAKE) -C $@ completions; \
+	else \
+		echo "==> Skipping $@ (no completions target)"; \
+	fi
 
 $(CLEAN):
 	$(MAKE) -C $(basename $@) clean
@@ -20,7 +25,7 @@ all: $(MODULES) ## Make it all
 
 clean.all: $(CLEAN) ## Clean all modules
 
-.PHONY: $(MODULES) $(CLEAN) all clean.all
+.PHONY: $(MODULES) $(CLEAN) all clean.all completions
 
 
 help: ## Show this help message

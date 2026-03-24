@@ -2,19 +2,19 @@ alias rancher-kubectl="$HOME/.rd/bin/kubectl"
 
 alias k='kubectl'
 alias kp='k get pods -o wide'
+alias kpw='k get pods -o wide -w'
+alias kev='k get events --sort-by=.lastTimestamp'
 alias ks='k get services -o wide'
 alias kj='k get jobs'
 alias kc='k get cronjobs'
 
-alias kl='k logs -f PODS'
 alias kdp='k describe pod PODS'
 alias kds='k describe service SVC'
 alias kdj='k describe job JOBS'
 alias kdc='k describe cronjob CRONS'
 alias kcs='k config use-context CTX'
 alias kns='k config set-context --current --namespace NS'
-alias kgsa='k get pod PODS -o json | jq .spec.serviceAccount'
-alias kgsan='k get pod PODS -o json | jq .spec.serviceAccountName'
+alias kgsa='k get pod PODS -o json | jq .spec.serviceAccountName'
 
 alias -g PODS='$(  kfuzz pods       )'
 alias -g DEPLOY='$(kfuzz deploy     )'

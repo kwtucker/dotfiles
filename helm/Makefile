@@ -23,7 +23,7 @@ HELM_BIN = $(HELM_INSTALL_DIR)/helm
 
 LOCAL_BIN = $(HOME)/.local/bin
 
-.PHONY: install install_helm clean list_versions use_version check_rancher
+.PHONY: install install_helm clean completions list_versions use_version check_rancher
 
 install: .ensure.xdg.helm check_rancher install_helm
 	@echo "Installing $(MODULE_NAME) dotfiles..."
@@ -31,6 +31,15 @@ install: .ensure.xdg.helm check_rancher install_helm
 	@echo "Helm installed at $(HELM_BIN)"
 	@echo "Active Helm: $(LOCAL_BIN)/helm → $(HELM_BIN)"
 	@echo "✅ $(MODULE_NAME) installed."
+
+completions:
+	@if command -v helm >/dev/null 2>&1; then \
+		echo "Installing helm completions..."; \
+		$(HELM_BIN) completion zsh > $(ZSH_COMPLETIONS_DIR)/_helm; \
+	else \
+		echo "⚠️  helm not installed, skipping completions"; \
+	fi
+
 
 check_rancher:
 	@if [ -x "$(HOME)/.rd/bin/helm" ]; then \
