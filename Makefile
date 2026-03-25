@@ -25,8 +25,7 @@ all: $(MODULES) ## Make it all
 
 clean.all: $(CLEAN) ## Clean all modules
 
-.PHONY: $(MODULES) $(CLEAN) all clean.all completions
-
+.PHONY: $(MODULES) $(CLEAN) all clean.all
 
 help: ## Show this help message
 	@echo "Available targets:"; \
