@@ -25,7 +25,7 @@ LOCAL_BIN = $(HOME)/.local/bin
 
 .PHONY: install install_kubectl clean completions list_versions use_version check_rancher
 
-install: .ensure.xdg.kubernetes check_rancher install_kubectl
+install: .ensure.xdg.kubernetes check_rancher install_kubectl completions
 	@echo "Installing $(MODULE_NAME) dotfiles..."
 	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@echo "kubectl installed at $(KUBECTL_BIN)"

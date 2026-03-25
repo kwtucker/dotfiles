@@ -4,7 +4,7 @@ MODULE_NAME := ripgrep
 
 .PHONY: install clean completions
 
-install: .ensure.xdg.ripgrep
+install: .ensure.xdg.ripgrep completions
 	@echo "Installing $(MODULE_NAME) dotfiles..."
 	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@echo "✅ $(MODULE_NAME) installed."

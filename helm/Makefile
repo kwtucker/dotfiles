@@ -25,7 +25,7 @@ LOCAL_BIN = $(HOME)/.local/bin
 
 .PHONY: install install_helm clean completions list_versions use_version check_rancher
 
-install: .ensure.xdg.helm check_rancher install_helm
+install: .ensure.xdg.helm check_rancher install_helm completions
 	@echo "Installing $(MODULE_NAME) dotfiles..."
 	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@echo "Helm installed at $(HELM_BIN)"
