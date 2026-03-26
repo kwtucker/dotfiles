@@ -1,0 +1,35 @@
+# Presets: https://github.com/sxyazi/yazi/blob/shipped/yazi-config/preset/yazi-default.toml
+[mgr]
+ratio          = [1, 2, 4]   # left:current:preview column widths
+sort_by        = "natural"
+linemode       = "size"
+show_hidden    = true
+
+[preview]
+max_width  = 1200
+
+[opener]
+edit = [
+  { run = '$EDITOR "$@"', block = true, desc = "Edit in $EDITOR", for = "unix" },
+]
+open = [
+  { run = 'xdg-open "$@"', desc = "Open", for = "linux" },
+  { run = 'open "$@"',     desc = "Open", for = "macos" },
+]
+
+[open]
+prepend_rules = [
+  { mime = "text/*",        use = "edit" },
+  { mime = "application/*", use = "edit" },
+]
+
+[tasks]
+micro_workers    = 10
+macro_workers    = 10
+bizarre_retry    = 5
+image_alloc      = 536870912  # 512MB
+image_bound      = [0, 0]
+suppress_preload = false
+
+[log]
+enabled = false
