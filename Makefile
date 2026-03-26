@@ -6,7 +6,7 @@ SHELL := /bin/bash
 
 MODULES = \
 	  bin zsh alacritty fzf tmux git golang kubernetes helm terraform docker \
-	  bat nvim psql ripgrep $(LOCAL_MODULES)
+	  bat nvim psql ripgrep yazi $(LOCAL_MODULES)
 
 CLEAN := $(addsuffix .clean,$(MODULES))
 

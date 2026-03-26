@@ -24,7 +24,8 @@ terraform = "1.9.5"
 "aqua:sharkdp/bat"           = "0.24.0"
 "aqua:jesseduffield/lazygit" = "0.43.1"
 "aqua:cli/cli"               = "2.52.0"   # gh
-"aqua:starship/starship"      = "latest"
+"aqua:starship/starship"     = "latest"
+"aqua:sxyazi/yazi"           = "latest"   # file manager
 
 # ── LSP servers ───────────────────────────────────────────────────────────────
 "go:golang.org/x/tools/gopls"       = "latest"
