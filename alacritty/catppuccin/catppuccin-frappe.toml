@@ -1,11 +1,3 @@
-[[colors.indexed_colors]]
-color = "#EF9F76"
-index = 16
-
-[[colors.indexed_colors]]
-color = "#F2D5CF"
-index = 17
-
 [colors.bright]
 black = "#626880"
 blue = "#8CAAEE"
@@ -37,6 +29,14 @@ foreground = "#303446"
 [colors.hints.start]
 background = "#E5C890"
 foreground = "#303446"
+
+[[colors.indexed_colors]]
+color = "#EF9F76"
+index = 16
+
+[[colors.indexed_colors]]
+color = "#F2D5CF"
+index = 17
 
 [colors.normal]
 black = "#51576D"

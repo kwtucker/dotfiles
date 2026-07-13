@@ -63,7 +63,7 @@ RUN mkdir -p /opt/mise/config \
 
 # --- Pre-install all tools ---
 COPY mise.toml /opt/mise/config/config.toml
-RUN mise install --yes \
+RUN mise install --yes --verbose \
     && mise exec node -- npm install -g neovim \
     && chmod -R a+rx /opt/mise/data \
     && find /opt/mise/data/installs -type f -name "*" -exec chmod a+rx {} +
