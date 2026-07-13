@@ -9,6 +9,10 @@ export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate zsh)"
+fi
+
 # Load env files first (PATH, exports, env vars)
 typeset config_files
 config_files=($XDG_CONFIG_HOME/*/*.zsh)
@@ -29,11 +33,6 @@ else
   compinit -C $XDG_CACHE_HOME/zsh/zcompdump
 fi
 
-# Load everything else (aliases, functions) — excluding env and completion files
-for file in ${config_files:#*/env.zsh}; do
-  source "$file"
-done
-
 # Load antigen plugins
 source $XDG_CONFIG_HOME/zsh/antigen.zsh
 antigen bundle git
@@ -42,6 +41,11 @@ antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle paulirish/git-open
 antigen bundle Aloxaf/fzf-tab
 antigen apply
+
+# Load everything else (aliases, functions) — excluding env and completion files
+for file in ${config_files:#*/env.zsh}; do
+  source "$file"
+done
 
 # Local overrides
 [ -f ${XDG_CONFIG_HOME}/zsh/local ] && source ${XDG_CONFIG_HOME}/zsh/local

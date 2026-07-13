@@ -14,4 +14,6 @@ export CDPATH=$HOME/go/src
 
 # Prompt
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/zsh/starship.toml"
-eval "$(starship init zsh)"
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi
