@@ -1,5 +1,6 @@
 return {
   {
+    enabled = false,
     "mikavilpas/yazi.nvim",
     event = "VeryLazy",
     keys = {
