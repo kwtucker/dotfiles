@@ -45,17 +45,14 @@ else
   else
     ok "mise already present"
   fi
-
-  MISE_CONFIG_DIR="$XDG_CONFIG_HOME/mise"
-  mkdir -p "$MISE_CONFIG_DIR"
-  ln -sf "$DOTFILES_DIR/mise.toml" "$MISE_CONFIG_DIR/config.toml"
-  ok "mise config linked"
-
-  step "installing tools via mise"
-  eval "$(mise activate bash)" 2>/dev/null || true
-  mise install --yes
-  ok "all tools installed"
 fi
+
+# Always run — idempotent, upgrades pinned versions, fast if nothing changed
+mkdir -p "$XDG_CONFIG_HOME/mise"
+ln -sf "$DOTFILES_DIR/mise.toml" "$XDG_CONFIG_HOME/mise/config.toml"
+eval "$(mise activate bash)" 2>/dev/null || true
+mise install --yes
+ok "tools up to date"
 
 export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
