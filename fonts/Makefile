@@ -16,13 +16,14 @@ install: .ensure.xdg.fonts
 	@cd "$(FONTS_SRC)" && unzip -oq JetBrainsMono.zip
 	@find "$(FONTS_SRC)" -name '*.ttf' -exec mv {} "$(FONT_DIR)/" \;
 	@rm -rf "$(FONTS_SRC)"
-	# Rebuild font cache on Linux only (macOS manages ~/Library/Fonts automatically)
-	@if [ -n "$(FONTCACHE)" ]; then $(FONTCACHE) "$(FONT_DIR)"; fi
+	# Rebuild font cache on Linux only (macOS manages ~/Library/Fonts automatically).
+	# Guarded: minimal systems (e.g. containers) may not ship fontconfig.
+	@if [ -n "$(FONTCACHE)" ] && command -v fc-cache >/dev/null 2>&1; then $(FONTCACHE) "$(FONT_DIR)"; fi
 	@echo "✅ $(MODULE_NAME) installed."
 
 clean: .remove.xdg.fonts
 	@echo "Cleaning $(MODULE_NAME) data..."
 	@rm -f "$(FONT_DIR)/Inconsolata for Powerline.otf"
 	@rm -f $(FONT_DIR)/JetBrainsMonoNerdFont-*.ttf
-	@if [ -n "$(FONTCACHE)" ]; then $(FONTCACHE) "$(FONT_DIR)"; fi
+	@if [ -n "$(FONTCACHE)" ] && command -v fc-cache >/dev/null 2>&1; then $(FONTCACHE) "$(FONT_DIR)"; fi
 	@echo "✅ $(MODULE_NAME) cleaned."
