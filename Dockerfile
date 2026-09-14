@@ -1,6 +1,9 @@
 # syntax=docker/dockerfile:1
 #
 # Dev environment image - LazyVim edition.
+# Doubles as a kubectl-debug ephemeral sidecar: dotfiles are baked in and a
+# UID-agnostic entrypoint lays them into $HOME at container start.
+# Built multi-arch (amd64/arm64) — see .github/workflows/docker.yml.
 # - Treesitter needs: gcc, g++, make (to compile parsers)
 # - Mason needs: node (for LSP installers), curl, unzip, tar
 # - Telescope needs: ripgrep, fd (installed via mise)
@@ -68,7 +71,7 @@ RUN mise install --yes --verbose \
     && chmod -R a+rx /opt/mise/data \
     && find /opt/mise/data/installs -type f -name "*" -exec chmod a+rx {} +
 
-ENV PATH=/opt/mise/data/shims:/opt/mise/data/installs/node/22.9.0/bin:/usr/local/bin:$PATH
+ENV PATH=/opt/mise/data/shims:/usr/local/bin:$PATH
 
 # --- Non-root user ---
 # Ubuntu 24.04 ships with a default 'ubuntu' user at UID 1000 - remove it first
@@ -96,8 +99,26 @@ RUN echo 'export MISE_DATA_DIR=/opt/mise/data' > /etc/profile.d/mise.sh \
 # Create XDG_RUNTIME_DIR for neovim server socket
 RUN mkdir -p /run/user/1000 && chmod 700 /run/user/1000 && chown 1000:1000 /run/user/1000
 
+# --- Bake dotfiles + pre-warm (dev user) ---
+# `make all` here lays symlinks/completions/fonts into /home/dev AND
+# CI-tests the install on every image build. COPY + chown run as root so the
+# dev user can write into /opt/dotfiles during the build below.
+COPY . /opt/dotfiles
+RUN chown -R ${USERNAME}:${USER_GID} /opt/dotfiles \
+    && chmod -R a+rX /opt/dotfiles
+
+USER ${USERNAME}
+WORKDIR /home/dev
+
+# DOTFILES_IMAGE_BUILD=1 keeps the image agent-free (the opencode module
+# skips its tool provisioning; its config symlink still applies). Passed
+# inline so it does not persist into runtime shells.
+RUN DOTFILES_IMAGE_BUILD=1 make -C /opt/dotfiles all \
+    && nvim --headless "+Lazy! sync" +qa
+
 ENV XDG_RUNTIME_DIR=/run/user/1000
 ENV TERM=xterm-256color
 ENV COLORTERM=truecolor
 
+ENTRYPOINT ["/opt/dotfiles/docker/entrypoint.sh"]
 CMD ["/bin/zsh"]

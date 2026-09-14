@@ -5,6 +5,9 @@ XDG_CACHE_HOME  ?= ${HOME}/.cache
 XDG_DATA_HOME   ?= ${HOME}/.local/share
 ZSH_COMPLETIONS_DIR ?= ${XDG_DATA_HOME}/zsh/completions
 
+# platform.mk must be included *after* the XDG vars above (FONT_DIR uses them)
+include ../platform.mk
+
 XDG_DIRS := $(XDG_CONFIG_HOME) $(XDG_CACHE_HOME) $(XDG_DATA_HOME)
 
 .PHONY: .ensure.xdg .remove.xdg

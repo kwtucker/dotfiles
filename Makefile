@@ -6,11 +6,17 @@ SHELL := /bin/bash
 
 MODULES = \
 	  bin zsh alacritty fzf tmux git golang kubernetes helm terraform docker \
-	  bat nvim psql ripgrep yazi $(LOCAL_MODULES)
+	  bat nvim psql ripgrep fonts rust opencode $(LOCAL_MODULES)
 
-CLEAN := $(addsuffix .clean,$(MODULES))
+# Optional modules — installed on demand (`make <module>`), not part of `make all`.
+# Currently none; keep the mechanism for future use.
+OPTIONAL_MODULES =
 
-$(MODULES):
+TARGETS := $(MODULES) $(OPTIONAL_MODULES)
+
+CLEAN := $(addsuffix .clean,$(TARGETS))
+
+$(TARGETS):
 	$(MAKE) -C $@ install
 	@if grep -qE '^\.PHONY:.*completions|^completions:' $@/Makefile 2>/dev/null; then \
 		$(MAKE) -C $@ completions; \
@@ -25,7 +31,7 @@ all: $(MODULES) ## Make it all
 
 clean.all: $(CLEAN) ## Clean all modules
 
-.PHONY: $(MODULES) $(CLEAN) all clean.all
+.PHONY: $(TARGETS) $(CLEAN) all clean.all
 
 help: ## Show this help message
 	@echo "Available targets:"; \

@@ -1,3 +1,0 @@
--- init.lua — yazi plugin initialization
--- Add plugin setup calls here as you install plugins.
--- See https://yazi-rs.github.io/docs/plugins/overview

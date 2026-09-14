@@ -12,6 +12,7 @@ node = "24"       # required by Mason (LSP installer inside neovim)
 python = "3.13"
 uv     = "latest"
 ruff   = "latest"
+rust   = "stable"
 
 # ── Kubernetes / Infra ────────────────────────────────────────────────────────
 kubectl   = "1.35.3"
@@ -27,13 +28,16 @@ terraform = "1.14.8"
 "aqua:jesseduffield/lazygit" = "latest"
 "aqua:cli/cli"               = "latest"
 "aqua:starship/starship"     = "latest"
-"aqua:sxyazi/yazi"           = "latest"
+"aqua:docker/cli"            = "latest"
+"cargo:stylua"               = "latest"
+"aqua:jqlang/jq"             = "latest"
 
 # ── LSP servers ───────────────────────────────────────────────────────────────
 "go:golang.org/x/tools/gopls"    = "latest"
 "aqua:hashicorp/terraform-ls"    = "latest"
 "aqua:terraform-linters/tflint"  = "latest"
 "github:golangci/golangci-lint"  = "latest"
+"aqua:terraform-docs/terraform-docs" = "latest"
 
 [settings]
 not_found_auto_install = false
