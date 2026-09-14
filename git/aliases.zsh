@@ -7,4 +7,4 @@ alias gp="git push origin"
 alias gpl="git pull origin"
 
 alias tig="tig --all"
-alias tis="\tig status"
+alias tis="tig status"

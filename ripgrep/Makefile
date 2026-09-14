@@ -4,7 +4,7 @@ MODULE_NAME := ripgrep
 
 .PHONY: install clean completions
 
-install: .ensure.xdg.ripgrep completions
+install: .ensure.xdg.ripgrep
 	@echo "Installing $(MODULE_NAME) dotfiles..."
 	ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 	@echo "✅ $(MODULE_NAME) installed."
@@ -12,7 +12,7 @@ install: .ensure.xdg.ripgrep completions
 completions:
 	@if command -v rg >/dev/null 2>&1; then \
 		echo "Installing ripgrep completions..."; \
-		rg --generate=complete-zsh > $(ZSH_COMPLETIONS_DIR)/_helm; \
+		rg --generate=complete-zsh > $(ZSH_COMPLETIONS_DIR)/_rg; \
 	else \
 		echo "⚠️  ripgrep not installed, skipping completions"; \
 	fi

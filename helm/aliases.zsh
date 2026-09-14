@@ -1,1 +1,1 @@
-alias rancher-helm="$HOME/.rd/bin/helm"
+alias rd-helm="$HOME/.rd/bin/helm"

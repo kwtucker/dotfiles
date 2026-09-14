@@ -1,49 +1,28 @@
 include ../env.mk
 
 MODULE_NAME := fonts
-
-UNAME_S := $(shell uname -s)
-
-ifeq ($(UNAME_S),Darwin)
-	FONT_DIR := $(HOME)/Library/Fonts
-else
-	FONT_DIR := $(XDG_DATA_HOME)/fonts
-endif
+FONTS_SRC := $(XDG_CACHE_HOME)/fonts
 
 .PHONY: install clean
 
 install: .ensure.xdg.fonts
-	@echo "Installing $(MODULE_NAME)..."
+	@echo "Installing $(MODULE_NAME) dotfiles..."
 	@mkdir -p "$(FONT_DIR)"
-
-	# Inconsolata for Powerline
-	@curl -fsSL \
-		-o "Inconsolata for Powerline.otf" \
-		"https://raw.githubusercontent.com/powerline/fonts/master/Inconsolata/Inconsolata%20for%20Powerline.otf"
-	@mv "Inconsolata for Powerline.otf" "$(FONT_DIR)/"
-
-	# JetBrains Mono Nerd Font
-	@curl -fsSL \
-		-o JetBrainsMono.zip \
-		"https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.0/JetBrainsMono.zip"
-	@unzip -q -o JetBrainsMono.zip
-	@mv *.ttf "$(FONT_DIR)/"
-	@rm -f JetBrainsMono.zip OFL.txt README.md
-
-	# Refresh font cache on Linux
-	@if command -v fc-cache >/dev/null 2>&1; then \
-		fc-cache -fv "$(FONT_DIR)"; \
-	fi
-
-	@echo "✅ Fonts installed to $(FONT_DIR)"
+	# Inconsolata (Powerline)
+	@curl -fsSL "https://raw.githubusercontent.com/powerline/fonts/master/Inconsolata/Inconsolata%20for%20Powerline.otf" -o "$(FONT_DIR)/Inconsolata for Powerline.otf"
+	# JetBrains Mono (Nerd Font)
+	@mkdir -p "$(FONTS_SRC)"
+	@curl -fsSL "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.0/JetBrainsMono.zip" -o "$(FONTS_SRC)/JetBrainsMono.zip"
+	@cd "$(FONTS_SRC)" && unzip -oq JetBrainsMono.zip
+	@find "$(FONTS_SRC)" -name '*.ttf' -exec mv {} "$(FONT_DIR)/" \;
+	@rm -rf "$(FONTS_SRC)"
+	# Rebuild font cache on Linux only (macOS manages ~/Library/Fonts automatically)
+	@if [ -n "$(FONTCACHE)" ]; then $(FONTCACHE) "$(FONT_DIR)"; fi
+	@echo "✅ $(MODULE_NAME) installed."
 
 clean: .remove.xdg.fonts
-	@echo "Cleaning $(MODULE_NAME)..."
+	@echo "Cleaning $(MODULE_NAME) data..."
 	@rm -f "$(FONT_DIR)/Inconsolata for Powerline.otf"
-	@rm -f "$(FONT_DIR)"/JetBrainsMono*.ttf
-
-	@if command -v fc-cache >/dev/null 2>&1; then \
-		fc-cache -fv "$(FONT_DIR)"; \
-	fi
-
+	@rm -f $(FONT_DIR)/JetBrainsMonoNerdFont-*.ttf
+	@if [ -n "$(FONTCACHE)" ]; then $(FONTCACHE) "$(FONT_DIR)"; fi
 	@echo "✅ $(MODULE_NAME) cleaned."

@@ -3,12 +3,14 @@
 .netrwhist*
 .zcompdump
 
-local*
+zsh/local
+mise.local.toml
 modules.local.mk
 
 nvim/autoload
 
 git/config.local
+git/config.env-*
 
 Brewfile.lock.json
 Brewfile.linux.lock.json
@@ -26,3 +28,5 @@ fzf/fzf/
 tmux/plugins
 
 packer_compiled.lua
+
+opencode/node_modules

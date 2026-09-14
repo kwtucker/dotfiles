@@ -1,0 +1,79 @@
+# config.local.example — machine-local git config (untracked, gitignored).
+# Set up a new machine:
+#   cp config.local.example config.local
+# then keep ONE environment block below and delete the rest.
+#
+# Environments, not just "work vs personal": give every machine you own
+# (personal desktop, work laptop, client contract box, macOS, Linux,
+# containers) the block that matches what that machine is for.
+#
+# The shared `config` includes this file first, so everything here
+# overrides the shared defaults.
+
+# ── 1. Identity: keep ONE environment, delete the rest ────────────────────
+# Personal machine:
+[user]
+    name = Your Name
+    email = you@personal.example
+
+# Work machine:
+# [user]
+#     name = Your Name
+#     email = you@work.example
+
+# Client / contract machine (one block per client):
+# [user]
+#     name = Your Name
+#     email = you@client.example
+
+# ── 2. Mixed machine: per-directory environments (optional) ────────────────
+# One machine hosting several environments: map directories to env files.
+# The [user] block above remains the default for everything else.
+# Env files live next to this one and are gitignored via `git/config.env-*`.
+# [includeIf "gitdir:~/work/"]
+#     path = ~/.config/git/config.env-work
+# [includeIf "gitdir:~/clients/acme/"]
+#     path = ~/.config/git/config.env-acme
+#
+# ...with e.g. ~/.config/git/config.env-work containing:
+# [user]
+#     name = Your Name
+#     email = you@work.example
+# [core]
+#     sshCommand = "ssh -i ~/.ssh/id_work -o IdentitiesOnly=yes"
+
+# ── 3. SSH key selection (access, per environment) ─────────────────────────
+# Machine-wide key (simplest when there is one key per machine):
+# [core]
+#     sshCommand = "ssh -i ~/.ssh/id_work -o IdentitiesOnly=yes"
+# Per-env keys belong in the env file from section 2.
+# For per-host keys prefer ~/.ssh/config Host blocks instead.
+
+# ── 4. Host rewrites per environment (access, incl. enterprise) ────────────
+# Second GitHub account via a ~/.ssh/config `Host github.com-work` alias:
+# [url "git@github.com-work:"]
+#     insteadOf = https://github.com/
+# GitHub Enterprise (self-hosted):
+# [url "git@ghe.work.example:"]
+#     insteadOf = https://ghe.work.example/
+# Enterprise with a non-standard SSH port via ~/.ssh/config Host block,
+# then point git at the alias:
+# [url "git@ghe-alias:"]
+#     insteadOf = https://ghe.work.example/
+# Prefer HTTPS + credential manager over the shared SSH rewrite:
+# [url "https://github.com/"]
+#     insteadOf = git@github.com:
+
+# ── 5. Credential helpers (access, per OS) ─────────────────────────────────
+# [credential]
+#     helper = /usr/share/doc/git/contrib/credential/libsecret/git-credential-libsecret  # Linux
+#     helper = /usr/local/share/gcm-core/git-credential-manager                          # Git Credential Manager
+#     helper = osxkeychain                                                               # macOS
+
+# ── 6. Commit signing (optional, often required at work/enterprise) ────────
+# [user]
+#     signingkey = ~/.ssh/id_work.pub
+# [gpg]
+#     format = ssh
+# [commit]
+#     gpgsign = true

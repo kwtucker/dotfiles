@@ -4,7 +4,7 @@ MODULE_NAME := zsh
 ZSH_DIR := $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 LOCAL_BIN := $(HOME)/.local/bin
 
-.PHONY: set-default-shell install clean
+.PHONY: install clean
 
 # Optional: set default shell (may fail in DevPod/containers)
 set-default-shell:
@@ -35,10 +35,8 @@ install: .ensure.xdg.zsh
 	@echo "🔗 Linked $(CURDIR) -> $(ZSH_DIR)"
 	# Ensure local bin exists
 	@mkdir -p $(LOCAL_BIN)
-	# Install Starship non-interactively
-	@curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir $(LOCAL_BIN)
 	# Install Antigen
-	@curl -L git.io/antigen -o $(ZSH_DIR)/antigen.zsh
+	@curl -fsSL git.io/antigen -o $(ZSH_DIR)/antigen.zsh
 	# Link zshenv
 	@ln -sf $(CURDIR)/zshenv $(HOME)/.zshenv
 	# Set default shell (optional)
@@ -48,6 +46,5 @@ install: .ensure.xdg.zsh
 clean: .remove.xdg.zsh
 	@echo "Cleaning $(MODULE_NAME) data..."
 	@rm -f $(HOME)/.zshenv
-	@rm -f $(LOCAL_BIN)/starship
 	@rm -f $(ZSH_DIR)/antigen.zsh
 	@echo "✅ $(MODULE_NAME) cleaned."

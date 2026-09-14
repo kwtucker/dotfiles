@@ -1,4 +1,4 @@
-alias rancher-kubectl="$HOME/.rd/bin/kubectl"
+alias rd-kubectl="$HOME/.rd/bin/kubectl"
 
 alias k='kubectl'
 alias kp='k get pods -o wide'

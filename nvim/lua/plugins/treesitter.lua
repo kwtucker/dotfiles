@@ -4,9 +4,6 @@ return {
     opts = function(_, opts)
       vim.list_extend(opts.ensure_installed, {
         "dockerfile",
-        "elixir",
-        "heex",
-        "eex",
         "go",
         "gomod",
         "gowork",

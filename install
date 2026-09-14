@@ -34,8 +34,14 @@ fi
 
 # ── Mise ───────────────────────────────────────────────────────────────────────
 step "mise"
+# Link mise.toml as the global mise config (contains both tools and settings).
+# In a pre-built image the tools live system-wide; skip installing/trusting there.
+mkdir -p "$XDG_CONFIG_HOME/mise"
+ln -sf "$DOTFILES_DIR/mise.toml" "$XDG_CONFIG_HOME/mise/config.toml"
+
 if [ "$TOOLS_PRESENT" = true ]; then
-  skip "tools already present (pre-built image)"
+  skip "tools already present (pre-built image) — not re-installing"
+  export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 else
   if ! command -v mise &>/dev/null; then
     echo "  installing mise..."
@@ -45,28 +51,22 @@ else
   else
     ok "mise already present"
   fi
+
+  eval "$(mise activate bash)" 2>/dev/null || true
+  mise install --yes
+
+  export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
+
+  # Fix permissions on all mise-installed binaries (aqua backend sometimes misses this)
+  find "$HOME/.local/share/mise/installs" -type f -exec chmod +x {} + 2>/dev/null || true
+
+  # Trust all possible mise config locations up front
+  MISE_YES=1 mise trust "$DOTFILES_DIR/mise.toml" 2>/dev/null || true
+  MISE_YES=1 mise trust /workspaces/dotfiles/mise.toml 2>/dev/null || true
+  MISE_YES=1 mise trust --all 2>/dev/null || true
+
+  ok "tools up to date"
 fi
-
-# Always run — idempotent, upgrades pinned versions, fast if nothing changed
-mkdir -p "$XDG_CONFIG_HOME/mise"
-ln -sf "$DOTFILES_DIR/mise.toml" "$XDG_CONFIG_HOME/mise/config.toml"
-eval "$(mise activate bash)" 2>/dev/null || true
-mise install --yes
-ok "tools up to date"
-
-export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
-
-# Link mise.toml as the global mise config (contains both tools and settings)
-mkdir -p "$XDG_CONFIG_HOME/mise"
-ln -sf "$DOTFILES_DIR/mise.toml" "$XDG_CONFIG_HOME/mise/config.toml"
-
-# Fix permissions on all mise-installed binaries (aqua backend sometimes misses this)
-find "$HOME/.local/share/mise/installs" -type f -exec chmod +x {} + 2>/dev/null || true
-
-# Trust all possible mise config locations up front
-MISE_YES=1 mise trust "$DOTFILES_DIR/mise.toml" 2>/dev/null || true
-MISE_YES=1 mise trust /workspaces/dotfiles/mise.toml 2>/dev/null || true
-MISE_YES=1 mise trust --all 2>/dev/null || true
 
 # ── Dotfile modules ────────────────────────────────────────────────────────────
 step "dotfile modules"
