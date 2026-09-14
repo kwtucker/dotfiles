@@ -1,15 +1,13 @@
 # .Files
 
 > Modular, portable, XDG-compliant dotfiles for Zsh, Neovim, tmux, Git, and developer tools.
-> Works on any Linux environment — local machines, remote servers, and DevPod workspaces.
+> Works on any Linux environment — local machines and remote servers.
 
 ## Environments
 
 These dotfiles are designed to work identically across all of the following:
 
 **Local Linux machine** — full install with mise managing all tools.
-
-**DevPod** — DevPod clones the dotfiles and runs `./install`, which skips tools that are already present and only lays symlinks, making cold starts fast.
 
 **Bare remote servers (SSH)** — no Docker required. One command installs mise and bootstraps the full environment from scratch.
 
@@ -25,13 +23,6 @@ These dotfiles are designed to work identically across all of the following:
 git clone git@github.com:kwtucker/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 ./install
-```
-
-### DevPod
-
-```bash
-devpod up . --provider docker \
-  --dotfiles git@github.com:kwtucker/dotfiles.git
 ```
 
 ## How it works
