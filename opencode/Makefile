@@ -10,7 +10,7 @@ OPENCODE_VERSION ?= latest
 MISE_CONFD := $(XDG_CONFIG_HOME)/mise/conf.d
 MISE_DATA := $(or $(MISE_DATA_DIR),$(HOME)/.local/share/mise)
 
-.PHONY: install clean
+.PHONY: install clean upgrade
 
 install: .ensure.xdg.opencode
 	@echo "Installing $(MODULE_NAME) dotfiles..."
@@ -29,6 +29,9 @@ install: .ensure.xdg.opencode
 		echo "⚠️  $(MISE_DATA) not writable — skipping tool install"; \
 	fi
 	@echo "✅ $(MODULE_NAME) installed."
+
+upgrade:
+	@MISE_YES=1 mise upgrade "aqua:anomalyco/opencode"
 
 clean: .remove.xdg.opencode
 	@echo "Cleaning $(MODULE_NAME) data..."
