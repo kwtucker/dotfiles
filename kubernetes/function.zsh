@@ -4,47 +4,6 @@ function kfuzz() {
   kubectl get "$1" | tfuzz
 }
 
-# Debug into a pod using your dev image as an ephemeral sidecar.
-# Fuzzy selects the pod then the target container. The debug container
-# is completely isolated — exits cleanly and leaves nothing on the cluster.
-# Image override: DEVENV_IMAGE=... kdebug
-# The pod's projected serviceaccount token is auto-mounted so kubectl works
-# inside without copying credentials by hand. Needs RBAC for pods/ephemeral
-# on your side; the token carries the pod's own permissions.
-# NOTE: you share the target's filesystem + network, but NOT its processes —
-# seeing app PIDs needs shareProcessNamespace: true on the workload.
-function kdebug() {
-  local image="${DEVENV_IMAGE:-ghcr.io/kwtucker/dotfiles-devenv:latest}"
-  local pod=$(echo PODS)
-  [[ -z "$pod" ]] && return 1
-  local spec=$(kubectl get pod "$pod" -o json)
-  local container=$(echo "$spec" | jq -r '.spec.containers[].name' | tfuzz)
-  [[ -z "$container" ]] && return 1
-
-  local custom_args=()
-  local custom_file=$(mktemp /tmp/kdebug-custom.XXXXXX.yaml)
-  local sa_vol=$(echo "$spec" | jq -r '.spec.volumes[] | select(.projected.sources[]? | has("serviceAccountToken")) | .name' | head -1)
-  if [[ -n "$sa_vol" ]]; then
-    cat > "$custom_file" <<EOF
-volumeMounts:
-- name: $sa_vol
-  mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-  readOnly: true
-EOF
-    custom_args=(--custom="$custom_file")
-  else
-    echo "No projected serviceaccount volume found — kubectl inside will need a manual kubeconfig."
-  fi
-
-  echo "Attaching debug container to ${pod}:${container}..."
-  kubectl debug -it "$pod" \
-    --image="$image" \
-    --target="$container" \
-    "${custom_args[@]}" \
-    -- zsh
-  rm -f "$custom_file"
-}
-
 # Exec into a running pod's container.
 # Fuzzy selects the pod then the container. Prefers zsh, falls back to bash.
 function ke() {

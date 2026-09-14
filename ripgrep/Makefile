@@ -10,6 +10,7 @@ install: .ensure.xdg.ripgrep
 	@echo "✅ $(MODULE_NAME) installed."
 
 completions:
+	@mkdir -p $(ZSH_COMPLETIONS_DIR)
 	@if command -v rg >/dev/null 2>&1; then \
 		echo "Installing ripgrep completions..."; \
 		rg --generate=complete-zsh > $(ZSH_COMPLETIONS_DIR)/_rg; \

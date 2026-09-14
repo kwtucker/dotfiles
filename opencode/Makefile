@@ -4,7 +4,7 @@ MODULE_NAME := opencode
 
 # Version is declared once here; install writes it into a machine-local
 # mise fragment (~/.config/mise/conf.d/opencode.toml) so the binary stays
-# out of the shared mise.toml and out of the Docker image.
+# out of the shared mise.toml.
 OPENCODE_VERSION ?= latest
 
 MISE_CONFD := $(XDG_CONFIG_HOME)/mise/conf.d
@@ -23,12 +23,10 @@ install: .ensure.xdg.opencode
 	@mkdir -p $(MISE_CONFD)
 	@printf '[tools]\n"aqua:anomalyco/opencode" = "$(OPENCODE_VERSION)"\n' > $(MISE_CONFD)/opencode.toml
 	@MISE_YES=1 mise trust $(MISE_CONFD)/opencode.toml
-	@if [ "${DOTFILES_IMAGE_BUILD:-0}" = "1" ]; then \
-		echo "ℹ️  Image build — skipping tool install (image stays agent-free)"; \
-	elif [ -w "$(MISE_DATA)" ] || [ ! -d "$(MISE_DATA)" ]; then \
+	@if [ -w "$(MISE_DATA)" ] || [ ! -d "$(MISE_DATA)" ]; then \
 		mise install; \
 	else \
-		echo "⚠️  $(MISE_DATA) not writable (e.g. prebuilt container) — skipping tool install"; \
+		echo "⚠️  $(MISE_DATA) not writable — skipping tool install"; \
 	fi
 	@echo "✅ $(MODULE_NAME) installed."
 

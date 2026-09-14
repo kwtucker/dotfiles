@@ -6,7 +6,9 @@ XDG_DATA_HOME   ?= ${HOME}/.local/share
 ZSH_COMPLETIONS_DIR ?= ${XDG_DATA_HOME}/zsh/completions
 
 # platform.mk must be included *after* the XDG vars above (FONT_DIR uses them)
-include ../platform.mk
+# platform.mk lives next to env.mk — resolve relative to THIS file so the
+# include works no matter which directory make is invoked from.
+include $(dir $(lastword $(MAKEFILE_LIST)))platform.mk
 
 XDG_DIRS := $(XDG_CONFIG_HOME) $(XDG_CACHE_HOME) $(XDG_DATA_HOME)
 
