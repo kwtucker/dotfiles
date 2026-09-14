@@ -10,6 +10,7 @@ install: .ensure.xdg.fzf
 	@echo "✅ $(MODULE_NAME) installed."
 
 completions:
+	@mkdir -p $(ZSH_COMPLETIONS_DIR)
 	@if command -v fzf >/dev/null 2>&1; then \
 		echo "Installing fzf completions..."; \
 		fzf --zsh > $(ZSH_COMPLETIONS_DIR)/_fzf; \

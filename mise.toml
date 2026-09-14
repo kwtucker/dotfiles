@@ -2,8 +2,7 @@
 # Replaces nix/config.nix.
 #
 # Update a tool: change the version here, commit, push.
-# CI rebuilds the image automatically.
-# On a live container/VPS: run `mise install` to apply.
+# On a live machine/container/VPS: run `mise install` to apply.
 
 [tools]
 # ── Runtimes ──────────────────────────────────────────────────────────────────

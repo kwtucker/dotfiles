@@ -4,6 +4,9 @@ SHELL := /bin/bash
 # If the file doesn't exist it will not error.
 -include modules.local.mk
 
+# Shared XDG vars (also makes ZSH_COMPLETIONS_DIR available below).
+include env.mk
+
 MODULES = \
 	  bin zsh alacritty fzf tmux git golang kubernetes helm terraform docker \
 	  bat nvim psql ripgrep fonts rust opencode $(LOCAL_MODULES)
@@ -19,6 +22,7 @@ CLEAN := $(addsuffix .clean,$(TARGETS))
 $(TARGETS):
 	$(MAKE) -C $@ install
 	@if grep -qE '^\.PHONY:.*completions|^completions:' $@/Makefile 2>/dev/null; then \
+		mkdir -p $(ZSH_COMPLETIONS_DIR); \
 		$(MAKE) -C $@ completions; \
 	else \
 		echo "==> Skipping $@ (no completions target)"; \

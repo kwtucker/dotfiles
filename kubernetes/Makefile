@@ -10,6 +10,7 @@ install: .ensure.xdg.kubernetes
 	@echo "✅ $(MODULE_NAME) installed."
 
 completions:
+	@mkdir -p $(ZSH_COMPLETIONS_DIR)
 	@if command -v kubectl >/dev/null 2>&1; then \
 		echo "Installing kubectl completions..."; \
 		kubectl completion zsh > $(ZSH_COMPLETIONS_DIR)/_kubectl; \

@@ -10,6 +10,7 @@ install: .ensure.xdg.helm
 	@echo "✅ $(MODULE_NAME) installed."
 
 completions:
+	@mkdir -p $(ZSH_COMPLETIONS_DIR)
 	@if command -v helm >/dev/null 2>&1; then \
 		echo "Installing helm completions..."; \
 		helm completion zsh > $(ZSH_COMPLETIONS_DIR)/_helm; \
