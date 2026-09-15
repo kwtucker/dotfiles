@@ -67,37 +67,45 @@ COPY --chown=dev:dev kubernetes/ /home/dev/.dotfiles/kubernetes/
 COPY --chown=dev:dev helm/ /home/dev/.dotfiles/helm/
 COPY --chown=dev:dev docker/ /home/dev/.dotfiles/docker/
 
+# All RUNs below use bash, not /bin/sh (dash): `mise activate bash` emits
+# bashisms (typeset, arrays) that abort dash with a syntax error (exit 2).
+SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
+
 USER dev
 WORKDIR /home/dev
 ENV HOME=/home/dev \
     PATH=/home/dev/.local/bin:/home/dev/.local/share/mise/shims:/home/dev/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-# Install mise + slim toolset, lay down dotfile symlinks, pre-warm plugins.
-# - mise.workspace.toml becomes the global mise config (NOT the full mise.toml).
-# - Skip fonts/alacritty/whalebyte/terraform/rust/opencode: client-side or
-#   unneeded in the container (see plan).
-# - zsh module curls antigen; tmux module clones TPM; nvim bootstraps
-#   lazy.nvim on first launch — all need network at build time by design.
+# 1. Toolchain: mise + slim toolset (own layer so CI logs show mise failures).
 RUN curl https://mise.run | sh \
     && ln -sf /home/dev/.dotfiles/image/mise.workspace.toml /home/dev/.config/mise/config.toml \
     && eval "$(/home/dev/.local/bin/mise activate bash)" \
     && mise trust /home/dev/.dotfiles/image/mise.workspace.toml \
     && mise install --yes \
-    && find /home/dev/.local/share/mise/installs -type f -exec chmod +x {} + 2>/dev/null || true \
-    && make -C /home/dev/.dotfiles zsh \
+    && find /home/dev/.local/share/mise/installs -type f -exec chmod +x {} + 2>/dev/null || true
+
+# 2. Dotfiles: symlinks + shell/editor modules.
+# Skip fonts/alacritty/whalebyte/terraform/rust/opencode: client-side or
+# unneeded in the container. zsh curls antigen, tmux clones TPM,
+# nvim bootstraps lazy.nvim — all need network at build time by design.
+RUN make -C /home/dev/.dotfiles zsh \
     && make -C /home/dev/.dotfiles nvim \
     && make -C /home/dev/.dotfiles fzf \
     && make -C /home/dev/.dotfiles tmux \
     && make -C /home/dev/.dotfiles git \
-    && make -C /home/dev/.dotfiles golang \
-    && make -C /home/dev/.dotfiles kubernetes \
+    && make -C /home/dev/.dotfiles golang
+
+# 3. Dotfiles: k8s/infra + CLI modules (own layer for debuggable logs).
+RUN make -C /home/dev/.dotfiles kubernetes \
     && make -C /home/dev/.dotfiles helm \
     && make -C /home/dev/.dotfiles bat \
     && make -C /home/dev/.dotfiles ripgrep \
     && make -C /home/dev/.dotfiles bin \
     && make -C /home/dev/.dotfiles psql \
-    && make -C /home/dev/.dotfiles docker \
-    && nvim --headless "+Lazy! sync" +qa || true \
+    && make -C /home/dev/.dotfiles docker
+
+# 4. Pre-warm editor + clean caches to keep the image lean.
+RUN nvim --headless "+Lazy! sync" +qa || true \
     && mise reshim \
     && rm -rf /home/dev/.cache/mise /tmp/*
 
