@@ -111,12 +111,20 @@ RUN make -C /home/dev/.dotfiles kubernetes \
     && make -C /home/dev/.dotfiles docker
 
 # 4. Pre-warm editor: Lazy plugins + Mason LSP/tools, then clean caches.
+# lazy.nvim is cloned explicitly with NO `|| true`: the lazy.lua bootstrap
+# uses vim.fn.system, whose failures surface only as a cryptic E5113 at
+# startup while `|| true` ships a green-but-editorless image. A loud git
+# failure here beats that. (The braces keep `|| true` scoped to the sync
+# step so it can't neutralize a clone failure — && and || are
+# left-associative.)
 # The MasonInstall list must match the WORKSPACE_IMAGE subset in
 # nvim/lua/plugins/mason.lua (source of truth). MasonInstall is async, so
 # the lua wait polls the registry until every package reports installed
 # (20 min cap) before quitting — otherwise +qa would kill slow installs
 # (notably the go tools, which compile from source).
-RUN nvim --headless "+Lazy! sync" +qa || true \
+RUN rm -rf /home/dev/.local/share/nvim/lazy/lazy.nvim \
+    && git clone --filter=blob:none --branch=stable https://github.com/folke/lazy.nvim.git /home/dev/.local/share/nvim/lazy/lazy.nvim \
+    && { nvim --headless "+Lazy! sync" +qa || true; } \
     && nvim --headless \
       '+MasonInstall docker-compose-language-service dockerfile-language-server gofumpt goimports golangci-lint golangci-lint-langserver gomodifytags gopls json-lsp lua-language-server shellcheck shfmt staticcheck stylua taplo terraform-ls yaml-language-server' \
       '+lua vim.wait(1200000, function() local ok, reg = pcall(require, "mason-registry") if not ok then return false end for _, name in ipairs({ "docker-compose-language-service", "dockerfile-language-server", "gofumpt", "goimports", "golangci-lint", "golangci-lint-langserver", "gomodifytags", "gopls", "json-lsp", "lua-language-server", "shellcheck", "shfmt", "staticcheck", "stylua", "taplo", "terraform-ls", "yaml-language-server" }) do if not reg.is_installed(name) then return false end end return true end, 5000)' \
