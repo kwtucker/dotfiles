@@ -110,8 +110,17 @@ RUN make -C /home/dev/.dotfiles kubernetes \
     && make -C /home/dev/.dotfiles psql \
     && make -C /home/dev/.dotfiles docker
 
-# 4. Pre-warm editor + clean caches to keep the image lean.
+# 4. Pre-warm editor: Lazy plugins + Mason LSP/tools, then clean caches.
+# The MasonInstall list must match the WORKSPACE_IMAGE subset in
+# nvim/lua/plugins/mason.lua (source of truth). MasonInstall is async, so
+# the lua wait polls the registry until every package reports installed
+# (20 min cap) before quitting — otherwise +qa would kill slow installs
+# (notably the go tools, which compile from source).
 RUN nvim --headless "+Lazy! sync" +qa || true \
+    && nvim --headless \
+      '+MasonInstall docker-compose-language-service dockerfile-language-server gofumpt goimports golangci-lint golangci-lint-langserver gomodifytags gopls json-lsp lua-language-server shellcheck shfmt staticcheck stylua taplo terraform-ls yaml-language-server' \
+      '+lua vim.wait(1200000, function() local ok, reg = pcall(require, "mason-registry") if not ok then return false end for _, name in ipairs({ "docker-compose-language-service", "dockerfile-language-server", "gofumpt", "goimports", "golangci-lint", "golangci-lint-langserver", "gomodifytags", "gopls", "json-lsp", "lua-language-server", "shellcheck", "shfmt", "staticcheck", "stylua", "taplo", "terraform-ls", "yaml-language-server" }) do if not reg.is_installed(name) then return false end end return true end, 5000)' \
+      '+qa' || true \
     && mise reshim \
     && rm -rf /home/dev/.cache/mise /tmp/*
 
