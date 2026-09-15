@@ -37,7 +37,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && locale-gen C.UTF-8
 
 # Non-root dev user first so every layer below is correctly owned.
-RUN useradd -m -s /usr/bin/zsh -u 1000 dev \
+# Ubuntu >= 23.04 ships an `ubuntu` user on uid 1000 — remove it so `dev`
+# can take uid 1000 (matches runAsUser: 1000 in k8s/dev-pod.yaml).
+RUN (id ubuntu >/dev/null 2>&1 && userdel -r ubuntu || true) \
+    && useradd -m -s /usr/bin/zsh -u 1000 dev \
     && echo "dev ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/dev \
     && chmod 0440 /etc/sudoers.d/dev \
     && mkdir -p /home/dev/work /home/dev/.config/mise /home/dev/.local/bin \
