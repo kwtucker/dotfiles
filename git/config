@@ -34,12 +34,26 @@
 [push]
   default = simple
 
+# HTTPS fetch auth (pairs with pushInsteadOf above): in-memory cache, no
+# secrets touch disk, nothing to configure per-machine. Override in
+# config.local with libsecret (GNOME) or Git Credential Manager when
+# available — helpers are tried in order until one answers. Harmless in
+# containers/CI (only fires when a private repo actually needs credentials).
+[credential]
+  helper = cache --timeout=28800
+
 [merge]
   tool = vscode
 
 [mergetool "vscode"]
   cmd = "code --wait"
 
+# Fetch stays HTTPS everywhere so keyless environments (containers, CI) can
+# clone anonymously. Only PUSH is forced through SSH (laptops have keys).
+# For private-repo fetches over HTTPS you need a credential helper — see
+# [credential] below and git/config.local.example. Changed from
+# `insteadOf` on 2026-09-15: the global fetch rewrite broke every
+# github.com clone where no SSH keys exist (workspace image, CI).
 [url "git@github.com:"]
-  insteadOf = https://github.com/
+  pushInsteadOf = https://github.com/
 
