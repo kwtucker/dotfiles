@@ -78,11 +78,21 @@ ENV HOME=/home/dev \
     PATH=/home/dev/.local/bin:/home/dev/.local/share/mise/shims:/home/dev/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # 1. Toolchain: mise + slim toolset (own layer so CI logs show mise failures).
-RUN curl https://mise.run | sh \
+# github_token is a BuildKit *secret* (see workspace-image.yaml), never an
+# ARG — it can't linger in layer history. aqua + mise's github backend read
+# GITHUB_TOKEN for api.github.com calls; without it, anonymous CI calls get
+# rate-limited on shared runners. Local `docker build` without the secret
+# still works via the `if` guard (anonymous quota). The sentinel loop fails
+# the layer LOUD if any API-backed tool didn't install — a green-but-partial
+# image (e.g. missing nvim) must never ship again.
+RUN --mount=type=secret,id=github_token \
+    if [ -f /run/secrets/github_token ]; then export GITHUB_TOKEN="$(cat /run/secrets/github_token)"; fi \
+    && curl https://mise.run | sh \
     && ln -sf /home/dev/.dotfiles/image/mise.workspace.toml /home/dev/.config/mise/config.toml \
     && eval "$(/home/dev/.local/bin/mise activate bash)" \
     && mise trust /home/dev/.dotfiles/image/mise.workspace.toml \
     && mise install --yes \
+    && for b in nvim rg fzf starship k9s; do test -x "/home/dev/.local/share/mise/shims/$b" || { echo "MISSING mise tool: $b"; exit 1; }; done \
     && find /home/dev/.local/share/mise/installs -type f -exec chmod +x {} + 2>/dev/null || true
 
 # 2. Dotfiles: symlinks + shell/editor modules.
