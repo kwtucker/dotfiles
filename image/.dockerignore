@@ -1,0 +1,20 @@
+# image/.dockerignore — what must never bake into the image.
+#
+# NOTE: Docker only reads `.dockerignore` at the build-context root, so the
+# Dockerfile itself uses an explicit COPY list as the real enforcement.
+# This file mirrors the repo's two ignore scopes:
+# - ../.gitignore — what git won't commit in THIS repo
+#   (zsh/local, git/config.local, modules.local.mk, mise.local.toml).
+# - ../git/ignore — global excludesFile for every OTHER repo you work in
+#   (*.secret, *.env); repeated here so stray local files can't bake in
+#   even if someone builds with a dirty worktree.
+zsh/local
+git/config.local
+git/config.env-*
+mise.local.toml
+modules.local.mk
+*.secret
+*.env
+.whatever/.secret
+.git
+node_modules
