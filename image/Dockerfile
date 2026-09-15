@@ -124,9 +124,16 @@ RUN make -C /home/dev/.dotfiles kubernetes \
 # lazy.nvim is cloned explicitly with NO `|| true`: the lazy.lua bootstrap
 # uses vim.fn.system, whose failures surface only as a cryptic E5113 at
 # startup while `|| true` ships a green-but-editorless image. A loud git
-# failure here beats that. (The braces keep `|| true` scoped to the sync
+# failure here beats that. (The braces keep `|| true` scoped to the Lazy
 # step so it can't neutralize a clone failure — && and || are
 # left-associative.)
+# `Lazy! sync` (NOT `install`): verified locally that `sync` fully engages
+# headless (clones + builds + treesitter parsers, with log output) while
+# `install` silently no-ops headless (RC=0, zero plugins — its runner never
+# gets pumped without the sync view). `sync`'s clean step is safe here:
+# lazy.nvim adds itself to the spec (plugin.lua), so it is never "unused".
+# The `test -d` assertions fail the build LOUD if the dir ever goes missing,
+# so a broken editor can never ship green again either way.
 # The MasonInstall list must match the WORKSPACE_IMAGE subset in
 # nvim/lua/plugins/mason.lua (source of truth). MasonInstall is async, so
 # the lua wait polls the registry until every package reports installed
@@ -134,7 +141,9 @@ RUN make -C /home/dev/.dotfiles kubernetes \
 # (notably the go tools, which compile from source).
 RUN rm -rf /home/dev/.local/share/nvim/lazy/lazy.nvim \
     && git clone --filter=blob:none --branch=stable https://github.com/folke/lazy.nvim.git /home/dev/.local/share/nvim/lazy/lazy.nvim \
+    && test -d /home/dev/.local/share/nvim/lazy/lazy.nvim/lua \
     && { nvim --headless "+Lazy! sync" +qa || true; } \
+    && test -d /home/dev/.local/share/nvim/lazy/lazy.nvim/lua \
     && nvim --headless \
       '+MasonInstall docker-compose-language-service dockerfile-language-server gofumpt goimports golangci-lint golangci-lint-langserver gomodifytags gopls json-lsp lua-language-server shellcheck shfmt staticcheck stylua taplo terraform-ls yaml-language-server' \
       '+lua vim.wait(1200000, function() local ok, reg = pcall(require, "mason-registry") if not ok then return false end for _, name in ipairs({ "docker-compose-language-service", "dockerfile-language-server", "gofumpt", "goimports", "golangci-lint", "golangci-lint-langserver", "gomodifytags", "gopls", "json-lsp", "lua-language-server", "shellcheck", "shfmt", "staticcheck", "stylua", "taplo", "terraform-ls", "yaml-language-server" }) do if not reg.is_installed(name) then return false end end return true end, 5000)' \
