@@ -54,3 +54,21 @@ function krestart() {
   kubectl rollout restart $resource_type/$resource
   kubectl rollout status $resource_type/$resource
 }
+
+# Debug image for ephemeral containers (override per-shell if needed).
+export KDEBUG_IMAGE="${KDEBUG_IMAGE:-ghcr.io/kwtucker/workspace:latest}"
+
+# Attach an ephemeral debug container to a running pod.
+# Fuzzy-selects pod + container, shares target namespaces, lands in zsh.
+# Usage: kdebug  (set KDEBUG_IMAGE to a pinned :sha-... build to override)
+function kdebug() {
+  local pod=$(echo PODS)
+  [[ -z "$pod" ]] && return 1
+  local container=$(kubectl get pod $pod -o json | jq -r '.spec.containers[].name' | tfuzz)
+  [[ -z "$container" ]] && return 1
+  echo "Debugging $pod:$container with $KDEBUG_IMAGE"
+  echo "Note: image runs as non-root; use 'sudo -i' inside for privileged commands."
+  kubectl debug pod/$pod -it \
+    --image=$KDEBUG_IMAGE --profile=general \
+    --share-processes --target=$container -- zsh
+}
