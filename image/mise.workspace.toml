@@ -1,0 +1,36 @@
+# mise.workspace.toml — slim toolset for the public workspace image.
+# Full local env lives in ../mise.toml; this file intentionally omits
+# python, rust, terraform and LSPs you don't need for Go remote-dev + debug.
+# Fonts are also omitted: Nerd Fonts render in your local terminal emulator,
+# not inside the container (see ../fonts/Makefile).
+
+[tools]
+# ── Runtimes ──────────────────────────────────────────────────────────────────
+go   = "1.26"
+node = "24" # required by Mason / LazyVim, not for app dev
+
+# ── Kubernetes / debug ────────────────────────────────────────────────────────
+kubectl = "1.35.3"
+helm    = "4.1.3"
+"aqua:derailed/k9s"   = "latest"
+"aqua:stern/stern"    = "latest"
+"aqua:mikefarah/yq"   = "latest"
+
+# ── Neovim + shell tooling ────────────────────────────────────────────────────
+"aqua:neovim/neovim"         = "latest"
+"github:junegunn/fzf"        = "latest"
+"aqua:BurntSushi/ripgrep"    = "latest"
+"aqua:sharkdp/fd"            = "latest"
+"aqua:sharkdp/bat"           = "latest"
+"aqua:jesseduffield/lazygit" = "latest"
+"aqua:cli/cli"               = "latest"
+"aqua:starship/starship"     = "latest"
+"aqua:jqlang/jq"             = "latest"
+
+# ── Go dev ────────────────────────────────────────────────────────────────────
+"go:golang.org/x/tools/gopls"   = "latest"
+"github:golangci/golangci-lint" = "latest"
+
+[settings]
+not_found_auto_install = false
+yes = true

@@ -1,0 +1,12 @@
+{
+  "name": "workspace",
+  "image": "ghcr.io/kwtucker/workspace:latest",
+  "remoteUser": "dev",
+  "workspaceFolder": "/home/dev/work",
+  "customizations": {
+    "vscode": {
+      "extensions": ["golang.go", "ms-azuretools.vscode-docker"]
+    }
+  },
+  "postAttachCommand": "zsh -ic 'mise ls'"
+}
