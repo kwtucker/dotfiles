@@ -22,7 +22,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     XDG_CACHE_HOME=/home/dev/.cache \
     XDG_DATA_HOME=/home/dev/.local/share \
     MISE_YES=1 \
-    GOTOOLCHAIN=local
+    GOTOOLCHAIN=local \
+    WORKSPACE_IMAGE=1
 
 # Base deps: shell, VCS, network/debug, Go build essentials, tmux.
 # mise manages all dev-tool versions (see mise.workspace.toml).
@@ -94,6 +95,11 @@ RUN make -C /home/dev/.dotfiles zsh \
     && make -C /home/dev/.dotfiles tmux \
     && make -C /home/dev/.dotfiles git \
     && make -C /home/dev/.dotfiles golang
+
+# 2b. Pre-warm: run one non-interactive login shell so antigen clones its
+# bundles and compinit writes its dump into this layer. Fresh containers
+# then skip first-run downloads and hit a prompt in ~2s.
+RUN zsh -ic true
 
 # 3. Dotfiles: k8s/infra + CLI modules (own layer for debuggable logs).
 RUN make -C /home/dev/.dotfiles kubernetes \
