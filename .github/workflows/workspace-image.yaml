@@ -61,3 +61,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # Ephemeral per-run token for api.github.com calls made by
+          # mise/aqua during the build. Mounted as a BuildKit secret
+          # (consumed via --mount in the Dockerfile), never baked in.
+          secrets: |
+            github_token=${{ secrets.GITHUB_TOKEN }}
