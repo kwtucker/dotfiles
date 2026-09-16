@@ -55,25 +55,27 @@ function krestart() {
   kubectl rollout status $resource_type/$resource
 }
 
-# Debug image for ephemeral containers (override per-shell if needed).
-export KDEBUG_IMAGE="${KDEBUG_IMAGE:-ghcr.io/kwtucker/k8s-debug:v0.1.2}"
-
 # Attach an ephemeral debug container to a running pod.
 # Fuzzy-selects pod (across all namespaces) + container, shares target
 # namespaces, lands in zsh.
-# Usage: kdebug  (set KDEBUG_IMAGE to another tag to override)
+# Usage: kdebug  (export KDEBUG_IMAGE to override the default image)
 function kdebug() {
+  # Default lives here (not in a top-level export): a top-level
+  # `export KDEBUG_IMAGE="${KDEBUG_IMAGE:-...}"` sticks in running shells,
+  # so bumping the default never took effect without `unset KDEBUG_IMAGE`.
+  # Now the file is the source of truth; export only to pin/override.
+  local image="${KDEBUG_IMAGE:-ghcr.io/kwtucker/k8s-debug:v0.1.2}"
   local sel=$(kubectl get pods -A | fzf-tmux --header-lines=1 --reverse --prompt="pod> " | awk '{print $1"/"$2}')
   [[ -z "$sel" ]] && return 1
   local ns=${sel%%/*}
   local pod=${sel#*/}
   local container=$(kubectl get pod "$pod" -n "$ns" -o json | jq -r '.spec.containers[].name' | fzf-tmux --reverse --prompt="container> ")
   [[ -z "$container" ]] && return 1
-  echo "Debugging $ns/$pod:$container with $KDEBUG_IMAGE"
+  echo "Debugging $ns/$pod:$container with $image"
   echo "Note: debug container inherits the target pod's securityContext (runs as root unless the pod forces runAsUser)."
   local -a cmd=(
     kubectl debug pod/$pod -n $ns -it
-    --image=$KDEBUG_IMAGE --profile=general
+    --image=$image --profile=general
     --share-processes --target=$container
     --arguments-only -- zsh
   )
