@@ -56,7 +56,7 @@ function krestart() {
 }
 
 # Debug image for ephemeral containers (override per-shell if needed).
-export KDEBUG_IMAGE="${KDEBUG_IMAGE:-ghcr.io/kwtucker/k8s-debug:v0.1.0}"
+export KDEBUG_IMAGE="${KDEBUG_IMAGE:-ghcr.io/kwtucker/k8s-debug:v0.1.1}"
 
 # Attach an ephemeral debug container to a running pod.
 # Fuzzy-selects pod (across all namespaces) + container, shares target
