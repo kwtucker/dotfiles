@@ -6,6 +6,13 @@
 -- ephemeral troubleshooting container, not an editor workstation. Laptop
 -- behavior is unchanged. Keep image/Dockerfile's MasonInstall list in sync
 -- with the subset here; mason.lua is the source of truth.
+--
+-- NOTE: Lazy merges `ensure_installed` from EVERY mason.nvim spec (core's
+-- stylua/shfmt plus each enabled LazyVim extra's tools), so a table here can
+-- only ADD entries. Under $K8S_DEBUG we use function form instead: lazy runs
+-- user opts functions after the core+extras merge, so assigning {} wipes the
+-- whole merged list. tree-sitter-cli is unaffected — LazyVim installs it
+-- on demand in util/treesitter.lua, outside ensure_installed.
 local ensure_installed_full = {
   "docker-compose-language-service",
   "dockerfile-language-server",
@@ -55,9 +62,11 @@ local ensure_installed_workspace = {
 return {
   {
     "mason-org/mason.nvim",
-    opts = {
-      ensure_installed = vim.env.K8S_DEBUG and {}
-        or (vim.env.WORKSPACE_IMAGE and ensure_installed_workspace or ensure_installed_full),
+    opts = vim.env.K8S_DEBUG and function(_, opts)
+      opts.ensure_installed = {}
+    end or {
+      ensure_installed = vim.env.WORKSPACE_IMAGE and ensure_installed_workspace
+        or ensure_installed_full,
     },
   },
   {
