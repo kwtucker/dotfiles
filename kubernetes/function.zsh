@@ -71,8 +71,12 @@ function kdebug() {
   [[ -z "$container" ]] && return 1
   echo "Debugging $ns/$pod:$container with $KDEBUG_IMAGE"
   echo "Note: debug container inherits the target pod's securityContext (runs as root unless the pod forces runAsUser)."
-  echo "+ kubectl debug pod/$pod -n $ns -it --image=$KDEBUG_IMAGE --profile=general --share-processes --target=$container --arguments-only -- zsh"
-  kubectl debug pod/$pod -n $ns -it \
-    --image=$KDEBUG_IMAGE --profile=general \
-    --share-processes --target=$container --arguments-only -- zsh
+  local -a cmd=(
+    kubectl debug pod/$pod -n $ns -it
+    --image=$KDEBUG_IMAGE --profile=general
+    --share-processes --target=$container
+    --arguments-only -- zsh
+  )
+  echo "+ ${(j: :)cmd}"
+  "${cmd[@]}"
 }
