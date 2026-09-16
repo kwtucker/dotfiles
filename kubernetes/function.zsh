@@ -56,7 +56,7 @@ function krestart() {
 }
 
 # Debug image for ephemeral containers (override per-shell if needed).
-export KDEBUG_IMAGE="${KDEBUG_IMAGE:-ghcr.io/kwtucker/k8s-debug:v0.1.1}"
+export KDEBUG_IMAGE="${KDEBUG_IMAGE:-ghcr.io/kwtucker/k8s-debug:v0.1.2}"
 
 # Attach an ephemeral debug container to a running pod.
 # Fuzzy-selects pod (across all namespaces) + container, shares target
@@ -70,9 +70,9 @@ function kdebug() {
   local container=$(kubectl get pod "$pod" -n "$ns" -o json | jq -r '.spec.containers[].name' | fzf-tmux --reverse --prompt="container> ")
   [[ -z "$container" ]] && return 1
   echo "Debugging $ns/$pod:$container with $KDEBUG_IMAGE"
-  echo "Note: debug image runs as root; most tools work where the pod's security context allows."
-  echo "+ kubectl debug pod/$pod -n $ns -it --image=$KDEBUG_IMAGE --profile=general --share-processes --target=$container -- zsh"
+  echo "Note: debug container inherits the target pod's securityContext (runs as root unless the pod forces runAsUser)."
+  echo "+ kubectl debug pod/$pod -n $ns -it --image=$KDEBUG_IMAGE --profile=general --share-processes --target=$container --arguments-only -- zsh"
   kubectl debug pod/$pod -n $ns -it \
     --image=$KDEBUG_IMAGE --profile=general \
-    --share-processes --target=$container -- zsh
+    --share-processes --target=$container --arguments-only -- zsh
 }
