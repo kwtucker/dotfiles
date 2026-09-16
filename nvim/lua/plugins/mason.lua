@@ -1,9 +1,11 @@
 -- Full LSP/tool set for laptops. Inside the workspace image ($WORKSPACE_IMAGE,
 -- see image/Dockerfile) only the Go/infra subset below is ensured — the full
 -- list (pyright, rust-analyzer, eslint, …) would otherwise download hundreds
--- of MB on first nvim launch in every fresh container. Laptop behavior is
--- unchanged. Keep image/Dockerfile's MasonInstall list in sync with the
--- subset here; mason.lua is the source of truth.
+-- of MB on first nvim launch in every fresh container. Inside the k8s-debug
+-- image ($K8S_DEBUG, see kwtucker/k8s-debug) nothing is ensured: it is an
+-- ephemeral troubleshooting container, not an editor workstation. Laptop
+-- behavior is unchanged. Keep image/Dockerfile's MasonInstall list in sync
+-- with the subset here; mason.lua is the source of truth.
 local ensure_installed_full = {
   "docker-compose-language-service",
   "dockerfile-language-server",
@@ -54,7 +56,8 @@ return {
   {
     "mason-org/mason.nvim",
     opts = {
-      ensure_installed = vim.env.WORKSPACE_IMAGE and ensure_installed_workspace or ensure_installed_full,
+      ensure_installed = vim.env.K8S_DEBUG and {}
+        or (vim.env.WORKSPACE_IMAGE and ensure_installed_workspace or ensure_installed_full),
     },
   },
   {
