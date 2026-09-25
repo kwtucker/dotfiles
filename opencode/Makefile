@@ -10,7 +10,7 @@ OPENCODE_VERSION ?= latest
 MISE_CONFD := $(XDG_CONFIG_HOME)/mise/conf.d
 MISE_DATA := $(or $(MISE_DATA_DIR),$(HOME)/.local/share/mise)
 
-.PHONY: install clean upgrade
+.PHONY: install clean upgrade sync-skills
 
 install: .ensure.xdg.opencode
 	@echo "Installing $(MODULE_NAME) dotfiles..."
@@ -32,6 +32,9 @@ install: .ensure.xdg.opencode
 
 upgrade:
 	@MISE_YES=1 mise upgrade "aqua:anomalyco/opencode"
+
+sync-skills:
+	@./skills/conventional-commits/sync.sh
 
 clean: .remove.xdg.opencode
 	@echo "Cleaning $(MODULE_NAME) data..."
