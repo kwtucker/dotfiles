@@ -4,7 +4,7 @@ MODULE_NAME := zsh
 ZSH_DIR := $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 LOCAL_BIN := $(HOME)/.local/bin
 
-.PHONY: install clean upgrade
+.PHONY: install clean upgrade regen-cache
 
 # Optional: set default shell (may fail in DevPod/containers)
 set-default-shell:
@@ -49,6 +49,20 @@ upgrade:
 	@rm -f "$${ADOTDIR:-$$HOME/.antigen}/.lock"
 	@zsh -ic 'antigen update; antigen apply' || true
 	@echo "✅ $(MODULE_NAME) upgraded."
+
+# Regenerate the antigen plugin cache. MUST run non-interactively
+# (_ANTIGEN_INTERACTIVE=false) so antigen captures bundle sources —
+# `antigen cache-gen` from an interactive shell writes an EMPTY cache,
+# silently disabling every plugin (fzf-tab, autosuggestions, ...).
+# Run this on the machine where the shell will be used: WORKSPACE_IMAGE
+# gates laptop-only bundles (e.g. git-open) at generation time.
+regen-cache:
+	@echo "Regenerating antigen cache..."
+	@rm -f "$${ADOTDIR:-$$HOME/.antigen}/init.zsh" "$${ADOTDIR:-$$HOME/.antigen}/init.zsh.zwc"
+	@zsh -c '_ANTIGEN_INTERACTIVE=false; source $(ZSH_DIR)/.zshrc'
+	@grep -q "fzf-tab/fzf-tab.plugin.zsh" "$${ADOTDIR:-$$HOME/.antigen}/init.zsh" \
+		&& echo "✅ antigen cache regenerated." \
+		|| (echo "❌ cache regen failed (fzf-tab missing from cache)"; exit 1)
 
 clean: .remove.xdg.zsh
 	@echo "Cleaning $(MODULE_NAME) data..."
