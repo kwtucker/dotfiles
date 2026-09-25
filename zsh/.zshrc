@@ -33,6 +33,14 @@ else
   compinit -C $XDG_CACHE_HOME/zsh/zcompdump
 fi
 
+# fzf's shell integration rebinds TAB to its own widget, so it must load
+# BEFORE fzf-tab below — last binder wins TAB.
+[[ -f $XDG_CONFIG_HOME/fzf/completion.zsh ]] && source "$XDG_CONFIG_HOME/fzf/completion.zsh"
+
+# Keep antigen on the same compdump file initialized above,
+# instead of its default $ADOTDIR/.zcompdump.
+export ANTIGEN_COMPDUMP="$XDG_CACHE_HOME/zsh/zcompdump"
+
 # Load antigen plugins
 source $XDG_CONFIG_HOME/zsh/antigen.zsh
 if [[ -z "${WORKSPACE_IMAGE:-}" ]]; then
@@ -44,8 +52,9 @@ antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle Aloxaf/fzf-tab
 antigen apply
 
-# Load everything else (aliases, functions) — excluding env and completion files
-for file in ${config_files:#*/env.zsh}; do
+# Load everything else — excluding env files (loaded first) and
+# fzf/completion.zsh (loaded before antigen so fzf-tab owns TAB)
+for file in ${${config_files:#*/env.zsh}:#*/completion.zsh}; do
   source "$file"
 done
 
