@@ -4,7 +4,7 @@ MODULE_NAME := zsh
 ZSH_DIR := $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 LOCAL_BIN := $(HOME)/.local/bin
 
-.PHONY: install clean
+.PHONY: install clean upgrade
 
 # Optional: set default shell (may fail in DevPod/containers)
 set-default-shell:
@@ -42,6 +42,13 @@ install: .ensure.xdg.zsh
 	# Set default shell (optional)
 	# @$(MAKE) set-default-shell
 	@echo "✅ $(MODULE_NAME) installed."
+
+upgrade:
+	@echo "Upgrading $(MODULE_NAME) plugins..."
+	@curl -fsSL git.io/antigen -o $(ZSH_DIR)/antigen.zsh
+	@rm -f "$${ADOTDIR:-$$HOME/.antigen}/.lock"
+	@zsh -ic 'antigen update; antigen apply' || true
+	@echo "✅ $(MODULE_NAME) upgraded."
 
 clean: .remove.xdg.zsh
 	@echo "Cleaning $(MODULE_NAME) data..."

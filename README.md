@@ -173,6 +173,16 @@ kubectl rollout restart deploy/workspace
 | `make clean.all` | Remove all installed modules |
 | `make [module]` | Install a specific module, e.g. `make nvim` |
 | `make [module].clean` | Clean a specific module, e.g. `make nvim.clean` |
+| `make outdated` | Preview outdated tools for `mise.toml` + `image/mise.workspace.toml` (no changes) |
+| `make upgrade.tools` | Upgrade mise tools within pinned ranges + refresh completions |
+| `make upgrade.plugins` | Upgrade plugins with an `upgrade` target (`nvim`, `tmux`, `zsh`, `opencode`); skips the rest |
+| `make upgrade.all` | `upgrade.tools` + `upgrade.plugins` (tools first) |
+| `make [module].upgrade` | Upgrade a specific module's plugins, e.g. `make nvim.upgrade` |
 | `make help` | List all available targets |
+
+Upgrades are split by design: `upgrade.tools` never rewrites version pins
+(`mise upgrade` stays within the ranges in `mise.toml`; bumps stay manual via
+`make outdated` → edit → commit). The workspace image file is preview-only —
+pushing a bump there triggers a CI rebuild (~10–40 min).
 
 There are currently no optional modules. To add one later, list it in `OPTIONAL_MODULES` in the root `Makefile` — it becomes installable via `make <module>` but stays out of `make all`. Or append it to `LOCAL_MODULES` in `modules.local.mk` to include it in `make all` on that machine.

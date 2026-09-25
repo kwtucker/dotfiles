@@ -2,6 +2,7 @@
 .netrwbook
 .netrwhist*
 .zcompdump
+*.zwc
 
 zsh/local
 mise.local.toml
