@@ -31,3 +31,4 @@ tmux/plugins
 packer_compiled.lua
 
 opencode/node_modules
+opencode/service.json
