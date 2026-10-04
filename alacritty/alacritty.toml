@@ -1,5 +1,6 @@
-import = ["~/.config/alacritty/catppuccin/catppuccin-frappe.toml"]
+[general]
 live_config_reload = true
+import = ["~/.config/alacritty/catppuccin/catppuccin-frappe.toml"]
 
 [colors]
 draw_bold_text_with_bright_colors = true
@@ -158,9 +159,11 @@ multiplier = 10
 save_to_clipboard = true
 semantic_escape_chars = ",│`|:\"' ()[]{}<>"
 
-[shell]
-args = ["-i", "-c", "tm; exec zsh"]
-program = "/bin/zsh"
+[terminal]
+shell = {
+  args = ["-i", "-c", "tm; exec zsh"],
+  program = "/bin/zsh",
+}
 
 [window]
 decorations = "full"
