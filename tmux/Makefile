@@ -9,7 +9,11 @@ TPM_DIR := $(HOME)/.tmux/plugins/tpm
 install: .ensure.xdg.tmux
 	@echo "Installing $(MODULE_NAME) dotfiles..."
 	# Link tmux config dir
-	@if [ ! -L "$(TMUX_DIR)" ]; then \
+	@# `test -L` is true for a *dangling* symlink too, so a link left behind by
+	@# a moved/rename repo (e.g. ~/dotfiles -> ~/.dotfiles) would look 
+	@# "already linked" forever and silently disable the whole tmux config.
+	@# Require the link to actually resolve to this checkout before skipping.
+	@if [ ! -L "$(TMUX_DIR)" ] || [ "$$(readlink "$(TMUX_DIR)")" != "$(CURDIR)" ]; then \
 		ln -sfn $(CURDIR) $(TMUX_DIR); \
 		echo "Linked $(CURDIR) -> $(TMUX_DIR)"; \
 	else \
