@@ -12,6 +12,7 @@ python = "3.13"
 uv     = "latest"
 ruff   = "latest"
 rust   = "stable"
+tmux   = "latest"
 
 # ── Kubernetes / Infra ────────────────────────────────────────────────────────
 kubectl   = "1.35.3"
@@ -25,11 +26,13 @@ terraform = "1.14.8"
 "aqua:sharkdp/fd"            = "latest"
 "aqua:sharkdp/bat"           = "latest"
 "aqua:jesseduffield/lazygit" = "latest"
+"conda:tig"                  = "latest"
 "aqua:cli/cli"               = "latest"
 "aqua:starship/starship"     = "latest"
 "aqua:docker/cli"            = "latest"
 "cargo:stylua"               = "latest"
 "aqua:jqlang/jq"             = "latest"
+"aqua:fullstorydev/grpcurl"  = "latest"
 
 # ── LSP servers ───────────────────────────────────────────────────────────────
 "go:golang.org/x/tools/gopls"    = "latest"
