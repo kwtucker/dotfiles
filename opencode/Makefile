@@ -9,7 +9,7 @@ OPENCODE_TOOL := http:opencode
 
 MISE_DATA := $(or $(MISE_DATA_DIR),$(HOME)/.local/share/mise)
 
-.PHONY: install clean upgrade
+.PHONY: install clean upgrade sync-skills
 
 install: .ensure.xdg.opencode
 	@echo "Installing $(MODULE_NAME) dotfiles..."
@@ -39,3 +39,10 @@ clean: .remove.xdg.opencode
 	@echo "Cleaning $(MODULE_NAME) data..."
 	@mise uninstall $(OPENCODE_TOOL) || true
 	@echo "✅ $(MODULE_NAME) cleaned."
+
+# Re-vendor the conventional-commits skill from upstream claude-kit.
+# Pass a pinned commit with: make -C opencode sync-skills SKILL_SYNC_ARGS="--sha <sha>"
+SKILL_SYNC_ARGS ?=
+
+sync-skills:
+	@./skills/conventional-commits/sync.sh $(SKILL_SYNC_ARGS)
