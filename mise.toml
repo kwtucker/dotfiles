@@ -41,6 +41,22 @@ terraform = "1.14.8"
 "github:golangci/golangci-lint"  = "latest"
 "aqua:terraform-docs/terraform-docs" = "latest"
 
+# ── AI agents ────────────────────────────────────────────────────────────────
+# opencode v2 ships from opencode.ai rather than GitHub releases, so it needs
+# mise's http backend. The "2" prefix resolves to the newest 2.x through
+# version_list_url — a future v3 will not arrive without a deliberate bump
+# here. Client-side only: intentionally absent from image/mise.workspace.toml.
+[tools."http:opencode"]
+version           = "2"
+version_list_url  = "https://opencode.ai/update/api/latest/cli/npm"
+version_json_path = ".version"
+
+[tools."http:opencode".platforms]
+linux-x64   = { url = "https://opencode.ai/files/bin/{{version}}/opencode-linux-x64.tar.gz" }
+linux-arm64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-linux-arm64.tar.gz" }
+macos-x64   = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin-x64.zip" }
+macos-arm64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin-arm64.zip" }
+
 [settings]
 not_found_auto_install = false
 yes = true
