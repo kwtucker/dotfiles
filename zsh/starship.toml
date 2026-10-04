@@ -1,6 +1,7 @@
 palette = "catppuccin_frappe"
 right_format = """$aws$terraform$kubernetes"""
 continuation_prompt = '▶▶ '
+command_timeout = 2000
 
 [aws]
 format = '[$symbol($profile )(\($region\) )(\[$duration\] )]($style)'
