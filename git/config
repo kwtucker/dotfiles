@@ -28,9 +28,6 @@
   prune = true
   pruneTags = true
 
-[pull]
-  rebase = true
-
 [push]
   default = simple
 
