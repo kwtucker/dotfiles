@@ -186,7 +186,7 @@ kubectl rollout restart deploy/workspace
 | Target | Description |
 |---|---|
 | `make install` / `make update` | Install or update this machine (runs `./install`) |
-| `make all` | Relink all modules only (no pull, top-up, or prune) |
+| `make all` | Relink all modules in parallel (no pull, top-up, or prune) |
 | `make clean.all` | Remove all installed modules |
 | `make [module]` | Install a specific module, e.g. `make nvim` |
 | `make [module].clean` | Clean a specific module, e.g. `make nvim.clean` |
