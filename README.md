@@ -27,14 +27,14 @@ cd ~/.dotfiles
 
 ### Updating an existing machine
 
-`./install` is idempotent. Run it again on a machine that is already set up and
-it becomes an **update**: it pulls the latest dotfiles (`git pull --ff-only`),
-installs any tools or modules another machine added, re-links all configs, and
-prunes superseded tool versions.
+`./install` is idempotent. Run it again — or `make update`, which wraps it — on
+a machine that is already set up and it becomes an **update**: it pulls the
+latest dotfiles (`git pull --ff-only`), installs any tools or modules another
+machine added, re-links all configs, and prunes superseded tool versions.
 
 ```bash
 cd ~/.dotfiles
-./install
+./install          # or: make update  (or: make install)
 ```
 
 ## How it works
@@ -181,7 +181,8 @@ kubectl rollout restart deploy/workspace
 
 | Target | Description |
 |---|---|
-| `make all` | Install all modules |
+| `make install` / `make update` | Install or update this machine (runs `./install`) |
+| `make all` | Relink all modules only (no pull, top-up, or prune) |
 | `make clean.all` | Remove all installed modules |
 | `make [module]` | Install a specific module, e.g. `make nvim` |
 | `make [module].clean` | Clean a specific module, e.g. `make nvim.clean` |
