@@ -73,12 +73,17 @@ upgrade.tools: ## Upgrade mise tools within pinned ranges + refresh completions
 			$(MAKE) -C $$m completions; \
 		fi; \
 	done
+	@$(MAKE) prune.tools
+
+prune.tools: ## Remove superseded mise tool versions (keeps referenced ones)
+	@MISE_YES=1 mise prune --yes
+	@mise reshim
 
 upgrade.plugins: $(UPGRADE) ## Upgrade editor/shell plugins (nvim, tmux, zsh, opencode)
 
 upgrade.all: upgrade.tools upgrade.plugins ## Upgrade tools + plugins
 
-.PHONY: $(TARGETS) $(CLEAN) $(UPGRADE) all clean.all outdated upgrade.tools upgrade.plugins upgrade.all
+.PHONY: $(TARGETS) $(CLEAN) $(UPGRADE) all clean.all outdated upgrade.tools prune.tools upgrade.plugins upgrade.all
 
 help: ## Show this help message
 	@echo "Available targets:"; \
@@ -92,6 +97,7 @@ help: ## Show this help message
 	echo "  make <module>.clean # Clean a specific module, e.g. 'make zsh.clean'"; \
 	echo "  make outdated       # Preview outdated tools (no changes)"; \
 	echo "  make upgrade.tools  # Upgrade mise tools within pinned ranges"; \
+	echo "  make prune.tools    # Remove superseded mise tool versions"; \
 	echo "  make upgrade.plugins # Upgrade editor/shell plugins"; \
 	echo "  make upgrade.all    # Upgrade tools + plugins"
 
