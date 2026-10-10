@@ -35,8 +35,12 @@ install: .ensure.xdg.zsh
 	@echo "🔗 Linked $(CURDIR) -> $(ZSH_DIR)"
 	# Ensure local bin exists
 	@mkdir -p $(LOCAL_BIN)
-	# Install Antigen
-	@curl -fsSL git.io/antigen -o $(ZSH_DIR)/antigen.zsh
+	# Install Antigen only if missing — keeps the tracked pin stable so
+	# installs never dirty the repo. Use `make zsh.upgrade` to bump it.
+	@[ -f $(ZSH_DIR)/antigen.zsh ] || { \
+		echo "Fetching antigen..."; \
+		curl -fsSL git.io/antigen -o $(ZSH_DIR)/antigen.zsh; \
+	}
 	# Link zshenv
 	@ln -sf $(CURDIR)/zshenv $(HOME)/.zshenv
 	# Set default shell (optional)
