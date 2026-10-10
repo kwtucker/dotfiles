@@ -25,6 +25,18 @@ cd ~/.dotfiles
 ./install
 ```
 
+### Updating an existing machine
+
+`./install` is idempotent. Run it again on a machine that is already set up and
+it becomes an **update**: it pulls the latest dotfiles (`git pull --ff-only`),
+installs any tools or modules another machine added, re-links all configs, and
+prunes superseded tool versions.
+
+```bash
+cd ~/.dotfiles
+./install
+```
+
 ## How it works
 
 ### Tools — mise
@@ -46,7 +58,7 @@ rust      = "stable"
 # ...and more
 ```
 
-To update a tool, change the version in `mise.toml`, commit, and push. On a live machine, run `mise install` to apply.
+To update a tool, change the version in `mise.toml`, commit, and push. On a live machine, run `./install` (or `mise install`) to apply.
 
 Per-project overrides are supported — drop a `mise.toml` in any project directory and mise will switch tool versions automatically when you `cd` into it.
 
@@ -175,6 +187,7 @@ kubectl rollout restart deploy/workspace
 | `make [module].clean` | Clean a specific module, e.g. `make nvim.clean` |
 | `make outdated` | Preview outdated tools for `mise.toml` + `image/mise.workspace.toml` (no changes) |
 | `make upgrade.tools` | Upgrade mise tools within pinned ranges + refresh completions |
+| `make prune.tools` | Remove superseded mise tool versions (keeps referenced ones) |
 | `make upgrade.plugins` | Upgrade plugins with an `upgrade` target (`nvim`, `tmux`, `zsh`, `opencode`); skips the rest |
 | `make upgrade.all` | `upgrade.tools` + `upgrade.plugins` (tools first) |
 | `make [module].upgrade` | Upgrade a specific module's plugins, e.g. `make nvim.upgrade` |
