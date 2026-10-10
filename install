@@ -124,17 +124,8 @@ mise reshim
 ok "stale tool versions pruned"
 
 # ── Shell activation ───────────────────────────────────────────────────────────
-# .bashrc is already symlinked by the zsh/git/etc modules above and launches zsh.
-# Just ensure mise activates inside zsh.
-step "shell"
-ZSHRC="$HOME/.zshrc"
-MISE_LINE='eval "$(mise activate zsh)"'
+# Nothing to do here: the zsh module's tracked .zshrc (ZDOTDIR=.config/zsh)
+# already runs `eval "$(mise activate zsh)"`. zsh never reads ~/.zshrc when
+# ZDOTDIR is set, so don't try to edit it.
 
-if [ -f "$ZSHRC" ] && grep -qF "$MISE_LINE" "$ZSHRC" 2>/dev/null; then
-  skip "mise activation already in .zshrc"
-elif [ -f "$ZSHRC" ]; then
-  printf '\n# mise — added by dotfiles/install\n%s\n' "$MISE_LINE" >>"$ZSHRC"
-  ok "mise activation added to .zshrc"
-fi
-
-echo -e "\n${GREEN}${BOLD}✅ done.${RESET} Open a new shell or: source ~/.zshrc\n"
+echo -e "\n${GREEN}${BOLD}✅ done.${RESET} Open a new shell or run: exec zsh\n"
