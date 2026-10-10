@@ -2,7 +2,7 @@
 # install — works in all three contexts:
 #   1. Bare Linux server / Tailscale VPS (full install)
 #   2. DevPod --dotfiles flag (full install into fresh workspace)
-#   3. Machine with tools already present (symlinks + top-up only)
+#   3. Machine with tools already present (update: pull + top-up + prune)
 set -euo pipefail
 
 BOLD='\033[1m'
@@ -25,23 +25,47 @@ export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME"
 
 # ── Detect context ─────────────────────────────────────────────────────────────
-# If mise + key tools are already on PATH, skip the slow install and
-# just lay symlinks.
+# If mise + key tools are already on PATH this is an *existing* machine, so we
+# take the update path: pull latest, top up anything missing, prune stale tools.
+# Otherwise it's a fresh bootstrap (bare server, DevPod --dotfiles).
 TOOLS_PRESENT=false
 if command -v mise &>/dev/null && command -v nvim &>/dev/null && command -v go &>/dev/null; then
   TOOLS_PRESENT=true
 fi
 
+# ── Update existing checkout ───────────────────────────────────────────────────
+# Pull commits other machines pushed (new modules, tool pins, configs) before
+# applying anything. Safe: --ff-only never merges, and we skip when there is no
+# remote, a detached HEAD, or local divergence.
+if [ "$TOOLS_PRESENT" = true ]; then
+  step "update"
+  if git -C "$DOTFILES_DIR" rev-parse --git-dir &>/dev/null \
+    && git -C "$DOTFILES_DIR" remote get-url origin &>/dev/null \
+    && [ "$(git -C "$DOTFILES_DIR" rev-parse --abbrev-ref HEAD)" != "HEAD" ]; then
+    if git -C "$DOTFILES_DIR" pull --ff-only; then
+      ok "pulled latest dotfiles"
+    else
+      echo -e "  ${YELLOW}↷${RESET} git pull skipped (dirty or diverged) — applying local files"
+    fi
+  else
+    echo -e "  ${YELLOW}↷${RESET} no git remote or detached HEAD — applying local files"
+  fi
+fi
+
 # ── Mise ───────────────────────────────────────────────────────────────────────
 step "mise"
 # Link mise.toml as the global mise config (contains both tools and settings).
-# When the tools are already present system-wide, skip installing/trusting.
 mkdir -p "$XDG_CONFIG_HOME/mise"
 ln -sf "$DOTFILES_DIR/mise.toml" "$XDG_CONFIG_HOME/mise/config.toml"
+export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
 if [ "$TOOLS_PRESENT" = true ]; then
-  skip "tools already present — not re-installing"
-  export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
+  # Top up: install anything new another machine added to mise.toml. Idempotent
+  # and fast when everything is already present.
+  MISE_YES=1 mise install --yes
+  MISE_YES=1 mise trust "$DOTFILES_DIR/mise.toml" 2>/dev/null || true
+  mise reshim
+  ok "tools topped up"
 else
   if ! command -v mise &>/dev/null; then
     echo "  installing mise..."
@@ -72,6 +96,14 @@ fi
 step "dotfile modules"
 make -C "$DOTFILES_DIR" all
 ok "modules installed"
+
+# ── Cleanup ────────────────────────────────────────────────────────────────────
+# Drop tool versions no longer referenced by mise.toml (e.g. superseded
+# opencode/kubectl/helm builds) so upgrades don't accumulate on disk.
+step "cleanup"
+MISE_YES=1 mise prune --yes || true
+mise reshim
+ok "stale tool versions pruned"
 
 # ── Shell activation ───────────────────────────────────────────────────────────
 # .bashrc is already symlinked by the zsh/git/etc modules above and launches zsh.
