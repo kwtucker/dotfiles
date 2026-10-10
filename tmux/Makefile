@@ -19,12 +19,13 @@ install: .ensure.xdg.tmux
 	else \
 		echo "✅ $(TMUX_DIR) already linked"; \
 	fi
-	# Install or update TPM
+	# Ensure TPM is present — updates happen via `make tmux.upgrade`
+	# (pulling TPM on every install added a needless network round-trip).
 	@mkdir -p $(HOME)/.tmux/plugins
 	@if [ ! -d "$(TPM_DIR)/.git" ]; then \
 		git clone https://github.com/tmux-plugins/tpm "$(TPM_DIR)"; \
 	else \
-		git -C "$(TPM_DIR)" pull --ff-only; \
+		echo "✅ TPM already installed"; \
 	fi
 	# Install plugins non-interactively if tmux server is running
 	@if command -v tmux >/dev/null && tmux info >/dev/null 2>&1; then \
