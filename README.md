@@ -62,6 +62,10 @@ rust      = "stable"
 # ...and more
 ```
 
+GNU Make is managed here too: macOS ships Make 3.81, which lacks `--output-sync`,
+so `mise.toml` pins a modern GNU Make (4.x) and the parallel module pass runs the
+same way on Linux and macOS.
+
 To update a tool, change the version in `mise.toml`, commit, and push. On a live machine, run `./install` (or `mise install`) to apply.
 
 Per-project overrides are supported — drop a `mise.toml` in any project directory and mise will switch tool versions automatically when you `cd` into it.
