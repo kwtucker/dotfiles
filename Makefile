@@ -50,6 +50,13 @@ $(UPGRADE):
 
 all: $(MODULES) ## Make it all
 
+# Single entrypoint for fresh installs and updates — delegates to ./install so
+# context detection (fresh vs existing machine) lives in one place.
+install: ## Install or update this machine in any context (runs ./install)
+	@./install
+
+update: install ## Update an existing machine (alias for `install`)
+
 clean.all: $(CLEAN) ## Clean all modules
 
 outdated: ## Show outdated tools (laptop + workspace image, no changes)
@@ -83,7 +90,7 @@ upgrade.plugins: $(UPGRADE) ## Upgrade editor/shell plugins (nvim, tmux, zsh, op
 
 upgrade.all: upgrade.tools upgrade.plugins ## Upgrade tools + plugins
 
-.PHONY: $(TARGETS) $(CLEAN) $(UPGRADE) all clean.all outdated upgrade.tools prune.tools upgrade.plugins upgrade.all
+.PHONY: $(TARGETS) $(CLEAN) $(UPGRADE) install update all clean.all outdated upgrade.tools prune.tools upgrade.plugins upgrade.all
 
 help: ## Show this help message
 	@echo "Available targets:"; \
@@ -92,7 +99,9 @@ help: ## Show this help message
 	echo; \
 	echo "Usage:"; \
 	echo "  make <target>       # Run a specific target"; \
-	echo "  make all            # Install all modules"; \
+	echo "  make install        # Install or update this machine (runs ./install)"; \
+	echo "  make update         # Update an existing machine (alias for install)"; \
+	echo "  make all            # Relink all modules only (no pull/top-up/prune)"; \
 	echo "  make clean.all      # Clean all modules"; \
 	echo "  make <module>.clean # Clean a specific module, e.g. 'make zsh.clean'"; \
 	echo "  make outdated       # Preview outdated tools (no changes)"; \
