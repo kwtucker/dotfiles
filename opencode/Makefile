@@ -9,7 +9,7 @@ OPENCODE_TOOL := http:opencode
 
 MISE_DATA := $(or $(MISE_DATA_DIR),$(HOME)/.local/share/mise)
 
-.PHONY: install clean upgrade sync-skills
+.PHONY: install clean upgrade prune sync-skills
 
 install: .ensure.xdg.opencode
 	@echo "Installing $(MODULE_NAME) dotfiles..."
@@ -22,11 +22,18 @@ install: .ensure.xdg.opencode
 	@if [ -w "$(MISE_DATA)" ] || [ ! -d "$(MISE_DATA)" ]; then \
 		MISE_YES=1 mise install $(OPENCODE_TOOL); \
 		mise reshim; \
+		mise prune $(OPENCODE_TOOL) || true; \
 		mise ls $(OPENCODE_TOOL); \
 	else \
 		echo "⚠️  $(MISE_DATA) not writable — skipping tool install"; \
 	fi
 	@echo "✅ $(MODULE_NAME) installed."
+
+# Remove superseded opencode versions (keeps the one mise.toml requests).
+prune:
+	@echo "Pruning old $(MODULE_NAME) versions..."
+	@mise prune $(OPENCODE_TOOL) || true
+	@mise ls $(OPENCODE_TOOL)
 
 upgrade:
 	@echo "Upgrading $(MODULE_NAME)..."
