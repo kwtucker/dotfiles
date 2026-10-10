@@ -1,6 +1,15 @@
 SHELL := /bin/bash
 .SHELLFLAGS := -euo pipefail -c
 
+# Parallel module installs. NUM_CPUS is portable (Linux + macOS). Grouped output
+# (--output-sync) keeps the log readable and is only used on GNU Make >= 4;
+# macOS ships make 3.81, which lacks it, so we fall back to plain -j. An
+# explicit -j on the command line is respected.
+NUM_CPUS := $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
+OUTPUT_SYNC := $(shell $(MAKE) --version 2>/dev/null | head -1 | grep -qE 'GNU Make ([4-9]|1[0-9])\.' && echo --output-sync=recurse)
+JOBS := $(if $(filter -j% --jobs%,$(MAKEFLAGS)),,-j$(NUM_CPUS))
+MAKEFLAGS += $(JOBS) $(OUTPUT_SYNC)
+
 # If the file doesn't exist it will not error.
 -include modules.local.mk
 
@@ -48,7 +57,7 @@ $(UPGRADE):
 		echo "==> Skipping $(basename $@) (no upgrade target)"; \
 	fi
 
-all: $(MODULES) ## Make it all
+all: $(MODULES) ## Install all modules (parallel)
 
 # Single entrypoint for fresh installs and updates — delegates to ./install so
 # context detection (fresh vs existing machine) lives in one place.
@@ -101,7 +110,7 @@ help: ## Show this help message
 	echo "  make <target>       # Run a specific target"; \
 	echo "  make install        # Install or update this machine (runs ./install)"; \
 	echo "  make update         # Update an existing machine (alias for install)"; \
-	echo "  make all            # Relink all modules only (no pull/top-up/prune)"; \
+	echo "  make all            # Relink all modules (parallel; no pull/top-up/prune)"; \
 	echo "  make clean.all      # Clean all modules"; \
 	echo "  make <module>.clean # Clean a specific module, e.g. 'make zsh.clean'"; \
 	echo "  make outdated       # Preview outdated tools (no changes)"; \
