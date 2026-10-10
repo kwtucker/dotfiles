@@ -37,6 +37,10 @@ cd ~/.dotfiles
 ./install          # or: make update  (or: make install)
 ```
 
+When the checkout is unchanged since the last successful run, the module pass is
+skipped automatically (tools are still topped up). Force a full pass with
+`FORCE=1 ./install`.
+
 ## How it works
 
 ### Tools — mise
