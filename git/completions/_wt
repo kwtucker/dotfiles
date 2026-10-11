@@ -1,0 +1,49 @@
+#compdef wt
+# wt — git worktree manager. Completes subcommands, flags, and git branch
+# names (the default `wt <branch> [base-branch]` create form takes branches).
+
+_wt() {
+  local -a commands
+  commands=(
+    'list:List all worktrees for current project'
+    'switch:Interactive TUI to switch between worktrees'
+    'remove:Remove a worktree (interactive if no name given)'
+    'rename:Rename a worktree and branch'
+    'cleanup:Remove all worktrees for project (with confirmation)'
+    'update:Update from origin default branch'
+    'prune:Prune branches and worktrees removed from remote'
+    'review:Review all worktrees across all projects'
+    'doctor:Diagnose installation issues'
+    'version:Check for new versions'
+    'help:Show detailed help'
+  )
+
+  _arguments -C -s \
+    '(-e --editor)'{-e,--editor}'[Specify editor to open worktree]:editor:_command_names -e' \
+    '(-w --with-changes)'{-w,--with-changes}'[Move unstaged changes to new worktree (create only)]' \
+    '(-d --delete-branch)'{-d,--delete-branch}'[Auto-delete branch when removing (remove/review only)]' \
+    '(-r --rebase)'{-r,--rebase}'[Use rebase instead of merge (update only)]' \
+    '(-n --dry-run)'{-n,--dry-run}'[Show analysis without cleanup prompts (review only)]' \
+    '(-a --auto)'{-a,--auto}'[Auto-select merged/orphaned for removal (review only)]' \
+    '(-h --help)'{-h,--help}'[Show this help message]' \
+    '1: :->command' \
+    '*: :->args'
+
+  case $state in
+    command)
+      _describe -t commands 'wt command' commands
+      _wt_branches
+      ;;
+    args)
+      _wt_branches
+      ;;
+  esac
+}
+
+_wt_branches() {
+  local -a branches
+  branches=("${(@f)$(git for-each-ref --format='%(refname:short)' refs/heads refs/remotes/origin 2>/dev/null | sed 's#^origin/##' | sort -u)}")
+  _describe -t branches 'git branch' branches
+}
+
+_wt "$@"
