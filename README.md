@@ -51,14 +51,15 @@ Tools that must stay machine-local instead of shared are provisioned per-machine
 
 ```toml
 [tools]
-go        = "1.26"
+go        = "1.26"       # minor range — patch releases flow
 node      = "24"
-kubectl   = "1.35.3"
+kubectl   = "1.35.3"     # exact pin — bumps are deliberate
 helm      = "4.1.3"
 terraform = "1.14.8"
 rust      = "stable"
-"aqua:docker/cli" = "latest"
-"aqua:neovim/neovim" = "latest"
+tmux      = "3.7c"
+"aqua:docker/cli"    = "29.9.0"
+"aqua:neovim/neovim" = "0.12.6"
 # ...and more
 ```
 
@@ -66,7 +67,17 @@ GNU Make is managed here too: macOS ships Make 3.81, which lacks `--output-sync`
 so `mise.toml` pins a modern GNU Make (4.x) and the parallel module pass runs the
 same way on Linux and macOS.
 
-To update a tool, change the version in `mise.toml`, commit, and push. On a live machine, run `./install` (or `mise install`) to apply.
+**Versioning policy.** CLI tools and LSP servers are pinned to exact versions,
+so upgrading one is a deliberate, reviewable commit; language runtimes (`go`,
+`node`, `python`, `make`) keep their minor range so patch releases flow. To bump
+a tool: `make outdated` to preview → edit the pin here → commit/push → on a live
+machine run `./install` (or `mise install`). `make upgrade.tools` will not move
+exact pins, and `make prune.tools` cleans up superseded versions.
+
+One exception worth knowing: `rust` is a rustup-managed `stable` channel
+(`~/.local/share/mise/installs/rust/stable` → `~/.cargo/bin`), so it is *not*
+reproducible from this file — pin it with rustup (a `rust-toolchain.toml`) if
+that matters.
 
 Per-project overrides are supported — drop a `mise.toml` in any project directory and mise will switch tool versions automatically when you `cd` into it.
 
