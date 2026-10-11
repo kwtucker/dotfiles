@@ -1,18 +1,21 @@
 # mise.toml — single source of truth for all CLI tools and runtimes.
 # Replaces nix/config.nix.
 #
-# Update a tool: change the version here, commit, push.
-# On a live machine/container/VPS: run `mise install` to apply.
+# Tools are pinned to exact versions by default so upgrades are deliberate and
+# reproducible; language runtimes keep their minor range so patch releases flow.
+# Bump a pin with `make outdated` → edit here → commit, then `mise install`
+# (or `./install`) on a live machine. `make upgrade.tools` never rewrites pins —
+# it only moves within ranges.
 
 [tools]
 # ── Runtimes ──────────────────────────────────────────────────────────────────
 go   = "1.26"
 node = "24"       # required by Mason (LSP installer inside neovim)
 python = "3.13"
-uv     = "latest"
-ruff   = "latest"
+uv     = "0.13.0"
+ruff   = "0.17.0"
 rust   = "stable"
-tmux   = "latest"
+tmux   = "3.7c"
 
 # ── Build tooling ─────────────────────────────────────────────────────────────
 # macOS ships GNU Make 3.81, which predates --output-sync: the parallel module
@@ -26,26 +29,26 @@ helm      = "4.1.3"
 terraform = "1.14.8"
 
 # ── Neovim + shell tooling ────────────────────────────────────────────────────
-"aqua:neovim/neovim"         = "latest"
-"github:junegunn/fzf"        = "latest"
-"aqua:BurntSushi/ripgrep"    = "latest"
-"aqua:sharkdp/fd"            = "latest"
-"aqua:sharkdp/bat"           = "latest"
-"aqua:jesseduffield/lazygit" = "latest"
-"conda:tig"                  = "latest"
-"aqua:cli/cli"               = "latest"
-"aqua:starship/starship"     = "latest"
-"aqua:docker/cli"            = "latest"
-"cargo:stylua"               = "latest"
-"aqua:jqlang/jq"             = "latest"
-"aqua:fullstorydev/grpcurl"  = "latest"
+"aqua:neovim/neovim"         = "0.12.6"
+"github:junegunn/fzf"        = "0.74.4"
+"aqua:BurntSushi/ripgrep"    = "15.2.0"
+"aqua:sharkdp/fd"            = "10.5.0"
+"aqua:sharkdp/bat"           = "0.26.1"
+"aqua:jesseduffield/lazygit" = "0.66.0"
+"conda:tig"                  = "2.6.1"
+"aqua:cli/cli"               = "2.102.0"
+"aqua:starship/starship"     = "1.26.0"
+"aqua:docker/cli"            = "29.9.0"
+"cargo:stylua"               = "2.5.2"
+"aqua:jqlang/jq"             = "1.8.2"
+"aqua:fullstorydev/grpcurl"  = "1.9.4"
 
 # ── LSP servers ───────────────────────────────────────────────────────────────
-"go:golang.org/x/tools/gopls"    = "latest"
-"aqua:hashicorp/terraform-ls"    = "latest"
-"aqua:terraform-linters/tflint"  = "latest"
-"github:golangci/golangci-lint"  = "latest"
-"aqua:terraform-docs/terraform-docs" = "latest"
+"go:golang.org/x/tools/gopls"    = "0.23.0"
+"aqua:hashicorp/terraform-ls"    = "0.39.0"
+"aqua:terraform-linters/tflint"  = "0.64.0"
+"github:golangci/golangci-lint"  = "2.14.0"
+"aqua:terraform-docs/terraform-docs" = "0.24.0"
 
 # ── AI agents ────────────────────────────────────────────────────────────────
 # opencode v2 ships from opencode.ai rather than GitHub releases, so it needs
