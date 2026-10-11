@@ -1,5 +1,20 @@
 # Search or create tmux session.
 function tm() {
+  # A tmux upgrade (e.g. via mise, which tracks `latest`) can leave an old
+  # server running behind the newer client. Attaching across that version
+  # mismatch fails with "open terminal failed: not a terminal" — so drop the
+  # stale server before we try to attach. Skip when already inside tmux, since
+  # the server we're attached to already matches our client.
+  if [[ -z "$TMUX" ]]; then
+    local _cver _sver
+    _cver=$(tmux -V 2>/dev/null | sed 's/^tmux //')
+    _sver=$(tmux display-message -p '#{version}' 2>/dev/null)
+    if [[ -n "$_sver" && "$_sver" != "$_cver" ]]; then
+      tmux kill-server
+    fi
+    unset _cver _sver
+  fi
+
   # Determine attach vs switch
   [[ -n "$TMUX" ]] && change="switch-client" || change="attach-session"
 
