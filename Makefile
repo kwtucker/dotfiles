@@ -31,7 +31,7 @@ CLEAN := $(addsuffix .clean,$(TARGETS))
 UPGRADE := $(addsuffix .upgrade,$(TARGETS))
 
 # Modules with a `completions` target — completions are refreshed after tool upgrades.
-COMPLETION_MODULES := kubernetes helm fzf ripgrep docker golang rust terraform zsh
+COMPLETION_MODULES := kubernetes helm fzf ripgrep docker golang rust terraform zsh git
 
 $(TARGETS):
 	$(MAKE) -C $@ install
