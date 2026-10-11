@@ -93,6 +93,42 @@ else
   ok "tools up to date"
 fi
 
+# ── Long-running processes ─────────────────────────────────────────────────────
+# Upgrading a tool swaps the binary on disk, but any process already running
+# keeps the old version. tmux is the notable case: a stale server can't be
+# attached to by the new client ("open terminal failed: not a terminal"). Recycle
+# the server only when the tmux binary actually changed, so ordinary updates
+# don't kill live sessions. Skipped while inside tmux — killing the server would
+# drop the very pane running this update. The tm() function is a lazy fallback
+# for the case we skip here.
+step "services"
+if command -v tmux &>/dev/null; then
+  TMUX_VER="$(tmux -V 2>/dev/null || true)"
+  TMUX_MARK="$XDG_STATE_HOME/dotfiles/tmux-version"
+  TMUX_PREV="$(cat "$TMUX_MARK" 2>/dev/null || true)"
+  mkdir -p "$XDG_STATE_HOME/dotfiles"
+  if [ -n "$TMUX_VER" ]; then
+    # Only act when we know the previous version (skip the free-form first run).
+    if [ -n "$TMUX_PREV" ] && [ "$TMUX_VER" != "$TMUX_PREV" ]; then
+      if [ -n "${TMUX:-}" ]; then
+        echo -e "  ${YELLOW}↷${RESET} tmux ${TMUX_VER#tmux } installed — detach and reattach to switch the running server"
+      elif tmux list-sessions &>/dev/null; then
+        tmux kill-server 2>/dev/null || true
+        ok "recycled tmux server (now ${TMUX_VER#tmux })"
+      else
+        ok "tmux now ${TMUX_VER#tmux } (no server running)"
+      fi
+    else
+      ok "tmux up to date"
+    fi
+    printf '%s\n' "$TMUX_VER" >"$TMUX_MARK"
+  else
+    skip "tmux version unknown"
+  fi
+else
+  skip "tmux not installed"
+fi
+
 # ── Dotfile modules ────────────────────────────────────────────────────────────
 # Fast path: when the checkout is identical to the last successful apply and the
 # tree is clean, every module is already linked — skip the pass entirely. Any
