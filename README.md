@@ -74,6 +74,11 @@ a tool: `make outdated` to preview → edit the pin here → commit/push → on 
 machine run `./install` (or `mise install`). `make upgrade.tools` will not move
 exact pins, and `make prune.tools` cleans up superseded versions.
 
+Long-running processes keep the old binary until they restart, so `./install`
+recycles the tmux server automatically when its version changes (skipped when run
+from inside tmux). Editors are not touched — restart nvim, or run `:LspRestart`,
+after bumping nvim or an LSP server so it loads the new binary.
+
 One exception worth knowing: `rust` is a rustup-managed `stable` channel
 (`~/.local/share/mise/installs/rust/stable` → `~/.cargo/bin`), so it is *not*
 reproducible from this file — pin it with rustup (a `rust-toolchain.toml`) if
