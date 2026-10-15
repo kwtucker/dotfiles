@@ -60,7 +60,7 @@ done
 
 # Local overrides
 [ -f ${XDG_CONFIG_HOME}/zsh/local ] && source ${XDG_CONFIG_HOME}/zsh/local
-[ -f ${WHALEBYTE}/.secret ] && source ${WHALEBYTE}/.secret
+# ${WHALEBYTE}/.secret is an age-encrypted vault (see `wbs`) — never sourced.
 [ -f ${WHALEBYTE}/.env ] && source ${WHALEBYTE}/.env
 
 unset config_files
