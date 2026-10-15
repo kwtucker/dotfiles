@@ -176,6 +176,20 @@ cmd_validate() {
   printf '%s\n' "✅ Vault is valid JSON ($n key(s)): $VAULT"
 }
 
+# Print key names only (never values), sorted, one per line. An empty vault
+# produces no output so the result is safe to test with [ -z "$(wbs list)" ].
+cmd_list() {
+  need age
+  need jq
+  require_vault
+  new_tmp
+
+  local plain="$tmp/plain.json"
+  decrypt_to "$plain"
+  validate_json "$plain" || die "vault is not valid JSON"
+  jq -r 'keys[]' "$plain"
+}
+
 usage() {
   cat <<EOF
 $PROG — Whalebyte Secrets vault (age passphrase + JSON)
@@ -185,6 +199,7 @@ Usage:
   $PROG edit         Explicitly edit the vault
   $PROG init         Initialize a new empty vault
   $PROG get KEY      Print one value (e.g. export FOO="\$($PROG get FOO)")
+  $PROG list         List key names, sorted (no values)
   $PROG validate     Decrypt and validate the JSON
   $PROG help         Show this help
 
@@ -208,6 +223,7 @@ case "$cmd" in
   edit) cmd_edit "$@" ;;
   init) cmd_init "$@" ;;
   get) cmd_get "$@" ;;
+  list | keys) cmd_list "$@" ;;
   validate | check) cmd_validate "$@" ;;
   help | -h | --help) usage ;;
   *) die "unknown command: $cmd (try '$PROG help')" ;;

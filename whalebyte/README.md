@@ -47,6 +47,7 @@ overwrites `.secret`.
 | `wbs` / `wbs edit` | Decrypt, edit in Neovim, validate, re-encrypt |
 | `wbs init` | Create a new empty vault (fails if one exists) |
 | `wbs get KEY` | Decrypt and print one value to stdout |
+| `wbs list` | Decrypt and print key names, sorted (no values) |
 | `wbs validate` | Decrypt and validate the JSON, report the key count |
 | `wbs help` | Usage |
 
