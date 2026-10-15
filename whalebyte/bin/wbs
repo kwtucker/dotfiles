@@ -1,0 +1,214 @@
+#!/usr/bin/env bash
+# wbs — Whalebyte Secrets vault.
+#
+# A passphrase-protected, age-encrypted JSON store for personal secrets.
+# The vault lives outside this repository at $WHALEBYTE/.secret and is NEVER
+# sourced by the shell. Decrypted plaintext only ever exists in a 0700 temp
+# directory next to the vault and is removed on exit (including on error).
+#
+#   age (--passphrase, scrypt)  → encrypt / decrypt
+#   jq                          → validate + key lookup
+#   nvim                        → edit
+#
+# See whalebyte/README.md for setup, recovery, and security limitations.
+set -euo pipefail
+
+VAULT_DIR="${WHALEBYTE:-$HOME/.whalebyte}"
+VAULT="${VAULT_DIR}/.secret"
+WBS_EDITOR="${WBS_EDITOR:-nvim}"
+PROG="$(basename "$0")"
+
+tmp=""
+cleanup() {
+  if [ -n "$tmp" ]; then
+    rm -rf "$tmp"
+    tmp=""
+  fi
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+die() { printf '%s: error: %s\n' "$PROG" "$*" >&2; exit 1; }
+note() { printf '%s: %s\n' "$PROG" "$*" >&2; }
+
+need() {
+  command -v "$1" >/dev/null 2>&1 || die "missing dependency '$1' — run 'make whalebyte' (age comes from mise, jq from mise/nvim)"
+}
+
+new_tmp() {
+  [ -d "$VAULT_DIR" ] || die "vault directory not found: $VAULT_DIR (run 'make whalebyte')"
+  tmp="$(mktemp -d "${VAULT_DIR}/.wbs.XXXXXX")" || die "could not create temp dir in $VAULT_DIR"
+  chmod 700 "$tmp"
+}
+
+# Decrypt the vault to $1 (0600). Returns non-zero (message) on failure.
+decrypt_to() {
+  local dest="$1"
+  if ! age --decrypt --output "$dest" "$VAULT"; then
+    die "decryption failed (wrong passphrase, corrupt vault, or not an age file)"
+  fi
+  chmod 600 "$dest"
+}
+
+# Encrypt $1 (plaintext) to $2 (ciphertext).
+encrypt_from() {
+  local src="$1" dest="$2"
+  if ! age --passphrase --output "$dest" "$src"; then
+    die "encryption failed; vault left unchanged"
+  fi
+}
+
+validate_json() { jq -e . "$1" >/dev/null 2>&1; }
+
+require_vault() {
+  [ -f "$VAULT" ] || die "no vault at $VAULT — create one with '$PROG init'"
+}
+
+# Open the editor with swap/backup/undo/shada disabled for this plaintext file.
+# -c runs AFTER the first file is read, so it wins over the user config
+# (nvim/lua/config/options.lua sets undofile = true).
+edit_file() {
+  "$WBS_EDITOR" -n -i NONE \
+    --cmd 'set nobackup nowritebackup noundofile noswapfile' \
+    -c 'set nobackup nowritebackup noundofile noswapfile' \
+    -- "$1"
+}
+
+confirm() {
+  local reply
+  if ! read -r -p "$1 [y/N] " reply </dev/tty 2>/dev/null; then
+    return 1
+  fi
+  case "$reply" in [yY] | [yY][eE][sS]) return 0 ;; *) return 1 ;; esac
+}
+
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
+
+cmd_init() {
+  need age
+  need jq
+  [ -e "$VAULT" ] && die "vault already exists at $VAULT — refusing to overwrite (move or remove it first)"
+  new_tmp
+
+  local plain="$tmp/plain.json"
+  printf '{}\n' >"$plain"
+  chmod 600 "$plain"
+
+  note "creating new vault at $VAULT"
+  encrypt_from "$plain" "$tmp/new.enc"
+  chmod 600 "$tmp/new.enc"
+  mv -f "$tmp/new.enc" "$VAULT"
+  printf '%s\n' "✅ Initialized empty vault: $VAULT"
+  printf '%s\n' "   Add secrets with:  $PROG   (or '$PROG edit')"
+}
+
+cmd_edit() {
+  need age
+  need jq
+  need "$WBS_EDITOR"
+  require_vault
+  new_tmp
+
+  local plain="$tmp/plain.json" orig="$tmp/orig.json"
+  note "decrypting $VAULT"
+  decrypt_to "$plain"
+  validate_json "$plain" || die "vault is not valid JSON — refusing to edit"
+
+  cp "$plain" "$orig"
+  chmod 600 "$orig"
+
+  # Edit / validate / re-encrypt loop.
+  while :; do
+    if ! edit_file "$plain"; then
+      die "editor exited with an error; vault left unchanged"
+    fi
+    if cmp -s "$plain" "$orig"; then
+      printf '%s\n' "No changes; vault left unchanged."
+      return 0
+    fi
+    if validate_json "$plain"; then
+      break
+    fi
+    note "edited content is not valid JSON"
+    if ! confirm "Re-open the editor?"; then
+      die "aborting; vault left unchanged"
+    fi
+  done
+
+  encrypt_from "$plain" "$tmp/new.enc"
+  chmod 600 "$tmp/new.enc"
+  mv -f "$tmp/new.enc" "$VAULT"
+  printf '%s\n' "✅ Vault updated: $VAULT"
+}
+
+cmd_get() {
+  local key="${1:-}"
+  [ -n "$key" ] || die "usage: $PROG get KEY"
+  need age
+  need jq
+  require_vault
+  new_tmp
+
+  local plain="$tmp/plain.json"
+  decrypt_to "$plain"
+  validate_json "$plain" || die "vault is not valid JSON"
+
+  if ! jq -e --arg k "$key" 'has($k)' "$plain" >/dev/null; then
+    die "key not found: $key"
+  fi
+  jq -r --arg k "$key" '.[$k]' "$plain"
+}
+
+cmd_validate() {
+  need age
+  need jq
+  require_vault
+  new_tmp
+
+  local plain="$tmp/plain.json"
+  decrypt_to "$plain"
+  validate_json "$plain" || die "vault is not valid JSON"
+  local n
+  n="$(jq 'length' "$plain")"
+  printf '%s\n' "✅ Vault is valid JSON ($n key(s)): $VAULT"
+}
+
+usage() {
+  cat <<EOF
+$PROG — Whalebyte Secrets vault (age passphrase + JSON)
+
+Usage:
+  $PROG              Open the vault in $WBS_EDITOR (same as '$PROG edit')
+  $PROG edit         Explicitly edit the vault
+  $PROG init         Initialize a new empty vault
+  $PROG get KEY      Print one value (e.g. export FOO="\$($PROG get FOO)")
+  $PROG validate     Decrypt and validate the JSON
+  $PROG help         Show this help
+
+Environment:
+  WHALEBYTE          Vault directory (default: \$HOME/.whalebyte)
+  WBS_EDITOR         Editor to use (default: nvim)
+EOF
+}
+
+# ---------------------------------------------------------------------------
+# Dispatch
+# ---------------------------------------------------------------------------
+
+cmd="edit"
+if [ "$#" -gt 0 ]; then
+  cmd="$1"
+  shift
+fi
+
+case "$cmd" in
+  edit) cmd_edit "$@" ;;
+  init) cmd_init "$@" ;;
+  get) cmd_get "$@" ;;
+  validate | check) cmd_validate "$@" ;;
+  help | -h | --help) usage ;;
+  *) die "unknown command: $cmd (try '$PROG help')" ;;
+esac
