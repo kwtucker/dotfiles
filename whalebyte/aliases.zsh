@@ -3,4 +3,4 @@
 alias wbc="cd $WHALEBYTE/code"
 # wbs is the secrets-vault CLI (~/.local/bin/wbs), not an alias.
 alias wbe="vim $WHALEBYTE/.env"
-alias wbn="cd $WHALEBYTE/Notes/"
+alias wbn="cd $WHALEBYTE/pkm/"
