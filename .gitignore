@@ -8,6 +8,10 @@ zsh/local
 mise.local.toml
 modules.local.mk
 
+# Secrets — defense-in-depth (the installed global gitignore also covers these).
+*.secret
+*.env
+
 nvim/autoload
 
 git/config.local
