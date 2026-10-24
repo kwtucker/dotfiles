@@ -17,6 +17,8 @@ install: .ensure.xdg.whalebyte
 	# wbs — the secrets-vault CLI. Symlinked (not sourced) so updates to the
 	# tracked script take effect immediately. See whalebyte/README.md.
 	# ~/.local/bin is created by the bin/zsh modules (as git's `wt` relies on).
+	@mkdir -p $(HOME)/.config/age
+	@chmod 700 $(HOME)/.config/age
 	@chmod +x $(CURDIR)/bin/wbs
 	@ln -sfn $(CURDIR)/bin/wbs $(LOCAL_BIN)/wbs
 	# Dependencies come from mise (age, jq); nvim is only needed to edit.
