@@ -58,8 +58,8 @@ overwrites `.secret`.
 Nothing is auto-exported at shell startup. Pull values on demand:
 
 ```sh
-export SPOTIFY_ID="$(wbs get SPOTIFY_ID)"
-SPOTIFY_SECRET="$(wbs get SPOTIFY_SECRET)" command-uses-it
+export API_KEY="$(wbs get API_KEY)"
+OTHER_SECRET="$(wbs get OTHER_SECRET)" some-command
 ```
 
 ### How it works
@@ -128,8 +128,8 @@ The vault stores a JSON object of string keys → values, e.g.:
 
 ```json
 {
-  "SPOTIFY_ID": "…",
-  "SPOTIFY_SECRET": "…"
+  "EXAMPLE_ID": "replace-me",
+  "EXAMPLE_SECRET": "replace-me"
 }
 ```
 
