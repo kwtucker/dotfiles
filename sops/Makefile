@@ -12,8 +12,13 @@ install: .ensure.xdg.sops
 	@mkdir -p $(HOME)/.local/bin
 	@chmod 700 $(HOME)/.config/sops
 	@chmod 700 $(HOME)/.config/age
-	@printf '%s\n' '#!/usr/bin/env bash' 'IDENTITY="$${WBS_IDENTITY:-$$HOME/.config/age/wbs-identity.age}"' 'exec age -d "$$IDENTITY"' > $(HOME)/.local/bin/sops-age-key-from-wbs
-	@chmod +x $(HOME)/.local/bin/sops-age-key-from-wbs
+	@if [ ! -x "$(HOME)/.local/bin/sops-age-key-from-wbs" ]; then \
+		echo "Installing sops-age-key helper..."; \
+		printf '%s\n' '#!/usr/bin/env bash' 'IDENTITY="$${WBS_IDENTITY:-$$HOME/.config/age/wbs-identity.age}"' 'exec age -d "$$IDENTITY"' > $(HOME)/.local/bin/sops-age-key-from-wbs; \
+		chmod +x $(HOME)/.local/bin/sops-age-key-from-wbs; \
+	else \
+		echo "✅ sops-age-key-from-wbs already installed"; \
+	fi
 	@echo "✅ $(MODULE_NAME) installed."
 
 clean: .remove.xdg.sops
