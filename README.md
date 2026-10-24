@@ -98,7 +98,7 @@ Configuration is split into independent modules, each in its own directory with 
 | `git/` | Git config, aliases, delta pager |
 | `fzf/` | fzf config and shell integration |
 | `alacritty/` | Alacritty terminal config |
-| `golang/` | Go environment variables |
+| `golang/` | Go environment variables; `gofumpt`, `goimports`, `staticcheck`, `govulncheck` (binary: mise) |
 | `kubernetes/` | kubectl aliases + completions (binary: mise) |
 | `helm/` | Helm config + completions (binary: mise) |
 | `terraform/` | Terraform config (binary: mise) |

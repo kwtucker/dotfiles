@@ -42,7 +42,17 @@ terraform = "1.14.8"
 "cargo:stylua"               = "2.5.2"
 "aqua:jqlang/jq"             = "1.8.2"
 "aqua:FiloSottile/age"       = "1.3.2"
+"aqua:getsops/sops"          = "3.11.0"
 "aqua:fullstorydev/grpcurl"  = "1.9.4"
+
+# ── Go tooling ────────────────────────────────────────────────────────────────
+# Prebuilt binaries where upstream publishes them; goimports and govulncheck
+# have no release assets, so they build via `go install` (go: backend).
+# staticcheck releases are date-based (2026.2.2 is module v0.8.2).
+"aqua:mvdan/gofumpt"                   = "0.12.0"
+"github:dominikh/go-tools"             = "2026.2.2"  # staticcheck
+"go:golang.org/x/tools/cmd/goimports"  = "0.52.0"
+"go:golang.org/x/vuln/cmd/govulncheck" = "1.9.0"
 
 # ── LSP servers ───────────────────────────────────────────────────────────────
 "go:golang.org/x/tools/gopls"    = "0.23.0"

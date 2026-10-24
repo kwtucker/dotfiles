@@ -1,21 +1,42 @@
 #!/usr/bin/env bash
 # wbs — Whalebyte Secrets vault.
 #
-# A passphrase-protected, age-encrypted JSON store for personal secrets.
+# An age-encrypted JSON store for personal secrets, unlocked by a passphrase.
 # The vault lives outside this repository at $WHALEBYTE/.secret and is NEVER
 # sourced by the shell. Decrypted plaintext only ever exists in a 0700 temp
 # directory next to the vault and is removed on exit (including on error).
 #
-#   age (--passphrase, scrypt)  → encrypt / decrypt
-#   jq                          → validate + key lookup
-#   nvim                        → edit
+# The vault is encrypted to an X25519 public key ($WHALEBYTE/.age-recipient).
+# The matching private key ($WHALEBYTE/.age-identity) is itself encrypted with
+# your passphrase, so a command prompts exactly once (to unlock the identity)
+# and re-encryption never prompts or asks for confirmation.
+#
+#   age / age-keygen  → encrypt, decrypt, key management
+#   jq                → validate + key lookup
+#   nvim              → edit
 #
 # See whalebyte/README.md for setup, recovery, and security limitations.
 set -euo pipefail
 
 VAULT_DIR="${WHALEBYTE:-$HOME/.whalebyte}"
 VAULT="${VAULT_DIR}/.secret"
-WBS_EDITOR="${WBS_EDITOR:-nvim}"
+# Identity can live outside the vault dir (preferred) or next to it.
+if [ -n "${WBS_IDENTITY:-}" ]; then
+  IDENTITY="$WBS_IDENTITY"
+elif [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/age/wbs-identity.age" ]; then
+  IDENTITY="${XDG_CONFIG_HOME:-$HOME/.config}/age/wbs-identity.age"
+else
+  IDENTITY="${VAULT_DIR}/.age-identity"
+fi
+if [ -n "${WBS_RECIPIENT:-}" ]; then
+  RECIPIENT="$WBS_RECIPIENT"
+elif [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/age/wbs-recipient" ]; then
+  RECIPIENT="${XDG_CONFIG_HOME:-$HOME/.config}/age/wbs-recipient"
+else
+  RECIPIENT="${VAULT_DIR}/.age-recipient"
+fi
+# Respect EDITOR/VISUAL, then WBS_EDITOR, then default to nvim
+WBS_EDITOR="${WBS_EDITOR:-${EDITOR:-${VISUAL:-nvim}}}"
 PROG="$(basename "$0")"
 
 tmp=""
@@ -42,27 +63,37 @@ new_tmp() {
   chmod 700 "$tmp"
 }
 
-# Decrypt the vault to $1 (0600). Returns non-zero (message) on failure.
+# Decrypt the vault to $1 (0600), unlocking the identity with the passphrase.
 decrypt_to() {
   local dest="$1"
-  if ! age --decrypt --output "$dest" "$VAULT"; then
-    die "decryption failed (wrong passphrase, corrupt vault, or not an age file)"
+  if ! age --decrypt --identity "$IDENTITY" --output "$dest" "$VAULT"; then
+    die "decryption failed (wrong passphrase, corrupt vault, or missing identity)"
   fi
   chmod 600 "$dest"
 }
 
-# Encrypt $1 (plaintext) to $2 (ciphertext).
-encrypt_from() {
-  local src="$1" dest="$2"
-  if ! age --passphrase --output "$dest" "$src"; then
+# Encrypt $2 (plaintext) to $3 (ciphertext) for recipient $1. No prompt.
+encrypt_with() {
+  local recip="$1" src="$2" dest="$3"
+  if ! age --encrypt --recipient "$recip" --output "$dest" "$src"; then
     die "encryption failed; vault left unchanged"
   fi
 }
+
+recipient_key() { cat "$RECIPIENT"; }
 
 validate_json() { jq -e . "$1" >/dev/null 2>&1; }
 
 require_vault() {
   [ -f "$VAULT" ] || die "no vault at $VAULT — create one with '$PROG init'"
+}
+
+require_identity() {
+  [ -f "$IDENTITY" ] || die "no identity at $IDENTITY — create one with '$PROG init' or '$PROG rekey'"
+}
+
+require_recipient() {
+  [ -f "$RECIPIENT" ] || die "no recipient at $RECIPIENT — create one with '$PROG init' or '$PROG rekey'"
 }
 
 # Open the editor with swap/backup/undo/shada disabled for this plaintext file.
@@ -89,20 +120,81 @@ confirm() {
 
 cmd_init() {
   need age
+  need age-keygen
   need jq
   [ -e "$VAULT" ] && die "vault already exists at $VAULT — refusing to overwrite (move or remove it first)"
+  [ -e "$IDENTITY" ] && die "identity already exists at $IDENTITY — refusing to overwrite"
   new_tmp
 
-  local plain="$tmp/plain.json"
-  printf '{}\n' >"$plain"
-  chmod 600 "$plain"
+  # Fresh X25519 keypair.
+  age-keygen --output "$tmp/identity.txt" 2>/dev/null || die "age-keygen failed"
+  chmod 600 "$tmp/identity.txt"
+  local recip
+  recip="$(age-keygen -y "$tmp/identity.txt")" || die "could not derive public key"
 
-  note "creating new vault at $VAULT"
-  encrypt_from "$plain" "$tmp/new.enc"
-  chmod 600 "$tmp/new.enc"
-  mv -f "$tmp/new.enc" "$VAULT"
-  printf '%s\n' "✅ Initialized empty vault: $VAULT"
+  # Protect the identity with the passphrase (prompts enter + confirm once).
+  note "setting a passphrase for the new identity"
+  if ! age --passphrase --output "$tmp/identity.age" "$tmp/identity.txt"; then
+    die "passphrase setup failed; nothing written"
+  fi
+  chmod 600 "$tmp/identity.age"
+  printf '%s\n' "$recip" >"$tmp/recipient"
+  chmod 644 "$tmp/recipient"
+
+  # Empty vault, encrypted to the recipient.
+  printf '{}\n' >"$tmp/plain.json"
+  chmod 600 "$tmp/plain.json"
+  encrypt_with "$recip" "$tmp/plain.json" "$tmp/vault.age"
+  chmod 600 "$tmp/vault.age"
+
+  mv -f "$tmp/identity.age" "$IDENTITY"
+  mv -f "$tmp/recipient" "$RECIPIENT"
+  mv -f "$tmp/vault.age" "$VAULT"
+  printf '%s\n' "✅ Initialized vault: $VAULT"
+  printf '%s\n' "   identity (passphrase-protected): $IDENTITY"
   printf '%s\n' "   Add secrets with:  $PROG   (or '$PROG edit')"
+}
+
+# Convert a legacy passphrase-only (scrypt) vault to the keypair layout.
+cmd_rekey() {
+  need age
+  need age-keygen
+  need jq
+  require_vault
+  [ -e "$IDENTITY" ] && die "identity already exists at $IDENTITY — vault is already keypair-based"
+  new_tmp
+
+  # Unlock the old passphrase-encrypted vault.
+  local plain="$tmp/plain.json"
+  note "unlocking legacy vault $VAULT"
+  if ! age --decrypt --output "$plain" "$VAULT"; then
+    die "decryption failed (wrong passphrase?)"
+  fi
+  chmod 600 "$plain"
+  validate_json "$plain" || die "vault is not valid JSON"
+
+  age-keygen --output "$tmp/identity.txt" 2>/dev/null || die "age-keygen failed"
+  chmod 600 "$tmp/identity.txt"
+  local recip
+  recip="$(age-keygen -y "$tmp/identity.txt")" || die "could not derive public key"
+
+  # The new identity gets its own passphrase (enter + confirm once).
+  note "setting a passphrase for the new identity"
+  if ! age --passphrase --output "$tmp/identity.age" "$tmp/identity.txt"; then
+    die "passphrase setup failed; vault unchanged"
+  fi
+  chmod 600 "$tmp/identity.age"
+  printf '%s\n' "$recip" >"$tmp/recipient"
+  chmod 644 "$tmp/recipient"
+
+  encrypt_with "$recip" "$plain" "$tmp/vault.age"
+  chmod 600 "$tmp/vault.age"
+
+  mv -f "$tmp/identity.age" "$IDENTITY"
+  mv -f "$tmp/recipient" "$RECIPIENT"
+  mv -f "$tmp/vault.age" "$VAULT"
+  printf '%s\n' "✅ Vault rekeyed: $VAULT"
+  printf '%s\n' "   Back up $IDENTITY — without it the vault cannot be decrypted."
 }
 
 cmd_edit() {
@@ -110,6 +202,8 @@ cmd_edit() {
   need jq
   need "$WBS_EDITOR"
   require_vault
+  require_identity
+  require_recipient
   new_tmp
 
   local plain="$tmp/plain.json" orig="$tmp/orig.json"
@@ -138,7 +232,9 @@ cmd_edit() {
     fi
   done
 
-  encrypt_from "$plain" "$tmp/new.enc"
+  local recip
+  recip="$(recipient_key)"
+  encrypt_with "$recip" "$plain" "$tmp/new.enc"
   chmod 600 "$tmp/new.enc"
   mv -f "$tmp/new.enc" "$VAULT"
   printf '%s\n' "✅ Vault updated: $VAULT"
@@ -150,6 +246,7 @@ cmd_get() {
   need age
   need jq
   require_vault
+  require_identity
   new_tmp
 
   local plain="$tmp/plain.json"
@@ -166,6 +263,7 @@ cmd_validate() {
   need age
   need jq
   require_vault
+  require_identity
   new_tmp
 
   local plain="$tmp/plain.json"
@@ -176,12 +274,11 @@ cmd_validate() {
   printf '%s\n' "✅ Vault is valid JSON ($n key(s)): $VAULT"
 }
 
-# Print key names only (never values), sorted, one per line. An empty vault
-# produces no output so the result is safe to test with [ -z "$(wbs list)" ].
 cmd_list() {
   need age
   need jq
   require_vault
+  require_identity
   new_tmp
 
   local plain="$tmp/plain.json"
@@ -192,20 +289,22 @@ cmd_list() {
 
 usage() {
   cat <<EOF
-$PROG — Whalebyte Secrets vault (age passphrase + JSON)
+$PROG — Whalebyte Secrets vault (age X25519 + passphrase-protected identity)
 
 Usage:
   $PROG              Open the vault in $WBS_EDITOR (same as '$PROG edit')
   $PROG edit         Explicitly edit the vault
-  $PROG init         Initialize a new empty vault
-  $PROG get KEY      Print one value (e.g. export FOO="\$($PROG get FOO)")
+  $PROG init         Initialize a new keypair vault (prompts for identity passphrase once)
+  $PROG rekey        Convert a legacy passphrase-only vault to the keypair layout
+  $PROG get KEY      Print one value (prompts once to unlock the identity)
   $PROG list         List key names, sorted (no values)
-  $PROG validate     Decrypt and validate the JSON
+  $PROG validate     Decrypt and validate the JSON, report the key count
   $PROG help         Show this help
 
-Environment:
-  WHALEBYTE          Vault directory (default: \$HOME/.whalebyte)
-  WBS_EDITOR         Editor to use (default: nvim)
+Files:
+  $VAULT              Vault encrypted to \$RECIPIENT (0600)
+  $IDENTITY           Passphrase-encrypted age identity (0600) — BACK IT UP
+  $RECIPIENT          Public key (0644)
 EOF
 }
 
@@ -222,6 +321,7 @@ fi
 case "$cmd" in
   edit) cmd_edit "$@" ;;
   init) cmd_init "$@" ;;
+  rekey) cmd_rekey "$@" ;;
   get) cmd_get "$@" ;;
   list | keys) cmd_list "$@" ;;
   validate | check) cmd_validate "$@" ;;
