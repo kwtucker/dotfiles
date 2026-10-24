@@ -62,5 +62,7 @@ done
 [ -f ${XDG_CONFIG_HOME}/zsh/local ] && source ${XDG_CONFIG_HOME}/zsh/local
 # ${WHALEBYTE}/.secret is an age-encrypted vault (see `wbs`) — never sourced.
 [ -f ${WHALEBYTE}/.env ] && source ${WHALEBYTE}/.env
+# sops config (env/paths) loaded via sops module if present
+[ -f ${XDG_CONFIG_HOME}/sops/env.zsh ] && source ${XDG_CONFIG_HOME}/sops/env.zsh
 
 unset config_files
