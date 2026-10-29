@@ -78,5 +78,6 @@ macos-x64   = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin
 macos-arm64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin-arm64.zip" }
 
 [settings]
+go.set_gobin = false
 not_found_auto_install = false
 yes = true
