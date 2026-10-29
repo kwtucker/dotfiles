@@ -98,7 +98,10 @@ upgrade:
 	@echo "Upgrading $(MODULE_NAME) plugins..."
 	@curl -fsSL git.io/antigen -o $(ZSH_DIR)/antigen.zsh
 	@rm -f "$${ADOTDIR:-$$HOME/.antigen}/.lock"
-	@zsh -ic 'antigen update; antigen apply' || true
+	@zsh -ic 'antigen update'
+	# Rebuild in a fresh non-interactive shell: applying again in the update
+	# shell can generate an empty cache and silently disable every plugin.
+	@$(MAKE) regen-cache
 	@echo "✅ $(MODULE_NAME) upgraded."
 
 # Regenerate the antigen plugin cache. MUST run non-interactively
