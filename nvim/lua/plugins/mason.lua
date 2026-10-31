@@ -1,11 +1,6 @@
--- Full LSP/tool set for laptops. Inside the workspace image ($WORKSPACE_IMAGE,
--- see image/Dockerfile) only the Go/infra subset below is ensured — the full
--- list (pyright, rust-analyzer, eslint, …) would otherwise download hundreds
--- of MB on first nvim launch in every fresh container. Inside the k8s-debug
--- image ($K8S_DEBUG, see kwtucker/k8s-debug) nothing is ensured: it is an
--- ephemeral troubleshooting container, not an editor workstation. Laptop
--- behavior is unchanged. Keep image/Dockerfile's MasonInstall list in sync
--- with the subset here; mason.lua is the source of truth.
+-- Full LSP/tool set for laptops. Inside the k8s-debug image ($K8S_DEBUG, see
+-- kwtucker/k8s-debug) nothing is ensured: it is an ephemeral troubleshooting
+-- container, not an editor workstation. Laptop behavior is unchanged.
 --
 -- NOTE: Lazy merges `ensure_installed` from EVERY mason.nvim spec (core's
 -- stylua/shfmt plus each enabled LazyVim extra's tools), so a table here can
@@ -39,34 +34,13 @@ local ensure_installed_full = {
   "yaml-language-server",
 }
 
-local ensure_installed_workspace = {
-  "docker-compose-language-service",
-  "dockerfile-language-server",
-  "gofumpt",
-  "goimports",
-  "golangci-lint",
-  "golangci-lint-langserver",
-  "gomodifytags",
-  "gopls",
-  "json-lsp",
-  "lua-language-server",
-  "shellcheck",
-  "shfmt",
-  "staticcheck",
-  "stylua",
-  "taplo",
-  "terraform-ls",
-  "yaml-language-server",
-}
-
 return {
   {
     "mason-org/mason.nvim",
     opts = vim.env.K8S_DEBUG and function(_, opts)
       opts.ensure_installed = {}
     end or {
-      ensure_installed = vim.env.WORKSPACE_IMAGE and ensure_installed_workspace
-        or ensure_installed_full,
+      ensure_installed = ensure_installed_full,
     },
   },
   {

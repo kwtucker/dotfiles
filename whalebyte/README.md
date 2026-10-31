@@ -3,7 +3,7 @@
 Personal, **local-only** module. It manages `~/.whalebyte` (code, notes, and a
 passphrase-protected secrets vault) and installs the `wbs` secrets CLI. It is
 enabled per-machine via `modules.local.mk` (`LOCAL_MODULES = whalebyte`) and is
-intentionally **not** part of the public module set or the workspace image.
+intentionally **not** part of the public module set.
 
 ## Secrets vault (`wbs`)
 

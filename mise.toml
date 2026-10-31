@@ -65,7 +65,7 @@ terraform = "1.14.8"
 # opencode v2 ships from opencode.ai rather than GitHub releases, so it needs
 # mise's http backend. The "2" prefix resolves to the newest 2.x through
 # version_list_url — a future v3 will not arrive without a deliberate bump
-# here. Client-side only: intentionally absent from image/mise.workspace.toml.
+# here. Client-side only.
 [tools."http:opencode"]
 version           = "2"
 version_list_url  = "https://opencode.ai/update/api/latest/cli/npm"

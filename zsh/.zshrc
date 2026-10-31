@@ -43,10 +43,7 @@ export ANTIGEN_COMPDUMP="$XDG_CACHE_HOME/zsh/zcompdump"
 
 # Load antigen plugins
 source $XDG_CONFIG_HOME/zsh/antigen.zsh
-if [[ -z "${WORKSPACE_IMAGE:-}" ]]; then
-  # Needs a browser — laptop only, skipped in containers.
-  antigen bundle paulirish/git-open
-fi
+antigen bundle paulirish/git-open
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle Aloxaf/fzf-tab

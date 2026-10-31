@@ -68,15 +68,8 @@ update: install ## Update an existing machine (alias for `install`)
 
 clean.all: $(CLEAN) ## Clean all modules
 
-outdated: ## Show outdated tools (laptop + workspace image, no changes)
-	@echo "== mise.toml (laptop) =="
+outdated: ## Show outdated tools (no changes)
 	@mise outdated || true
-	@echo ""
-	@echo "== image/mise.workspace.toml (workspace image) =="
-	@TMPDIR=$$(mktemp -d); \
-	cp $(CURDIR)/image/mise.workspace.toml "$$TMPDIR/mise.toml"; \
-	mise --cd "$$TMPDIR" outdated || true; \
-	rm -rf "$$TMPDIR"
 	@echo ""
 	@echo "Tip: 'mise outdated --bump' shows versions outside pinned ranges (bumps stay manual)."
 
