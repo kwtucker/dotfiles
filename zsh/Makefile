@@ -108,8 +108,7 @@ upgrade:
 # (_ANTIGEN_INTERACTIVE=false) so antigen captures bundle sources —
 # `antigen cache-gen` from an interactive shell writes an EMPTY cache,
 # silently disabling every plugin (fzf-tab, autosuggestions, ...).
-# Run this on the machine where the shell will be used: WORKSPACE_IMAGE
-# gates laptop-only bundles (e.g. git-open) at generation time.
+# Run this on the machine where the shell will be used.
 regen-cache:
 	@echo "Regenerating antigen cache..."
 	@rm -f "$${ADOTDIR:-$$HOME/.antigen}/init.zsh" "$${ADOTDIR:-$$HOME/.antigen}/init.zsh.zwc"

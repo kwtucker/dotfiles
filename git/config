@@ -50,7 +50,7 @@
 # For private-repo fetches over HTTPS you need a credential helper — see
 # [credential] below and git/config.local.example. Changed from
 # `insteadOf` on 2026-09-15: the global fetch rewrite broke every
-# github.com clone where no SSH keys exist (workspace image, CI).
+# github.com clone where no SSH keys exist (containers, CI).
 [url "git@github.com:"]
   pushInsteadOf = https://github.com/
 
