@@ -1,7 +1,18 @@
 return {
   {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        marksman = {},
+      },
+    },
+  },
+  {
     "MeanderingProgrammer/render-markdown.nvim",
     opts = {
+      anti_conceal = {
+        enabled = true,
+      },
       code = {
         sign = false,
         width = "block",

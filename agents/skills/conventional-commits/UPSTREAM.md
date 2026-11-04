@@ -13,15 +13,15 @@
 Run from this dotfiles repo:
 
 ```bash
-make -C opencode sync-skills
+make -C agents sync-skills
 ```
 
 Or directly:
 
 ```bash
-./opencode/skills/conventional-commits/sync.sh
+bash ./agents/skills/conventional-commits/sync.sh
 ```
 
-The script re-downloads both raw files from `main`, re-applies the OpenCode
-adaptations to `SKILL.md`, and prints the new upstream SHA so you can update
-the line above. Review the diff with `git diff` before committing.
+The script re-downloads both raw files from `main`, re-applies the portable
+adaptations to `SKILL.md`, and reminds you to record the upstream SHA above.
+Review the diff with `git diff` before committing.

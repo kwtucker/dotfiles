@@ -18,13 +18,12 @@ include env.mk
 
 MODULES = \
 	  bin zsh alacritty fzf tmux git golang kubernetes helm terraform docker \
-	  bat nvim psql ripgrep fonts rust opencode $(LOCAL_MODULES)
+	  bat nvim psql ripgrep fonts rust agents opencode $(LOCAL_MODULES)
 
 # Optional modules — installed on demand (`make <module>`), not part of `make all`.
-# Currently none; keep the mechanism for future use.
-OPTIONAL_MODULES =
+OPTIONAL_MODULES = copilot
 
-TARGETS := $(MODULES) $(OPTIONAL_MODULES)
+TARGETS := $(MODULES) $(filter-out $(MODULES),$(OPTIONAL_MODULES))
 
 CLEAN := $(addsuffix .clean,$(TARGETS))
 
@@ -41,6 +40,9 @@ $(TARGETS):
 	else \
 		echo "==> Skipping $@ (no completions target)"; \
 	fi
+
+# Install shared skills once, before either client (including parallel installs).
+opencode copilot: agents
 
 $(CLEAN):
 	$(MAKE) -C $(basename $@) clean
@@ -111,4 +113,3 @@ help: ## Show this help message
 	echo "  make prune.tools    # Remove superseded mise tool versions"; \
 	echo "  make upgrade.plugins # Upgrade editor/shell plugins"; \
 	echo "  make upgrade.all    # Upgrade tools + plugins"
-

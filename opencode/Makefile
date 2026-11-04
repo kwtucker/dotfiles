@@ -47,9 +47,8 @@ clean: .remove.xdg.opencode
 	@mise uninstall $(OPENCODE_TOOL) || true
 	@echo "✅ $(MODULE_NAME) cleaned."
 
-# Re-vendor the conventional-commits skill from upstream claude-kit.
-# Pass a pinned commit with: make -C opencode sync-skills SKILL_SYNC_ARGS="--sha <sha>"
+# Compatibility alias: shared skills now belong to the agents module.
 SKILL_SYNC_ARGS ?=
 
 sync-skills:
-	@./skills/conventional-commits/sync.sh $(SKILL_SYNC_ARGS)
+	@$(MAKE) -C ../agents sync-skills SKILL_SYNC_ARGS="$(SKILL_SYNC_ARGS)"

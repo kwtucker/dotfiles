@@ -1,92 +1,72 @@
--- Full LSP/tool set for laptops. Inside the k8s-debug image ($K8S_DEBUG, see
--- kwtucker/k8s-debug) nothing is ensured: it is an ephemeral troubleshooting
--- container, not an editor workstation. Laptop behavior is unchanged.
---
--- NOTE: Lazy merges `ensure_installed` from EVERY mason.nvim spec (core's
--- stylua/shfmt plus each enabled LazyVim extra's tools), so a table here can
--- only ADD entries. Under $K8S_DEBUG we use function form instead: lazy runs
--- user opts functions after the core+extras merge, so assigning {} wipes the
--- whole merged list. tree-sitter-cli is unaffected — LazyVim installs it
--- on demand in util/treesitter.lua, outside ensure_installed.
-local ensure_installed_full = {
-  "docker-compose-language-service",
-  "dockerfile-language-server",
-  "eslint-lsp",
-  "gofumpt",
-  "goimports",
-  "golangci-lint",
-  "golangci-lint-langserver",
-  "gomodifytags",
-  "gopls",
-  "json-lsp",
-  "lua-language-server",
-  "prettier",
-  "pyright",
-  "ruff",
-  "rust-analyzer",
-  "shellcheck",
-  "shfmt",
-  "staticcheck",
-  "stylua",
-  "taplo",
-  "terraform-ls",
-  "typescript-language-server",
-  "yaml-language-server",
-}
+local tools = require("config.tooling")
 
 return {
   {
     "mason-org/mason.nvim",
-    opts = vim.env.K8S_DEBUG and function(_, opts)
-      opts.ensure_installed = {}
-    end or {
-      ensure_installed = ensure_installed_full,
-    },
+    opts = function(_, opts)
+      -- mise/system tools take precedence; Mason supplies editor-only tools.
+      opts.PATH = "append"
+      local packages = tools.workspace and vim.deepcopy(tools.workspace_packages)
+        or vim.list_extend(vim.deepcopy(opts.ensure_installed or {}), {
+          "docker-compose-language-service",
+          "dockerfile-language-server",
+          "eslint-lsp",
+          "helm-ls",
+          "json-lsp",
+          "lua-language-server",
+          "prettier",
+          "pyright",
+          "rust-analyzer",
+          "shellcheck",
+          "shfmt",
+          "taplo",
+          "vtsls",
+          "yaml-language-server",
+        })
+      local seen = {}
+      tools.mason_ensure = {}
+      for _, name in ipairs(packages) do
+        -- The Rust extra requests codelldb even without a DAP plugin. Debugger
+        -- tooling is not part of this editor workflow.
+        local debugger = name == "codelldb" or name == "delve"
+        if not tools.debug and not debugger and not tools.mise_packages[name] and not seen[name] then
+          seen[name] = true
+          tools.mason_ensure[#tools.mason_ensure + 1] = name
+        end
+      end
+      -- Headless maintenance installs explicitly and waits for completion.
+      opts.ensure_installed = tools.maintenance and {} or tools.mason_ensure
+    end,
   },
   {
     "neovim/nvim-lspconfig",
-    dependencies = {
-      "mason-org/mason.nvim",
-    },
-    config = function()
-      local lspconfig = require("lspconfig")
-
-      lspconfig.gopls.setup({
-        cmd = { "gopls" },
-        filetypes = { "go", "gomod", "gowork", "gotmpl" },
-        root_dir = lspconfig.util.root_pattern("go.work", "go.mod", ".git"),
-        settings = {
-          gopls = {
-            analyses = {
-              unusedparams = true,
-            },
-            hints = {
-              assignVariableTypes = false,
-              compositeLiteralTypes = false,
-              compositeLiteralFields = false,
-              parameterNames = false,
-            },
-            gofumpt = true,
-            staticcheck = true,
-            completeUnimported = true,
-            buildFlags = { "-tags=unit,integration" },
-          },
-        },
-        on_attach = function(client, bufnr)
-          -- Keybindings and other settings for LSP on_attach
-          local function buf_set_keymap(...)
-            vim.api.nvim_buf_set_keymap(bufnr, ...)
+    opts = function(_, opts)
+      local packages = { gopls = "gopls", marksman = "marksman", ruff = "ruff", terraformls = "terraform-ls" }
+      local commands = {
+        gopls = { "gopls" },
+        marksman = { "marksman", "server" },
+        ruff = { "ruff", "server" },
+        terraformls = { "terraform-ls", "serve" },
+      }
+      for name, server in pairs(opts.servers) do
+        if name ~= "*" then
+          if tools.workspace and not tools.workspace_servers[name] then
+            opts.servers[name] = { enabled = false }
+          elseif type(server) == "table" then
+            if tools.debug or tools.maintenance or tools.mise_packages[packages[name]] then
+              server.mason = false
+            end
+            if tools.mise_packages[packages[name]] then
+              -- Resolve project pins through mise, even when Neovim changes roots.
+              server.cmd = vim.list_extend({ "mise", "exec", "--" }, commands[name])
+            end
           end
-          local opts = { noremap = true, silent = true }
-
-          buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-          buf_set_keymap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-          buf_set_keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-          buf_set_keymap("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
-          buf_set_keymap("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
-          buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
-        end,
-      })
+        end
+      end
     end,
   },
+  -- Rustaceanvim manages its own LSP outside lspconfig, so disabling the server
+  -- table alone would not enforce the workspace's Go/infra-only profile.
+  { "mrcjkb/rustaceanvim", optional = true, enabled = not tools.workspace },
+  { "Saecki/crates.nvim", optional = true, enabled = not tools.workspace },
 }
