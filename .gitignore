@@ -36,3 +36,5 @@ packer_compiled.lua
 
 opencode/node_modules
 opencode/service.json
+
+copilot/settings.json.lock
