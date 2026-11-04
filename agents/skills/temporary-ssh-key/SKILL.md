@@ -207,6 +207,46 @@ identity files or required connection settings; investigate those only if needed
 without persistently changing work authentication. Do not claim authentication
 succeeded unless an authorized connection test actually succeeded.
 
+### GitHub: include authentication and push commands
+
+For GitHub workflows, always provide both the authentication check and the actual
+one-time push command; do not stop at key registration or the SSH test. Substitute
+the actual generated private-key path, intended repository, and branch. Inspect
+the push remote and current branch when available instead of assuming `origin`
+and `main`; ask if the intended target is ambiguous. Use clearly labeled
+placeholders when the target is unknown.
+
+For a direct GitHub connection, isolate the temporary key from work SSH settings:
+
+```sh
+ssh -F /dev/null -o IdentitiesOnly=yes -i "/absolute/key-directory/id_ed25519" -T git@github.com
+```
+
+Explain that success should greet the intended GitHub username, and GitHub's SSH
+test normally exits with status 1 even after successful authentication. If it
+greets the wrong account, stop before pushing. `-F /dev/null` bypasses SSH config;
+if a required proxy or other connection setting is needed, investigate and adapt
+the one-time command rather than changing persistent configuration.
+
+If the confirmed push remote uses SSH, provide this command with the actual
+remote and branch substituted for `REMOTE` and `BRANCH`:
+
+```sh
+git -c core.sshCommand="ssh -F /dev/null -o IdentitiesOnly=yes -i '/absolute/key-directory/id_ed25519'" \
+  push REMOTE BRANCH
+```
+
+Quote the actual key path safely for both shell-parsing layers. If the remote
+uses HTTPS, `core.sshCommand` alone will not switch its transport; instead provide
+an explicit SSH destination such as `git@github.com:OWNER/REPOSITORY.git`, after
+confirming the target. Neither approach should change saved remotes or config.
+Never add `--force` or disable host-key verification. Providing the command does
+not authorize the agent to execute a push; do so only when separately requested.
+
+Remind the user to enter the key passphrase at the hidden prompt, and include
+the cleanup reminders after the push instructions: revoke the GitHub key, remove
+the generated local files, and restore any temporary `config.local` email change.
+
 Temporary directories may be removed by the operating system. This key is for
 short-lived use, not durable access or recovery.
 
