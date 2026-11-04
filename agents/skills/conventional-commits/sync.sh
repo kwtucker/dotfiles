@@ -20,7 +20,7 @@ echo "Fetching upstream SKILL.md + specification.md (ref: ${REF})..."
 curl -fsSL "${UPSTREAM_BASE}/SKILL.md" -o "${TMP_DIR}/SKILL.upstream.md"
 curl -fsSL "${UPSTREAM_BASE}/references/specification.md" -o "${TMP_DIR}/specification.md"
 
-# Re-apply OpenCode adaptations:
+# Re-apply portable skill adaptations:
 # 1. name: commit -> name: conventional-commits (must match folder name)
 # 2. drop Claude-only `user-invocable: true`
 # 3. append Reference pointer if not already present

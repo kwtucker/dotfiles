@@ -47,7 +47,8 @@ skipped automatically (tools are still topped up). Force a full pass with
 
 All CLI tools and language runtimes are declared in [`mise.toml`](./mise.toml) and managed by [mise](https://mise.jdx.dev). This replaces Nix, asdf, nvm, and any other version managers with a single file.
 
-Tools that must stay machine-local instead of shared are provisioned per-machine by their module: the module writes a fragment to `~/.config/mise/conf.d/<module>.toml`, which mise merges automatically. The `opencode` module works this way.
+OpenCode and Copilot CLI are declared here too. The Copilot Desktop app is
+installed separately; its MCP servers and skills can reuse the CLI configuration.
 
 ```toml
 [tools]
@@ -76,8 +77,8 @@ exact pins, and `make prune.tools` cleans up superseded versions.
 
 Long-running processes keep the old binary until they restart, so `./install`
 recycles the tmux server automatically when its version changes (skipped when run
-from inside tmux). Editors are not touched — restart nvim, or run `:LspRestart`,
-after bumping nvim or an LSP server so it loads the new binary.
+from inside tmux). Editors are not touched — restart Neovim after changing its
+version, or restart affected LSP clients after changing a server binary.
 
 One exception worth knowing: `rust` is a rustup-managed `stable` channel
 (`~/.local/share/mise/installs/rust/stable` → `~/.cargo/bin`), so it is *not*
@@ -109,9 +110,45 @@ Configuration is split into independent modules, each in its own directory with 
 | `fonts/` | Powerline + Nerd Font (JetBrains Mono) |
 | `rust/` | Rust toolchain + stylua (managed by mise) |
 | `bin/` | Personal scripts |
-| `opencode/` | opencode global config (binary provisioned per-machine via mise) |
+| `agents/` | Shared AI instructions and skills |
+| `opencode/` | OpenCode config, commands, and plugins (binary: mise) |
+| `copilot/` | Optional Copilot CLI config and MCP servers (binary: mise) |
 
 Each module symlinks its config files into the appropriate XDG directory (`~/.config`, `~/.local/share`, etc). Modules are independent — install only what you need. Tool binaries are *not* installed by modules; everything comes from `mise.toml`, so Kubectl, Helm, Docker, and Rust work identically on Linux and macOS (Apple Silicon).
+
+See [`nvim/README.md`](./nvim/README.md) for editor setup and maintenance.
+
+### AI agent configuration
+
+OpenCode and Copilot share [engineering instructions](./agents/instructions/engineering.md)
+and [skills](./agents/skills/) from `agents/`. Client-specific settings and MCP
+definitions stay in `opencode/` and `copilot/`; project guidance stays in each repo.
+
+```bash
+make agents                # Install shared instructions and skills
+make opencode              # Install shared files and OpenCode config
+make copilot               # Install shared files and Copilot config (optional)
+make -C agents sync-skills  # Refresh the commit skill; review the diff
+```
+
+Use the root targets so shared files install before either client. Copilot config
+links into `${COPILOT_HOME:-$HOME/.copilot}` without replacing personal instructions
+or session data. Conflicting files must be merged and moved aside first; clean
+targets for `agents` and `copilot` remove only links owned by this checkout.
+
+- **Go:** the [`go-development` skill](./agents/skills/go-development/SKILL.md)
+  provides the shared workflow; both clients use mise-managed `gopls mcp` for
+  saved-file context and diagnostics.
+- **Terse replies:** the opt-in [`caveman` skill](./agents/skills/caveman/SKILL.md)
+  changes chat style only. See its [usage notes](./agents/skills/caveman/UPSTREAM.md)
+  for activation and updates.
+- **Copilot Desktop:** reuses CLI skills and MCP servers, but manages its own app
+  preferences. Check discovery in **Customize → Skills/MCP** and ensure `gopls`
+  is on the app's PATH.
+
+Existing local skills are left untouched; review overlapping Go or commit skills
+before migrating. See [`agents/EVALUATION.md`](./agents/EVALUATION.md) for discovery
+and quality checks, and [`AGENTS.md`](./AGENTS.md) for repository guidance.
 
 ### Rancher Desktop
 
@@ -161,4 +198,7 @@ Upgrades are split by design: `upgrade.tools` never rewrites version pins
 (`mise upgrade` stays within the ranges in `mise.toml`; bumps stay manual via
 `make outdated` → edit → commit).
 
-There are currently no optional modules. To add one later, list it in `OPTIONAL_MODULES` in the root `Makefile` — it becomes installable via `make <module>` but stays out of `make all`. Or append it to `LOCAL_MODULES` in `modules.local.mk` to include it in `make all` on that machine.
+`copilot` is an optional module: install it with `make copilot`, or append it to
+`LOCAL_MODULES` in `modules.local.mk` to include it in `make all` on that machine.
+Additional optional modules can be listed in `OPTIONAL_MODULES` in the root
+`Makefile`.

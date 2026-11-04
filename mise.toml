@@ -55,6 +55,7 @@ terraform = "1.14.8"
 "go:golang.org/x/vuln/cmd/govulncheck" = "1.9.0"
 
 # ── LSP servers ───────────────────────────────────────────────────────────────
+"aqua:artempyanykh/marksman"     = "2026-02-08"
 "go:golang.org/x/tools/gopls"    = "0.23.0"
 "aqua:hashicorp/terraform-ls"    = "0.39.0"
 "aqua:terraform-linters/tflint"  = "0.64.0"
@@ -62,6 +63,11 @@ terraform = "1.14.8"
 "aqua:terraform-docs/terraform-docs" = "0.24.0"
 
 # ── AI agents ────────────────────────────────────────────────────────────────
+# CLI only; the Copilot Desktop app is installed separately. MCP and skills are
+# shared with Desktop via the user configuration, not a second tool install.
+[tools."aqua:github/copilot-cli"]
+version = "1.0.105"
+
 # opencode v2 ships from opencode.ai rather than GitHub releases, so it needs
 # mise's http backend. The "2" prefix resolves to the newest 2.x through
 # version_list_url — a future v3 will not arrive without a deliberate bump

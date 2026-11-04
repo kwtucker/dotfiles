@@ -4,7 +4,16 @@
   "default_agent": "plan",
   "update": "notify",
   "formatter": true,
+  "instructions": ["~/.agents/instructions/engineering.md"],
   "worktree": {
     "directory": "~/.wt/"
+  },
+  "mcp": {
+    "servers": {
+      "gopls": {
+        "type": "local",
+        "command": ["gopls", "mcp"]
+      }
+    }
   }
 }
