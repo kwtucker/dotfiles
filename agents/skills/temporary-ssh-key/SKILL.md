@@ -250,22 +250,78 @@ the generated local files, and restore any temporary `config.local` email change
 Temporary directories may be removed by the operating system. This key is for
 short-lived use, not durable access or recovery.
 
-## 5. Explain cleanup; do not perform it automatically
+## 5. Provide session-specific cleanup; do not perform it automatically
 
-1. Remove this specific public key from the destination's `authorized_keys`, or
-   delete this temporary key from GitHub. Preserve all other authorized keys.
-2. After the user confirms they are finished, delete only the generated private
-   key, its `.pub` file, and `public-key.png` if this workflow created it. Then use
-   `rmdir` on the exact generated directory. Never recursively delete a broad path
-   or clean unrelated SSH files. QR images and copied public-key text on other
-   devices are not removed by local cleanup.
-3. If the user independently added this key to an SSH agent, remove only that
-   identity; never clear the entire agent.
-4. If `config.local` was temporarily changed for personal commits, remind the
-   user to **switch the email back to its exact previous setting**, preserving
-   other changes. Verify the effective author/committer again in the repository
-   where they will resume work. Exiting the history-isolated shell does not undo
-   edits to `config.local`.
+Finish by providing a copyable cleanup checklist and commands with the actual
+absolute paths generated in this session, not just generic cleanup advice. Track
+the key directory, public-key fingerprint, and any PNG created by this workflow.
+Do not discover deletion targets by globbing temporary directories, using a
+possibly stale shell variable, or including keys from earlier sessions.
+
+### Revoke remote authorization first
+
+- For GitHub, direct the user to **Settings → SSH and GPG keys** and identify the
+  temporary key by its title and recorded public-key fingerprint. For an SSH
+  server, remove only this public-key entry from the destination user's
+  `authorized_keys`. Preserve all other keys.
+- Ask the user to confirm remote revocation before proceeding with local
+  deletion. Do not claim revocation happened merely because commands were shown
+  or local files were removed. If revocation cannot be completed, clearly report
+  that remote authorization remains; do not silently mark cleanup complete.
+- If the user independently added this key to an SSH agent, explain how to remove
+  only this identity while its public-key file is still available. Never clear
+  the entire agent or assume the workflow added the key.
+
+### Remove only the generated local files
+
+After the user confirms they are finished and remote authorization was revoked,
+provide commands like these, substituting the recorded absolute directory:
+
+```sh
+rm -i \
+  "/absolute/key-directory/id_ed25519" \
+  "/absolute/key-directory/id_ed25519.pub"
+rmdir "/absolute/key-directory"
+```
+
+Add the exact `public-key.png` path to the `rm -i` arguments only if this workflow
+created it. Do not include an unrelated existing image. Explain that `rm -i`
+prompts before each deletion and must be run in the user's interactive terminal,
+not an agent tool that cannot accept their responses. Providing these commands
+does not authorize the agent to execute them.
+
+Use literal, safely quoted paths; refuse cleanup if the directory has been
+replaced by a symlink or its identity is uncertain. `rmdir` must refuse to remove
+a nonempty directory. If deletion is declined or unexpected files remain, leave
+them intact, report incomplete cleanup, and do not retry with recursive or forced
+deletion. Never delete earlier temporary-key directories or unrelated SSH files.
+QR images and copied public-key text on other devices are not removed locally.
+
+### Restore commit identity and end the isolated shell
+
+If `config.local` was temporarily changed for personal commits, remind the user to
+**switch the email back to its exact previous setting**, preserving other changes.
+Verify the effective author/committer in the repository where they will resume
+work:
+
+```sh
+git var GIT_AUTHOR_IDENT
+git var GIT_COMMITTER_IDENT
+```
+
+Exiting the history-isolated shell does not undo edits to `config.local`. After
+restoration and key cleanup, if this workflow set `KEY_DIR` and the user is still
+inside the isolated child shell, provide:
+
+```sh
+unset KEY_DIR
+exit
+```
+
+If no variable was set, omit `unset KEY_DIR`. If the user did not start an isolated
+child shell, omit `exit`; do not inadvertently close their normal terminal. This
+ends the isolated session without clearing unrelated shared history, but does not
+erase terminal scrollback or agent transcripts.
 
 Deleting the local files does not revoke the remote authorization. Do not promise
 secure erasure on SSDs; removing the remote authorization is the revocation step.
