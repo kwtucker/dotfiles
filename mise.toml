@@ -36,6 +36,7 @@ terraform = "1.14.8"
 "aqua:sharkdp/bat"           = "0.26.1"
 "aqua:jesseduffield/lazygit" = "0.66.0"
 "conda:tig"                  = "2.6.1"
+"conda:libqrencode"          = "4.1.1" # Provides the qrencode CLI.
 "aqua:cli/cli"               = "2.102.0"
 "aqua:starship/starship"     = "1.26.0"
 "aqua:docker/cli"            = "29.9.0"

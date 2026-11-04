@@ -1,7 +1,7 @@
 include ../env.mk
 
 AGENTS_HOME := $(HOME)/.agents
-LINKS := skills/conventional-commits skills/go-development skills/caveman instructions/engineering.md
+LINKS := skills/conventional-commits skills/go-development skills/caveman skills/temporary-ssh-key instructions/engineering.md
 
 .PHONY: install clean sync-skills
 
