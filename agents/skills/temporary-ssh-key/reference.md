@@ -15,7 +15,7 @@ temp-ssh-key --version
 On another trusted machine:
 
 ```sh
-mise use -g github:kwtucker/temp-ssh-key@0.1.1
+mise use -g github:kwtucker/temp-ssh-key@0.1.2
 # or
 go install github.com/kwtucker/temp-ssh-key/cmd/temp-ssh-key@latest
 ```
@@ -24,7 +24,7 @@ On an untrusted machine, prefer a one-off pinned download over a persistent
 install, and get the user's explicit approval first:
 
 ```sh
-VERSION=0.1.1
+VERSION=0.1.2
 case "$(uname -s)" in
   Linux) os=linux ;;
   Darwin) os=darwin ;;
@@ -50,7 +50,7 @@ tar -xzf "$archive"
 Delete the temporary directory and archive when the session ends. Do not install to a
 persistent `PATH` location on a machine you do not trust unless the user asks.
 
-Require `0.1.1` or newer. If the tool is missing or older, stop rather than silently
+Require `0.1.2` or newer. If the tool is missing or older, stop rather than silently
 downloading a different version.
 
 ## Output contract
@@ -97,7 +97,8 @@ process with the isolated shell. It refuses to run inside an already isolated sh
 
 - The QR payload is the actual public-key text, not a hosted link; the public key is
   public.
-- Terminal QR uses block characters without ANSI color and requires a TTY. The CLI
+- Terminal QR uses half-block characters (two module rows per text row) without
+  ANSI color and requires a TTY. The CLI
   refuses captured output.
 - If the terminal cannot render it or the scan will not lock, use `--format png`. The
   PNG is written inside the key directory and refuses to overwrite an existing file.
@@ -284,7 +285,7 @@ location, never a repository or synced folder.
 
 - `temp-ssh-key: command not found`: install it; do not assume the skill directory
   contains the executable.
-- Version older than `0.1.1`: upgrade before running the flow.
+- Version older than `0.1.2`: upgrade before running the flow.
 - `create` refuses: it is not a TTY, or QR output was requested without one. Run it
   in the user's terminal; use `--format png` or `text` if QR rendering is impossible.
 - `start` says it is already in an isolated shell: run `create` there instead.

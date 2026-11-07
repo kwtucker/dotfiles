@@ -55,7 +55,7 @@ terraform = "1.14.8"
 "go:golang.org/x/vuln/cmd/govulncheck" = "1.9.0"
 
 # ── Personal tools ────────────────────────────────────────────────────────────
-"github:kwtucker/temp-ssh-key" = "0.1.1"
+"github:kwtucker/temp-ssh-key" = "0.1.2"
 
 # ── LSP servers ───────────────────────────────────────────────────────────────
 "aqua:artempyanykh/marksman"     = "2026-02-08"
