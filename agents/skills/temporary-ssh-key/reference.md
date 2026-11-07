@@ -15,7 +15,7 @@ temp-ssh-key --version
 On another trusted machine:
 
 ```sh
-mise use -g github:kwtucker/temp-ssh-key@0.1.2
+mise use -g github:kwtucker/temp-ssh-key@0.1.3
 # or
 go install github.com/kwtucker/temp-ssh-key/cmd/temp-ssh-key@latest
 ```
@@ -24,7 +24,7 @@ On an untrusted machine, prefer a one-off pinned download over a persistent
 install, and get the user's explicit approval first:
 
 ```sh
-VERSION=0.1.2
+VERSION=0.1.3
 case "$(uname -s)" in
   Linux) os=linux ;;
   Darwin) os=darwin ;;
@@ -50,7 +50,7 @@ tar -xzf "$archive"
 Delete the temporary directory and archive when the session ends. Do not install to a
 persistent `PATH` location on a machine you do not trust unless the user asks.
 
-Require `0.1.2` or newer. If the tool is missing or older, stop rather than silently
+Require `0.1.3` or newer. If the tool is missing or older, stop rather than silently
 downloading a different version.
 
 ## Output contract
@@ -70,6 +70,9 @@ eval "$(temp-ssh-key create --format qr)"
 ```
 
 Only stdout is evaluated. The QR code still renders because it is written to stderr.
+`create` therefore checks stdin (passphrase) and stderr (QR output), not stdout;
+stdout being a pipe under command substitution is expected. `show --format qr`
+writes to stdout and does need stdout to be a terminal.
 
 ## Key creation internals
 
@@ -285,9 +288,14 @@ location, never a repository or synced folder.
 
 - `temp-ssh-key: command not found`: install it; do not assume the skill directory
   contains the executable.
-- Version older than `0.1.2`: upgrade before running the flow.
-- `create` refuses: it is not a TTY, or QR output was requested without one. Run it
-  in the user's terminal; use `--format png` or `text` if QR rendering is impossible.
+- Version older than `0.1.3`: upgrade before running the flow.
+- `create` refuses: stdin is not a terminal (needed for a passphrase) or stderr is
+  not a terminal (needed for QR output). Run it in the user's terminal; use
+  `--format png` or `text` if QR rendering is impossible. Versions before `0.1.3`
+  wrongly checked stdout and rejected the documented
+  `eval "$(temp-ssh-key create --format qr)"` flow; upgrade instead of working
+  around it.
+- `show --format qr` refuses: stdout is not a terminal (for example, it is piped).
 - `start` says it is already in an isolated shell: run `create` there instead.
 - `env: no such key directory` or missing `$KEY_DIR`: the variable is unset or the
   directory was removed. Do not guess a path; rerun the flow.
