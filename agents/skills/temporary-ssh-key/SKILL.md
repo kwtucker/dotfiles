@@ -1,327 +1,191 @@
 ---
 name: temporary-ssh-key
-description: Generate a temporary Ed25519 SSH key pair and share only its OpenSSH public key as text, a terminal QR code, or a PNG for manual authorization on another server or GitHub. Keep private keys outside the repository, preserve existing SSH configuration, and explain one-time use and cleanup.
+description: Generate a temporary Ed25519 SSH key pair with the installed temp-ssh-key CLI and share only its public key as text, a terminal QR code, or a PNG so it can be authorized on GitHub, GitLab, or an SSH server without signing in on this machine. Run the flow in a history-isolated shell. Keep private keys outside the repository, preserve existing SSH configuration, and explain one-time use, revocation, and cleanup.
 ---
 
 # Temporary SSH key
 
-Create a disposable authentication key for the current machine. Display the
-public key so the user can authorize it elsewhere; never transfer the private key.
-Loading or installing this skill alone does not authorize key generation.
+Create a disposable authentication key for the current machine and share only its
+public key so the user can authorize it elsewhere. The usual case is temporary git
+access from a machine where the user must not sign in to their personal account (for
+example, a public or untrusted computer): scan the public key as a QR code on a
+trusted device, authorize it there, use it for the git operation, then revoke it and
+delete it locally.
 
-## 1. Confirm scope and passphrase handling
+This skill owns policy and procedure. The installed `temp-ssh-key` executable owns
+the mechanics: private temporary directory, Ed25519 generation, verification,
+public-key display, isolated shell, session exports, and guarded local cleanup. The
+tool never contacts a remote, edits SSH or Git configuration, adds a key to an agent,
+or revokes authorization.
 
-- Respect plan/read-only mode. Generate keys only when the user requests it and
-  writes are permitted.
-- Identify whether the destination is an SSH server or a service such as GitHub.
-  Do not contact or change the destination without separate authorization.
-- Default to a passphrase entered by the user in an interactive terminal. Never
-  ask for a passphrase in chat, capture it in tool output, or put it in arguments,
-  environment variables, files, or shell history.
-- If the available tool cannot provide a user-controlled interactive terminal,
-  create the private directory, provide the exact generation command for the
-  user's terminal, and wait for confirmation before reading the public key.
-- An unencrypted key is permitted only after the user explicitly agrees to that
-  tradeoff. Only then may generation use `-N ''`; never silently default to it.
+Read `reference.md` for host-specific UI steps, port-443 syntax, installation and
+bootstrap details, history internals, identity/signing details, cleanup guards, and
+troubleshooting. For flags, use `temp-ssh-key <command> --help`; do not duplicate the
+CLI reference here.
 
-### GitHub commit-email reminder
+## Preflight
 
-For GitHub workflows, remind the user: **before making personal commits, check
-your email in Git's `config.local`; switch it to your personal email if needed,
-and switch it back when finished.** SSH authentication and commit authorship are
-separate; changing keys does not change the email recorded in a commit. Pushing
-existing commits alone does not require changing the email.
-
-- Confirm the included local config path instead of assuming it. In this dotfiles
-  setup it is normally `~/.config/git/config.local`; other installations may use
-  `${XDG_CONFIG_HOME:-$HOME/.config}/git/config.local`. Never edit a tracked example
-  or put personal/work addresses into this skill.
-- Before a temporary change, have the user privately record the file's existing
-  `user.email` setting, including whether it was absent or had multiple values.
-  Preserve unrelated settings; do not dump the full config, which may contain
-  credentials. Do not edit the file without separate authorization.
-- Provide a command targeting that exact file, with the user's chosen personal
-  email, if they want to switch it. Verify the effective author and committer in
-  the intended repository before committing:
-
-  ```sh
-  git var GIT_AUTHOR_IDENT
-  git var GIT_COMMITTER_IDENT
-  ```
-
-- Repository-local config or environment variables can override `config.local`.
-  If the effective email is wrong, investigate its source rather than assuming
-  the file change worked. Do not rewrite existing commits automatically.
-- Keep restoration on the cleanup checklist even if key generation or
-  authentication fails. Restore the exact previous setting, not a guessed work
-  address. If it was originally absent, remove only the setting introduced by
-  this workflow rather than adding a new permanent default.
-
-### Optional terminal-history isolation
-
-If the user wants to keep this workflow out of terminal history, offer a separate
-history-isolated shell **before** they run any key commands. Check their shell;
-do not apply Bash history commands to zsh or assume the agent's tool shell is the
-user's interactive terminal.
-
-For zsh, have the user run this in their terminal:
+Before doing anything else, verify the tool is available and new enough:
 
 ```sh
-env HISTFILE=/dev/null SAVEHIST=0 zsh -f
+command -v temp-ssh-key
+temp-ssh-key --version
 ```
 
-This starts a child shell without user startup files and directs its history to
-`/dev/null`. Run the temporary-key commands inside that shell. It intentionally
-does not load the user's aliases or other interactive customizations. Environment
-changes and shell variables in the child do not carry back to the parent.
+Require `0.1.1` or newer. If it is missing or older, stop and tell the user how to
+install or upgrade it. Do not download and run a binary on an untrusted machine
+without the user's explicit approval and a checksum check; see `reference.md`.
 
-After restoring any temporary commit-email change and revoking/deleting the key,
-provide the session-ending command:
+## Hard rules
+
+- Generate only when the user asks and writes are permitted. Respect plan/read-only
+  mode.
+- Identify the destination (GitHub, GitLab, another git host, or an SSH server). Do
+  not contact or change it without separate authorization.
+- Passphrases go only to the user's interactive `ssh-keygen` prompt. Never ask for,
+  print, or place one in chat, arguments, environment variables, files, or history.
+- `create`, `shell`, `start`, and `cleanup --remove` are the user's commands. They
+  need their terminal; do not run them through a tool call. The agent may run
+  non-interactive commands such as `--version`, `show`, `env`, and the print-only
+  form of `cleanup`.
+- An unencrypted key only after explicit agreement, using `--allow-unencrypted`.
+- Never sign in to the personal account on this machine: no `gh auth login`,
+  `glab auth login`, browser session, or credential prompt. Authorize and revoke on
+  the trusted device.
+- Never read, print, upload, commit, or copy the private key. Do not add it to an
+  agent or edit SSH/Git configuration automatically.
+- Deleting local files is not revocation. Revoke remotely on the trusted device.
+- Always run the flow inside a history-isolated shell. Use `start`, or `shell` then
+  `create`; do not generate outside one.
+- On a public or untrusted computer, use this only where personal pushes are
+  permitted; do not bypass security controls or monitoring.
+
+## Flow
+
+### 1. Create the key inside an isolated shell
+
+Two valid flows. Prefer the strict flow when the user wants even the generation
+command kept out of the parent shell's history.
+
+**Convenience — one command:**
 
 ```sh
-exit
+temp-ssh-key start --format qr
 ```
 
-The child shell's in-memory history goes away when it exits, without rewriting
-the parent's history file. The launcher itself may remain in the parent's history;
-it contains no credentials. This is prevention, not retroactive history deletion.
+`start` creates the key, then replaces itself with a history-isolated shell. It
+exports `KEY_DIR`, `KEY`, and `KEY_FINGERPRINT` there. The parent shell records only
+`start`.
 
-If commands were already recorded, explain that there is no portable, reliable
-command to erase only one session from shared history. In particular, zsh's
-`SHARE_HISTORY` can interleave commands from multiple terminals. Do not truncate
-`HISTFILE`, run blanket history-clear commands, or delete entries by an unreviewed
-pattern. Targeted retroactive cleanup requires inspecting the actual user's shell
-settings and agreeing on specific entries first; a subprocess cannot directly
-clear the parent terminal's in-memory history.
-
-Neither this shell nor history cleanup erases terminal scrollback, agent
-transcripts, audit logs, backups, or remote logs. Do not disable security controls
-or claim complete erasure. Passphrases must still be entered only at hidden
-interactive prompts, never in command text.
-
-## 2. Generate outside the checkout
-
-- Check that `ssh-keygen` is available. Do not install tools automatically.
-- Use `mktemp -d` in the environment's approved temporary location, otherwise the
-  platform's temporary directory. Set `umask 077`; ensure the directory is private
-  (mode 700). Never put credentials inside a repository or a synced folder.
-- Record the returned absolute directory path. Shell variables do not necessarily
-  persist across tool calls; use the actual path in subsequent commands.
-- Use fresh filenames `id_ed25519` and `id_ed25519.pub`. Refuse to overwrite any
-  existing file or link, including a dangling symlink.
-- Generate the key with a generic comment, not an email address. Substitute the
-  actual private directory in this command:
-
-  ```sh
-  ssh-keygen -t ed25519 -C "temporary-ssh-access" -f "/absolute/key-directory/id_ed25519"
-  ```
-
-- Let the user enter and confirm the passphrase interactively. Do not run a
-  command that will wait for input in a noninteractive tool.
-- After successful generation, verify the private key is a regular, non-symlink
-  file with mode 600. Verify the public key is a regular, non-symlink file and
-  parses as an Ed25519 key with `ssh-keygen -lf`.
-- Never read, print, upload, commit, or copy the private key into chat. Do not add
-  it to an SSH agent or edit SSH/Git configuration automatically.
-
-## 3. Share the public key
-
-Offer **public-key text**, **terminal QR**, or **PNG**. Default to text if the
-user has no preference. Every format must use the verified `.pub` file only;
-never encode the private key or use an external QR-generation service.
-
-### Public-key text
-
-Use `cat` on the verified `.pub` file:
+**Strict — generate inside the isolated shell:**
 
 ```sh
-cat "/absolute/key-directory/id_ed25519.pub"
+temp-ssh-key shell
+eval "$(temp-ssh-key create --format qr)"
 ```
 
-Show the complete public key as one copyable line, without truncation. It should
-start with `ssh-ed25519`, followed by the encoded key and optional comment.
+`create` prints only eval-safe `KEY_DIR` and `KEY_FINGERPRINT` assignments to stdout;
+the public key, QR code, PNG path, and warnings go to stderr. `shell` starts `zsh -f`
+by default, or `bash --noprofile --norc` with `--shell bash`.
 
-### QR output
+Both flows disable history storage for the child shell and export
+`TEMP_SSH_KEY_ISOLATED=1` to prevent nesting. If the user is already in an isolated
+shell, `start` refuses and points at `create`; run `create` there. Run the rest of the
+flow inside that shell and `exit` when done.
 
-Check whether `qrencode` is available on PATH with `command -v qrencode`. If it is
-missing, explain that QR output is unavailable and fall back to public-key text.
-Do not install packages automatically. If QR generation fails, report the failure
-and provide text instead; do not claim a QR artifact was created successfully.
+`create` prompts for a passphrase through `ssh-keygen`. `--allow-unencrypted` skips
+the prompt and is never implicit. This is shell-history isolation, not Git config
+isolation.
 
-For a terminal QR code:
+### 2. Share and authorize
+
+- Prefer `qr`; use `png` if the terminal cannot render it (open locally, never
+  upload); use `text` for copy/paste.
+- Transfer only the public key. The QR payload is the public key, not a link.
+- The public key and fingerprint are not secret. The private key is.
+
+Scan it on the trusted device and add it to the intended account with a temporary
+title such as `temp-ssh-2026-11-06`:
+
+- GitHub: Settings → SSH and GPG keys → New SSH key → **Authentication Key**.
+- GitLab: Preferences → SSH Keys (optional expiry).
+- SSH server: append to the destination user's `authorized_keys`; do not edit it
+  remotely unless separately requested.
+
+Do not claim a scan or fingerprint match unless it actually happened.
+
+### 3. Use the key
 
 ```sh
-qrencode -t ANSIUTF8 < "/absolute/key-directory/id_ed25519.pub"
+eval "$(temp-ssh-key env "$KEY_DIR" --name "Your Name" --email "you@example.com")"
 ```
 
-This must run in a terminal the user can see. Tool output or Markdown renderers
-may not preserve ANSI colors or QR alignment; in that case, provide the exact
-command for the user's terminal or offer PNG/text instead. Do not claim that
-captured ANSI output is a usable rendered QR code.
+This exports `KEY_DIR`, `KEY`, `GIT_SSH_COMMAND`, a `core.sshCommand` override, and
+the four `GIT_AUTHOR_*`/`GIT_COMMITTER_*` variables. `--name` and `--email` must be
+given together or omitted. By default it also ignores global/system Git config
+(rewrite rules, the computer's configured identity, signing) for that shell; add
+`--no-isolate-config` to keep that config.
 
-For PNG, refuse to overwrite any existing file or link, including a dangling
-symlink, at the output path. Generate inside the private temporary key directory:
+Then:
 
 ```sh
-qrencode -t PNG -o "/absolute/key-directory/public-key.png" < "/absolute/key-directory/id_ed25519.pub"
+ssh -F /dev/null -o IdentitiesOnly=yes -i "$KEY" -T git@github.com
+git commit -m "..."
+git push git@github.com:OWNER/REPOSITORY.git HEAD:BRANCH
 ```
 
-Verify successful creation of a nonempty PNG before reporting its path. Keep track
-of this generated file for cleanup. Do not open it in a browser, upload it, or copy
-it outside the temporary directory automatically.
+- `-F /dev/null` bypasses `~/.ssh/config`; `IdentitiesOnly=yes` prevents other
+  identities. Keep host-key verification enabled.
+- GitHub greets the username and normally exits 1 on success. GitLab exits 0. If the
+  wrong account is greeted, stop.
+- Push to an explicit personal SSH URL; do not change remotes permanently.
+- Port 22 blocked: see `reference.md` for the 443 endpoints and `core.sshCommand`
+  form.
+- Never `--force` or disable host-key verification. Providing these commands does
+  not authorize executing a push.
 
-Explain that the QR code contains the actual public-key text, not a hosted link.
-The receiving device needs a scanner that supports plain text. Scanning transfers
-text only; it does not authorize the key. After scanning, verify that the complete
-decoded text starts with `ssh-ed25519` and was not truncated or wrapped into multiple
-lines when pasted. For stronger verification, compare the original public-key
-fingerprint with the decoded key saved on the destination, using `ssh-keygen -lf`
-on both files. Do not claim a scan/round-trip verification was performed unless
-it actually was.
+### 4. Revoke, then clean up
 
-### Destination instructions
+On the trusted device, delete the temporary key:
 
-For every format, report the private key's local path, but never its contents.
+- GitHub: Settings → SSH and GPG keys.
+- GitLab: Preferences → SSH Keys.
 
-Explain where the public key belongs:
-
-- **SSH server:** the destination user's `~/.ssh/authorized_keys`, not
-  `~/.ssh/config`. It is one authorized key per line; preserve existing entries.
-- **GitHub:** the intended account's **Settings → SSH and GPG keys → New SSH key**,
-  with key type **Authentication Key**. Give it a recognizable temporary title.
-
-Do not install the key remotely or overwrite `authorized_keys` on the user's behalf
-unless separately requested.
-
-## 4. Explain one-time use
-
-Provide a command using the actual local private-key path and the user's intended
-destination, or clearly labeled placeholders if the destination is unknown:
+Confirm revocation before local deletion. Then, in the user's terminal:
 
 ```sh
-ssh -o IdentitiesOnly=yes -i "/absolute/key-directory/id_ed25519" user@host
+temp-ssh-key cleanup "$KEY_DIR"            # prints the commands; deletes nothing
+temp-ssh-key cleanup "$KEY_DIR" --remove   # prompts per file, then rmdir
 ```
 
-Keep host-key verification enabled. Existing SSH configuration may supply other
-identity files or required connection settings; investigate those only if needed,
-without persistently changing work authentication. Do not claim authentication
-succeeded unless an authorized connection test actually succeeded.
+`--remove` must be the user's command, not the agent's. If deletion is declined or
+files remain, report incomplete cleanup. Never glob temporary directories or reuse
+paths from earlier sessions.
 
-### GitHub: include authentication and push commands
+Finally, in the isolated shell: `unset KEY_DIR KEY KEY_FINGERPRINT` and `exit`.
 
-For GitHub workflows, always provide both the authentication check and the actual
-one-time push command; do not stop at key registration or the SSH test. Substitute
-the actual generated private-key path, intended repository, and branch. Inspect
-the push remote and current branch when available instead of assuming `origin`
-and `main`; ask if the intended target is ambiguous. Use clearly labeled
-placeholders when the target is unknown.
+## Decision points
 
-For a direct GitHub connection, isolate the temporary key from work SSH settings:
+- **Flow:** `start` for convenience; `shell` then `create` when generation itself
+  must happen inside the isolated shell.
+- **Format:** QR when the account is on another device; PNG if the terminal cannot
+  render the QR; text for another channel.
+- **Host:** GitHub and GitLab are above; SSH-server details are in `reference.md`.
+- **Identity:** use `env` or per-command `-c user.name=... -c user.email=...`. Do not
+  edit config. Use the account's noreply address if its private email is blocked.
+- **Rewrite rules:** prefer an explicit `git@...` URL. Inspect and bypass when the
+  machine's rules are unknown; `reference.md` has the commands.
+- **Signing:** do not sign with the temporary key unless intended; isolated config
+  (the `env` default) or per-command `-c commit.gpgsign=false` avoids the machine's
+  signing setup.
 
-```sh
-ssh -F /dev/null -o IdentitiesOnly=yes -i "/absolute/key-directory/id_ed25519" -T git@github.com
-```
+## Stop conditions
 
-Explain that success should greet the intended GitHub username, and GitHub's SSH
-test normally exits with status 1 even after successful authentication. If it
-greets the wrong account, stop before pushing. `-F /dev/null` bypasses SSH config;
-if a required proxy or other connection setting is needed, investigate and adapt
-the one-time command rather than changing persistent configuration.
-
-If the confirmed push remote uses SSH, provide this command with the actual
-remote and branch substituted for `REMOTE` and `BRANCH`:
-
-```sh
-git -c core.sshCommand="ssh -F /dev/null -o IdentitiesOnly=yes -i '/absolute/key-directory/id_ed25519'" \
-  push REMOTE BRANCH
-```
-
-Quote the actual key path safely for both shell-parsing layers. If the remote
-uses HTTPS, `core.sshCommand` alone will not switch its transport; instead provide
-an explicit SSH destination such as `git@github.com:OWNER/REPOSITORY.git`, after
-confirming the target. Neither approach should change saved remotes or config.
-Never add `--force` or disable host-key verification. Providing the command does
-not authorize the agent to execute a push; do so only when separately requested.
-
-Remind the user to enter the key passphrase at the hidden prompt, and include
-the cleanup reminders after the push instructions: revoke the GitHub key, remove
-the generated local files, and restore any temporary `config.local` email change.
-
-Temporary directories may be removed by the operating system. This key is for
-short-lived use, not durable access or recovery.
-
-## 5. Provide session-specific cleanup; do not perform it automatically
-
-Finish by providing a copyable cleanup checklist and commands with the actual
-absolute paths generated in this session, not just generic cleanup advice. Track
-the key directory, public-key fingerprint, and any PNG created by this workflow.
-Do not discover deletion targets by globbing temporary directories, using a
-possibly stale shell variable, or including keys from earlier sessions.
-
-### Revoke remote authorization first
-
-- For GitHub, direct the user to **Settings → SSH and GPG keys** and identify the
-  temporary key by its title and recorded public-key fingerprint. For an SSH
-  server, remove only this public-key entry from the destination user's
-  `authorized_keys`. Preserve all other keys.
-- Ask the user to confirm remote revocation before proceeding with local
-  deletion. Do not claim revocation happened merely because commands were shown
-  or local files were removed. If revocation cannot be completed, clearly report
-  that remote authorization remains; do not silently mark cleanup complete.
-- If the user independently added this key to an SSH agent, explain how to remove
-  only this identity while its public-key file is still available. Never clear
-  the entire agent or assume the workflow added the key.
-
-### Remove only the generated local files
-
-After the user confirms they are finished and remote authorization was revoked,
-provide commands like these, substituting the recorded absolute directory:
-
-```sh
-rm -i \
-  "/absolute/key-directory/id_ed25519" \
-  "/absolute/key-directory/id_ed25519.pub"
-rmdir "/absolute/key-directory"
-```
-
-Add the exact `public-key.png` path to the `rm -i` arguments only if this workflow
-created it. Do not include an unrelated existing image. Explain that `rm -i`
-prompts before each deletion and must be run in the user's interactive terminal,
-not an agent tool that cannot accept their responses. Providing these commands
-does not authorize the agent to execute them.
-
-Use literal, safely quoted paths; refuse cleanup if the directory has been
-replaced by a symlink or its identity is uncertain. `rmdir` must refuse to remove
-a nonempty directory. If deletion is declined or unexpected files remain, leave
-them intact, report incomplete cleanup, and do not retry with recursive or forced
-deletion. Never delete earlier temporary-key directories or unrelated SSH files.
-QR images and copied public-key text on other devices are not removed locally.
-
-### Restore commit identity and end the isolated shell
-
-If `config.local` was temporarily changed for personal commits, remind the user to
-**switch the email back to its exact previous setting**, preserving other changes.
-Verify the effective author/committer in the repository where they will resume
-work:
-
-```sh
-git var GIT_AUTHOR_IDENT
-git var GIT_COMMITTER_IDENT
-```
-
-Exiting the history-isolated shell does not undo edits to `config.local`. After
-restoration and key cleanup, if this workflow set `KEY_DIR` and the user is still
-inside the isolated child shell, provide:
-
-```sh
-unset KEY_DIR
-exit
-```
-
-If no variable was set, omit `unset KEY_DIR`. If the user did not start an isolated
-child shell, omit `exit`; do not inadvertently close their normal terminal. This
-ends the isolated session without clearing unrelated shared history, but does not
-erase terminal scrollback or agent transcripts.
-
-Deleting the local files does not revoke the remote authorization. Do not promise
-secure erasure on SSDs; removing the remote authorization is the revocation step.
+- `temp-ssh-key` is missing or older than `0.1.1`.
+- The session is not in a history-isolated shell.
+- The user cannot provide an interactive terminal for `create`, `shell`, `start`,
+  `--remove`, or a passphrase.
+- The greeted account is not the intended one.
+- Revocation is not confirmed.
+- Cleanup refuses the directory or files remain.
+- The destination or authorization is ambiguous.
