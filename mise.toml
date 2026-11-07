@@ -36,7 +36,6 @@ terraform = "1.14.8"
 "aqua:sharkdp/bat"           = "0.26.1"
 "aqua:jesseduffield/lazygit" = "0.66.0"
 "conda:tig"                  = "2.6.1"
-"conda:libqrencode"          = "4.1.1" # Provides the qrencode CLI.
 "aqua:cli/cli"               = "2.102.0"
 "aqua:starship/starship"     = "1.26.0"
 "aqua:docker/cli"            = "29.9.0"
@@ -54,6 +53,9 @@ terraform = "1.14.8"
 "github:dominikh/go-tools"             = "2026.2.2"  # staticcheck
 "go:golang.org/x/tools/cmd/goimports"  = "0.52.0"
 "go:golang.org/x/vuln/cmd/govulncheck" = "1.9.0"
+
+# ── Personal tools ────────────────────────────────────────────────────────────
+"github:kwtucker/temp-ssh-key" = "0.1.1"
 
 # ── LSP servers ───────────────────────────────────────────────────────────────
 "aqua:artempyanykh/marksman"     = "2026-02-08"
