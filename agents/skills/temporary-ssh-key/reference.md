@@ -15,7 +15,7 @@ temp-ssh-key --version
 On another trusted machine:
 
 ```sh
-mise use -g github:kwtucker/temp-ssh-key@0.1.3
+mise use -g github:kwtucker/temp-ssh-key@0.2.0
 # or
 go install github.com/kwtucker/temp-ssh-key/cmd/temp-ssh-key@latest
 ```
@@ -24,7 +24,7 @@ On an untrusted machine, prefer a one-off pinned download over a persistent
 install, and get the user's explicit approval first:
 
 ```sh
-VERSION=0.1.3
+VERSION=0.2.0
 case "$(uname -s)" in
   Linux) os=linux ;;
   Darwin) os=darwin ;;
@@ -50,7 +50,7 @@ tar -xzf "$archive"
 Delete the temporary directory and archive when the session ends. Do not install to a
 persistent `PATH` location on a machine you do not trust unless the user asks.
 
-Require `0.1.3` or newer. If the tool is missing or older, stop rather than silently
+Require `0.2.0` or newer. If the tool is missing or older, stop rather than silently
 downloading a different version.
 
 ## Output contract
@@ -58,7 +58,7 @@ downloading a different version.
 | Command | stdout | stderr |
 |---|---|---|
 | `create` | only `KEY_DIR='...'` and `KEY_FINGERPRINT='...'` | public key, QR/PNG path, warnings, notes |
-| `start` | normally empty because the process is replaced | public key, QR/PNG path, warnings, notes |
+| `start` | normally empty because the process is replaced | public key, QR/PNG path, next steps, warnings, notes |
 | `show` | the requested artifact | fingerprint |
 | `env` | eval-safe exports | nothing |
 | `cleanup` (print mode) | literal `rm -i`/`rmdir` commands | revocation warning and note |
@@ -93,8 +93,10 @@ writes to stdout and does need stdout to be a terminal.
 - `--format qr` needs an interactive terminal. `--format png` does not.
 - `create` does not enter a shell. Use `start`, or `shell` then `create`.
 
-`start` runs the same creation, suppresses the stdout assignments, and replaces the
-process with the isolated shell. It refuses to run inside an already isolated shell.
+`start` runs the same creation, suppresses the stdout assignments, exports the full
+session environment (key paths, `GIT_SSH_COMMAND`, config override, optional
+identity, and config isolation), and replaces the process with the isolated shell.
+It refuses to run inside an already isolated shell.
 
 ## QR and PNG
 
@@ -218,27 +220,33 @@ fail.
 Two entry points:
 
 ```sh
-temp-ssh-key start --format qr       # create, then enter the shell
-temp-ssh-key shell                   # enter the shell, then create inside it
+temp-ssh-key start --format qr \
+  --name "Your Name" --email "you@example.com"  # create, then enter the shell
+temp-ssh-key shell                             # enter the shell, then create inside it
 ```
 
 The child is `zsh -f` by default or `bash --noprofile --norc` with `--shell bash`.
 It sets `HISTFILE=/dev/null` and `SAVEHIST=0` (zsh) or `HISTSIZE=0` (bash), and
-`TEMP_SSH_KEY_ISOLATED=1`. `shell KEY_DIR` also exports `KEY_DIR`, `KEY`, and
-`KEY_FINGERPRINT`; `start` exports them after creating the key.
+`TEMP_SSH_KEY_ISOLATED=1`. `start` and `shell KEY_DIR` export the full session
+environment: `KEY_DIR`, `KEY`, `KEY_FINGERPRINT`, `GIT_SSH_COMMAND`, the
+`core.sshCommand` override, optional identity, and Git config isolation.
+`shell` without a path only isolates history; create and export inside it.
+
+`start` and `shell` print a short next-steps banner, including the
+revoke-before-cleanup reminder.
 
 The parent shell records only `start` or `shell`; neither contains a secret. `create`
 run inside the isolated shell is also isolated. If the tool detects an existing
 isolated shell, `shell` does nothing and `start` refuses and points at `create`; do
-not nest.
+not nest; use `create` then `env` inside the existing shell.
 
 The child skips user startup files and sends history to `/dev/null`. Run all key,
 git, and cleanup commands inside it. It does not load aliases; `PATH` is inherited.
 Environment changes do not carry back to the parent. End with `exit`.
 
 This is required by this skill on every run, not only when history is audited. This
-is shell-history isolation; it is separate from the `env` command's Git config
-isolation, which ignores global/system Git config and is on by default.
+is shell-history isolation; it is separate from the Git config isolation that
+`start` and `env` apply, which ignores global/system Git config and is on by default.
 
 - The child's in-memory history disappears on exit; the parent's history is not
   rewritten. The shell-entry command may remain in the parent's history (no
@@ -252,7 +260,9 @@ isolation, which ignores global/system Git config and is on by default.
 
 ## Cleanup guards
 
-- `cleanup <dir>` prints literal `rm -i` paths and `rmdir`; it deletes nothing.
+- `cleanup [dir]` prints literal `rm -i` paths and `rmdir`; it deletes nothing.
+  When `dir` is omitted, it uses `$KEY_DIR`, which `start`, `shell KEY_DIR`, and
+  `env` export.
 - `--remove` prompts per managed file in the user's TTY, then removes the directory
   without recursion.
 - It refuses a directory that is not absolute, is a symlink, is not owned by the
@@ -273,10 +283,10 @@ isolation, which ignores global/system Git config and is on by default.
 create [--format text|qr|png] [--comment TEXT] [--allow-unencrypted] [--base DIR]
 shell  [KEY_DIR] [--shell zsh|bash]
 start  [--format text|qr|png] [--comment TEXT] [--allow-unencrypted] [--base DIR]
-       [--shell zsh|bash]
+       [--shell zsh|bash] [--name NAME --email EMAIL] [--no-isolate-config]
 show   KEY_DIR [--format text|qr|png]
 env    KEY_DIR [--name NAME --email EMAIL] [--no-isolate-config]
-cleanup KEY_DIR [--remove]
+cleanup [KEY_DIR] [--remove]
 ```
 
 `--help` is authoritative. `create` no longer enters a shell; `start` composes
@@ -288,7 +298,7 @@ location, never a repository or synced folder.
 
 - `temp-ssh-key: command not found`: install it; do not assume the skill directory
   contains the executable.
-- Version older than `0.1.3`: upgrade before running the flow.
+- Version older than `0.2.0`: upgrade before running the flow.
 - `create` refuses: stdin is not a terminal (needed for a passphrase) or stderr is
   not a terminal (needed for QR output). Run it in the user's terminal; use
   `--format png` or `text` if QR rendering is impossible. Versions before `0.1.3`
@@ -296,9 +306,14 @@ location, never a repository or synced folder.
   `eval "$(temp-ssh-key create --format qr)"` flow; upgrade instead of working
   around it.
 - `show --format qr` refuses: stdout is not a terminal (for example, it is piped).
-- `start` says it is already in an isolated shell: run `create` there instead.
+- `start` says it is already in an isolated shell: run `create` then `env` there.
 - `env: no such key directory` or missing `$KEY_DIR`: the variable is unset or the
   directory was removed. Do not guess a path; rerun the flow.
+- `cleanup` says `KEY_DIR is not set`: run it inside the session started by `start`
+  or `shell KEY_DIR`, or pass the path explicitly.
+- Git commits fail with no identity: `start` isolates global config by default, so
+  pass `--name` and `--email` (or use `--no-isolate-config`, or set the identity in
+  the repository).
 - `env: GIT_CONFIG_COUNT is not a non-negative integer`: the shell has a malformed
   override; unset or fix it before evaluating the exports.
 - Wrong account greeted: stop; do not push.

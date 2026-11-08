@@ -32,7 +32,7 @@ command -v temp-ssh-key
 temp-ssh-key --version
 ```
 
-Require `0.1.3` or newer. If it is missing or older, stop and tell the user how to
+Require `0.2.0` or newer. If it is missing or older, stop and tell the user how to
 install or upgrade it. Do not download and run a binary on an untrusted machine
 without the user's explicit approval and a checksum check; see `reference.md`.
 
@@ -70,32 +70,36 @@ command kept out of the parent shell's history.
 **Convenience — one command:**
 
 ```sh
-temp-ssh-key start --format qr
+temp-ssh-key start --format qr \
+  --name "Your Name" --email "you@example.com"
 ```
 
 `start` creates the key, then replaces itself with a history-isolated shell. It
-exports `KEY_DIR`, `KEY`, and `KEY_FINGERPRINT` there. The parent shell records only
-`start`.
+exports `KEY_DIR`, `KEY`, `KEY_FINGERPRINT`, `GIT_SSH_COMMAND`, the Git config
+override, the commit identity, and Git config isolation there. The parent shell
+records only `start`.
 
 **Strict — generate inside the isolated shell:**
 
 ```sh
 temp-ssh-key shell
 eval "$(temp-ssh-key create --format qr)"
+eval "$(temp-ssh-key env "$KEY_DIR" --name "Your Name" --email "you@example.com")"
 ```
 
 `create` prints only eval-safe `KEY_DIR` and `KEY_FINGERPRINT` assignments to stdout;
-the public key, QR code, PNG path, and warnings go to stderr. `shell` starts `zsh -f`
-by default, or `bash --noprofile --norc` with `--shell bash`.
+the public key, QR code, PNG path, and warnings go to stderr. `shell KEY_DIR` also
+exports the full session environment, so `env` is only needed after `create`.
 
 Both flows disable history storage for the child shell and export
-`TEMP_SSH_KEY_ISOLATED=1` to prevent nesting. If the user is already in an isolated
-shell, `start` refuses and points at `create`; run `create` there. Run the rest of the
-flow inside that shell and `exit` when done.
+`TEMP_SSH_KEY_ISOLATED=1` to prevent nesting. `shell` starts `zsh -f` by default,
+or `bash --noprofile --norc` with `--shell bash`. If the user is already in an
+isolated shell, `start` refuses and points at `create`; run `create` there, then
+`env`. Run the rest of the flow inside that shell and `exit` when done.
 
 `create` prompts for a passphrase through `ssh-keygen`. `--allow-unencrypted` skips
-the prompt and is never implicit. This is shell-history isolation, not Git config
-isolation.
+the prompt and is never implicit. History isolation is separate from the Git config
+isolation that `start` and `env` export.
 
 ### 2. Share and authorize
 
@@ -116,15 +120,19 @@ Do not claim a scan or fingerprint match unless it actually happened.
 
 ### 3. Use the key
 
+With `start`, the key and Git identity are already exported; go straight to the
+git commands. In the strict flow, export them first:
+
 ```sh
 eval "$(temp-ssh-key env "$KEY_DIR" --name "Your Name" --email "you@example.com")"
 ```
 
-This exports `KEY_DIR`, `KEY`, `GIT_SSH_COMMAND`, a `core.sshCommand` override, and
-the four `GIT_AUTHOR_*`/`GIT_COMMITTER_*` variables. `--name` and `--email` must be
-given together or omitted. By default it also ignores global/system Git config
-(rewrite rules, the computer's configured identity, signing) for that shell; add
-`--no-isolate-config` to keep that config.
+This exports `KEY_DIR`, `KEY`, `KEY_FINGERPRINT`, `GIT_SSH_COMMAND`, a
+`core.sshCommand` override, and the four `GIT_AUTHOR_*`/`GIT_COMMITTER_*` variables.
+`--name` and `--email` must be given together or omitted. By default it also ignores
+global/system Git config (rewrite rules, the computer's configured identity, signing)
+for that shell; add `--no-isolate-config` to keep that config. `start` accepts the
+same `--name`, `--email`, and `--no-isolate-config` flags.
 
 Then:
 
@@ -154,13 +162,14 @@ On the trusted device, delete the temporary key:
 Confirm revocation before local deletion. Then, in the user's terminal:
 
 ```sh
-temp-ssh-key cleanup "$KEY_DIR"            # prints the commands; deletes nothing
-temp-ssh-key cleanup "$KEY_DIR" --remove   # prompts per file, then rmdir
+temp-ssh-key cleanup            # prints the commands for $KEY_DIR; deletes nothing
+temp-ssh-key cleanup --remove   # prompts per file, then rmdir
 ```
 
-`--remove` must be the user's command, not the agent's. If deletion is declined or
-files remain, report incomplete cleanup. Never glob temporary directories or reuse
-paths from earlier sessions.
+`KEY_DIR` defaults to `$KEY_DIR`, so no path is needed inside the session. `--remove`
+must be the user's command, not the agent's. If deletion is declined or files remain,
+report incomplete cleanup. Never glob temporary directories or reuse paths from
+earlier sessions.
 
 Finally, in the isolated shell: `unset KEY_DIR KEY KEY_FINGERPRINT` and `exit`.
 
@@ -171,8 +180,9 @@ Finally, in the isolated shell: `unset KEY_DIR KEY KEY_FINGERPRINT` and `exit`.
 - **Format:** QR when the account is on another device; PNG if the terminal cannot
   render the QR; text for another channel.
 - **Host:** GitHub and GitLab are above; SSH-server details are in `reference.md`.
-- **Identity:** use `env` or per-command `-c user.name=... -c user.email=...`. Do not
-  edit config. Use the account's noreply address if its private email is blocked.
+- **Identity:** pass `--name` and `--email` to `start` or `env`, or use per-command
+  `-c user.name=... -c user.email=...`. Do not edit config. Use the account's noreply
+  address if its private email is blocked.
 - **Rewrite rules:** prefer an explicit `git@...` URL. Inspect and bypass when the
   machine's rules are unknown; `reference.md` has the commands.
 - **Signing:** do not sign with the temporary key unless intended; isolated config
@@ -181,7 +191,7 @@ Finally, in the isolated shell: `unset KEY_DIR KEY KEY_FINGERPRINT` and `exit`.
 
 ## Stop conditions
 
-- `temp-ssh-key` is missing or older than `0.1.3`.
+- `temp-ssh-key` is missing or older than `0.2.0`.
 - The session is not in a history-isolated shell.
 - The user cannot provide an interactive terminal for `create`, `shell`, `start`,
   `--remove`, or a passphrase.
