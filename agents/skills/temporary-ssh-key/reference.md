@@ -15,7 +15,7 @@ temp-ssh-key --version
 On another trusted machine:
 
 ```sh
-mise use -g github:kwtucker/temp-ssh-key@0.2.0
+mise use -g github:kwtucker/temp-ssh-key@0.2.2
 # or
 go install github.com/kwtucker/temp-ssh-key/cmd/temp-ssh-key@latest
 ```
@@ -24,7 +24,7 @@ On an untrusted machine, prefer a one-off pinned download over a persistent
 install, and get the user's explicit approval first:
 
 ```sh
-VERSION=0.2.0
+VERSION=0.2.2
 case "$(uname -s)" in
   Linux) os=linux ;;
   Darwin) os=darwin ;;
@@ -50,7 +50,7 @@ tar -xzf "$archive"
 Delete the temporary directory and archive when the session ends. Do not install to a
 persistent `PATH` location on a machine you do not trust unless the user asks.
 
-Require `0.2.0` or newer. If the tool is missing or older, stop rather than silently
+Require `0.2.2` or newer. If the tool is missing or older, stop rather than silently
 downloading a different version.
 
 ## Output contract
@@ -86,6 +86,9 @@ writes to stdout and does need stdout to be a terminal.
 - It verifies that the private key is a regular, non-symlink, non-empty file at mode
   600. It parses the public key as one OpenSSH `ssh-ed25519` line and computes the
   `SHA256:...` fingerprint from the key blob. It does not call `ssh-keygen -lf`.
+- `show`, `env`, and `shell KEY_DIR` re-verify the directory and confirm that the
+  private key's embedded public half matches `id_ed25519.pub` before using it. This
+  needs no passphrase. A mismatched or malformed pair is rejected.
 - On failure it removes only the partial files it created and the empty directory.
 - `create` needs an interactive terminal for the passphrase. `--allow-unencrypted`
   removes that requirement and skips the passphrase; use it only after explicit
@@ -94,9 +97,10 @@ writes to stdout and does need stdout to be a terminal.
 - `create` does not enter a shell. Use `start`, or `shell` then `create`.
 
 `start` runs the same creation, suppresses the stdout assignments, exports the full
-session environment (key paths, `GIT_SSH_COMMAND`, config override, optional
-identity, and config isolation), and replaces the process with the isolated shell.
-It refuses to run inside an already isolated shell.
+session environment (key paths, `GIT_SSH_COMMAND`, `GIT_TERMINAL_PROMPT=0`, config
+override, optional identity, and config isolation), and replaces the process with
+the isolated shell. It refuses to run inside an already isolated shell. If the
+shell is missing or cannot start, it removes the newly created key directory.
 
 ## QR and PNG
 
@@ -106,7 +110,7 @@ It refuses to run inside an already isolated shell.
   ANSI color and requires a TTY. The CLI
   refuses captured output.
 - If the terminal cannot render it or the scan will not lock, use `--format png`. The
-  PNG is written inside the key directory and refuses to overwrite an existing file.
+  PNG is written inside the key directory and is replaced atomically on repeat runs.
   Open it locally; never upload the PNG or use an external QR service.
 - Verify the decoded text starts with `ssh-ed25519`, is one line, and compare its
   fingerprint with the destination when possible. Do not claim a match that was not
@@ -179,6 +183,12 @@ change remotes permanently. `env` ignores global/system config by default; use
 
 ## Identity and signing
 
+Ask the user for the session's author name and email rather than guessing or
+inheriting them from the untrusted machine. Pass them verbatim to `--name` and
+`--email`, or use per-command `-c user.name=... -c user.email=...`; omit identity
+for fetch-only sessions. Never copy the example placeholders or assume a repository
+identity without confirmation.
+
 Per-command:
 
 ```sh
@@ -228,9 +238,14 @@ temp-ssh-key shell                             # enter the shell, then create in
 The child is `zsh -f` by default or `bash --noprofile --norc` with `--shell bash`.
 It sets `HISTFILE=/dev/null` and `SAVEHIST=0` (zsh) or `HISTSIZE=0` (bash), and
 `TEMP_SSH_KEY_ISOLATED=1`. `start` and `shell KEY_DIR` export the full session
-environment: `KEY_DIR`, `KEY`, `KEY_FINGERPRINT`, `GIT_SSH_COMMAND`, the
-`core.sshCommand` override, optional identity, and Git config isolation.
-`shell` without a path only isolates history; create and export inside it.
+environment: `KEY_DIR`, `KEY`, `KEY_FINGERPRINT`, `GIT_SSH_COMMAND`,
+`GIT_TERMINAL_PROMPT=0`, the `core.sshCommand` override, optional identity, and Git
+config isolation. `shell` without a path only isolates history; create and export
+inside it.
+
+Git config isolation uses `GIT_CONFIG_GLOBAL` and `GIT_CONFIG_SYSTEM`, which
+require Git 2.32 or newer. On older Git, use `--no-isolate-config`; the explicit
+`GIT_SSH_COMMAND` still works.
 
 `start` and `shell` print a short next-steps banner, including the
 revoke-before-cleanup reminder.
@@ -263,8 +278,9 @@ is shell-history isolation; it is separate from the Git config isolation that
 - `cleanup [dir]` prints literal `rm -i` paths and `rmdir`; it deletes nothing.
   When `dir` is omitted, it uses `$KEY_DIR`, which `start`, `shell KEY_DIR`, and
   `env` export.
-- `--remove` prompts per managed file in the user's TTY, then removes the directory
-  without recursion.
+- `--remove` requires interactive terminals on stdin and stderr. It prompts per
+  managed file on stderr, then removes the directory without recursion. stdout may
+  be captured. A failed prompt write aborts before deleting anything.
 - It refuses a directory that is not absolute, is a symlink, is not owned by the
   user, is not mode 700, whose basename is not `temp-ssh-key.*`, or that contains
   anything other than `id_ed25519`, `id_ed25519.pub`, and `public-key.png`.
@@ -298,7 +314,7 @@ location, never a repository or synced folder.
 
 - `temp-ssh-key: command not found`: install it; do not assume the skill directory
   contains the executable.
-- Version older than `0.2.0`: upgrade before running the flow.
+- Version older than `0.2.2`: upgrade before running the flow.
 - `create` refuses: stdin is not a terminal (needed for a passphrase) or stderr is
   not a terminal (needed for QR output). Run it in the user's terminal; use
   `--format png` or `text` if QR rendering is impossible. Versions before `0.1.3`
@@ -306,11 +322,16 @@ location, never a repository or synced folder.
   `eval "$(temp-ssh-key create --format qr)"` flow; upgrade instead of working
   around it.
 - `show --format qr` refuses: stdout is not a terminal (for example, it is piped).
+- `show`, `env`, or `shell` rejects the key pair: the private key is missing or
+  unreadable, or its embedded public half does not match `id_ed25519.pub`. Do not
+  reuse the directory; report it and create a fresh key.
 - `start` says it is already in an isolated shell: run `create` then `env` there.
 - `env: no such key directory` or missing `$KEY_DIR`: the variable is unset or the
   directory was removed. Do not guess a path; rerun the flow.
 - `cleanup` says `KEY_DIR is not set`: run it inside the session started by `start`
   or `shell KEY_DIR`, or pass the path explicitly.
+- `cleanup --remove` refuses: stdin or stderr is not an interactive terminal. Run it
+  in the user's terminal; stdout may still be captured.
 - Git commits fail with no identity: `start` isolates global config by default, so
   pass `--name` and `--email` (or use `--no-isolate-config`, or set the identity in
   the repository).

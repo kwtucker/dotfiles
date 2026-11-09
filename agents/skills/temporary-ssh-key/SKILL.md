@@ -32,7 +32,7 @@ command -v temp-ssh-key
 temp-ssh-key --version
 ```
 
-Require `0.2.0` or newer. If it is missing or older, stop and tell the user how to
+Require `0.2.2` or newer. If it is missing or older, stop and tell the user how to
 install or upgrade it. Do not download and run a binary on an untrusted machine
 without the user's explicit approval and a checksum check; see `reference.md`.
 
@@ -67,6 +67,14 @@ without the user's explicit approval and a checksum check; see `reference.md`.
 Two valid flows. Prefer the strict flow when the user wants even the generation
 command kept out of the parent shell's history.
 
+First, ask the user which Git author name and email to use for this session,
+unless they already provided them. Use those values verbatim with `--name` and
+`--email`. Do not invent values, copy the example placeholders, or read identity
+from the untrusted machine's global Git config. If the session will not commit,
+or the user declines, omit both flags and use per-command
+`-c user.name=... -c user.email=...` later. Suggest the host's noreply address if
+the user does not want to expose a personal email.
+
 **Convenience — one command:**
 
 ```sh
@@ -75,9 +83,9 @@ temp-ssh-key start --format qr \
 ```
 
 `start` creates the key, then replaces itself with a history-isolated shell. It
-exports `KEY_DIR`, `KEY`, `KEY_FINGERPRINT`, `GIT_SSH_COMMAND`, the Git config
-override, the commit identity, and Git config isolation there. The parent shell
-records only `start`.
+exports `KEY_DIR`, `KEY`, `KEY_FINGERPRINT`, `GIT_SSH_COMMAND`,
+`GIT_TERMINAL_PROMPT=0`, the Git config override, the commit identity, and Git
+config isolation there. The parent shell records only `start`.
 
 **Strict — generate inside the isolated shell:**
 
@@ -127,12 +135,13 @@ git commands. In the strict flow, export them first:
 eval "$(temp-ssh-key env "$KEY_DIR" --name "Your Name" --email "you@example.com")"
 ```
 
-This exports `KEY_DIR`, `KEY`, `KEY_FINGERPRINT`, `GIT_SSH_COMMAND`, a
-`core.sshCommand` override, and the four `GIT_AUTHOR_*`/`GIT_COMMITTER_*` variables.
-`--name` and `--email` must be given together or omitted. By default it also ignores
-global/system Git config (rewrite rules, the computer's configured identity, signing)
-for that shell; add `--no-isolate-config` to keep that config. `start` accepts the
-same `--name`, `--email`, and `--no-isolate-config` flags.
+This exports `KEY_DIR`, `KEY`, `KEY_FINGERPRINT`, `GIT_SSH_COMMAND`,
+`GIT_TERMINAL_PROMPT=0`, a `core.sshCommand` override, and the four
+`GIT_AUTHOR_*`/`GIT_COMMITTER_*` variables. `--name` and `--email` must be given
+together or omitted. By default it also ignores global/system Git config (rewrite
+rules, the computer's configured identity, signing) for that shell; add
+`--no-isolate-config` to keep that config. `start` accepts the same `--name`,
+`--email`, and `--no-isolate-config` flags.
 
 Then:
 
@@ -166,10 +175,11 @@ temp-ssh-key cleanup            # prints the commands for $KEY_DIR; deletes noth
 temp-ssh-key cleanup --remove   # prompts per file, then rmdir
 ```
 
-`KEY_DIR` defaults to `$KEY_DIR`, so no path is needed inside the session. `--remove`
-must be the user's command, not the agent's. If deletion is declined or files remain,
-report incomplete cleanup. Never glob temporary directories or reuse paths from
-earlier sessions.
+`KEY_DIR` defaults to `$KEY_DIR`, so no path is needed inside the session.
+`--remove` requires interactive terminals on stdin and stderr, writes its prompts
+to stderr, and must be the user's command, not the agent's. If deletion is
+declined or files remain, report incomplete cleanup. Never glob temporary
+directories or reuse paths from earlier sessions.
 
 Finally, in the isolated shell: `unset KEY_DIR KEY KEY_FINGERPRINT` and `exit`.
 
@@ -180,9 +190,12 @@ Finally, in the isolated shell: `unset KEY_DIR KEY KEY_FINGERPRINT` and `exit`.
 - **Format:** QR when the account is on another device; PNG if the terminal cannot
   render the QR; text for another channel.
 - **Host:** GitHub and GitLab are above; SSH-server details are in `reference.md`.
-- **Identity:** pass `--name` and `--email` to `start` or `env`, or use per-command
-  `-c user.name=... -c user.email=...`. Do not edit config. Use the account's noreply
-  address if its private email is blocked.
+- **Identity:** ask once for the author name and email, then pass `--name` and
+  `--email` to `start` or `env`; use the values verbatim. If the user declines or
+  the session only fetches/clones, use per-command
+  `-c user.name=... -c user.email=...` when committing. Do not edit config or trust
+  the machine's global identity. Use the account's noreply address if its private
+  email is blocked.
 - **Rewrite rules:** prefer an explicit `git@...` URL. Inspect and bypass when the
   machine's rules are unknown; `reference.md` has the commands.
 - **Signing:** do not sign with the temporary key unless intended; isolated config
@@ -191,7 +204,7 @@ Finally, in the isolated shell: `unset KEY_DIR KEY KEY_FINGERPRINT` and `exit`.
 
 ## Stop conditions
 
-- `temp-ssh-key` is missing or older than `0.2.0`.
+- `temp-ssh-key` is missing or older than `0.2.2`.
 - The session is not in a history-isolated shell.
 - The user cannot provide an interactive terminal for `create`, `shell`, `start`,
   `--remove`, or a passphrase.
