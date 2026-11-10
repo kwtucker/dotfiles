@@ -56,6 +56,19 @@ Do not treat this skill as authorization to edit in a read-only or planning task
   available repository tooling or `gofmt` and disclose the fallback. Check that
   automatic import selection chose the intended package; avoid unrelated formatting.
 
+### File organization
+
+- Go does not mandate declaration order. For new or substantially revised
+  production files, prefer constants and supporting types, then the main
+  operation/API, then supporting helpers in call-flow order: decoding/validation
+  before lower-level lookup/control helpers, where those phases apply.
+- Keep related receiver methods and their types together when that is clearer.
+  Place package-level tables near the logic they support, and preserve
+  initialization behavior when moving declarations.
+- Follow established repository conventions over this default. Do not reorder
+  unrelated code solely to enforce it; the goal is to make the main flow easy to
+  find and its supporting logic easy to follow.
+
 ### Exported API comments
 
 - Document exported functions, methods, and types. Begin the opening sentence with
