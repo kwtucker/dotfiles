@@ -32,7 +32,7 @@ command -v temp-ssh-key
 temp-ssh-key --version
 ```
 
-Require `0.2.2` or newer. If it is missing or older, stop and tell the user how to
+Require `0.2.3` or newer. If it is missing or older, stop and tell the user how to
 install or upgrade it. Do not download and run a binary on an untrusted machine
 without the user's explicit approval and a checksum check; see `reference.md`.
 
@@ -204,7 +204,7 @@ Finally, in the isolated shell: `unset KEY_DIR KEY KEY_FINGERPRINT` and `exit`.
 
 ## Stop conditions
 
-- `temp-ssh-key` is missing or older than `0.2.2`.
+- `temp-ssh-key` is missing or older than `0.2.3`.
 - The session is not in a history-isolated shell.
 - The user cannot provide an interactive terminal for `create`, `shell`, `start`,
   `--remove`, or a passphrase.
