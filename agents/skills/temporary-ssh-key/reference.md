@@ -61,7 +61,8 @@ downloading a different version.
 | `start` | normally empty because the process is replaced | public key, QR/PNG path, next steps, warnings, notes |
 | `show` | the requested artifact | fingerprint |
 | `env` | eval-safe exports | nothing |
-| `cleanup` (print mode) | literal `rm -i`/`rmdir` commands | revocation warning and note |
+| `cleanup` | empty; prompts and removal report on stderr | revocation warning, per-file prompts |
+| `cleanup --dry-run` | literal `rm -i`/`rmdir` commands | revocation warning and note |
 
 The split for `create` is what makes this safe:
 
@@ -278,12 +279,14 @@ is shell-history isolation; it is separate from the Git config isolation that
 
 ## Cleanup guards
 
-- `cleanup [dir]` prints literal `rm -i` paths and `rmdir`; it deletes nothing.
-  When `dir` is omitted, it uses `$KEY_DIR`, which `start`, `shell KEY_DIR`, and
-  `env` export.
-- `--remove` requires interactive terminals on stdin and stderr. It prompts per
-  managed file on stderr, then removes the directory without recursion. stdout may
-  be captured. A failed prompt write aborts before deleting anything.
+- `cleanup [dir]` prompts per managed file on stderr, then removes the directory
+  without recursion. When `dir` is omitted, it uses `$KEY_DIR`, which `start`,
+  `shell KEY_DIR`, and `env` export.
+- `cleanup` requires interactive terminals on stdin and stderr. stdout may be
+  captured. A failed prompt write aborts before deleting anything. `--yes` skips
+  the prompts and allows non-interactive use; `--dry-run` prints the literal
+  `rm -i` paths and `rmdir` instead and deletes nothing. The two flags are
+  mutually exclusive.
 - It refuses a directory that is not absolute, is a symlink, is not owned by the
   user, is not mode 700, whose basename is not `temp-ssh-key.*`, or that contains
   anything other than `id_ed25519`, `id_ed25519.pub`, and `public-key.png`.
@@ -305,8 +308,11 @@ start  [--format text|qr|png] [--comment TEXT] [--allow-unencrypted] [--base DIR
        [--shell zsh|bash] [--name NAME --email EMAIL] [--no-isolate-config]
 show   KEY_DIR [--format text|qr|png]
 env    KEY_DIR [--name NAME --email EMAIL] [--no-isolate-config]
-cleanup [KEY_DIR] [--remove]
+cleanup [KEY_DIR] [--dry-run] [--yes]
 ```
+
+`--dry-run` and `--yes` require 0.3.0 or newer; on 0.2.x, `cleanup` prints and
+`cleanup --remove` deletes.
 
 `--help` is authoritative. `create` no longer enters a shell; `start` composes
 create and shell. `--allow-unencrypted` only after explicit agreement. `--comment`
@@ -333,8 +339,9 @@ location, never a repository or synced folder.
   directory was removed. Do not guess a path; rerun the flow.
 - `cleanup` says `KEY_DIR is not set`: run it inside the session started by `start`
   or `shell KEY_DIR`, or pass the path explicitly.
-- `cleanup --remove` refuses: stdin or stderr is not an interactive terminal. Run it
-  in the user's terminal; stdout may still be captured.
+- `cleanup` refuses: stdin or stderr is not an interactive terminal. Run it in the
+  user's terminal, or use `--yes` (0.3.0+) if the user explicitly wants a
+  non-interactive deletion; stdout may still be captured.
 - Git commits fail with no identity: `start` isolates global config by default, so
   pass `--name` and `--email` (or use `--no-isolate-config`, or set the identity in
   the repository).

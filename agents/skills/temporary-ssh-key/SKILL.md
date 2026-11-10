@@ -44,10 +44,10 @@ without the user's explicit approval and a checksum check; see `reference.md`.
   not contact or change it without separate authorization.
 - Passphrases go only to the user's interactive `ssh-keygen` prompt. Never ask for,
   print, or place one in chat, arguments, environment variables, files, or history.
-- `create`, `shell`, `start`, and `cleanup --remove` are the user's commands. They
-  need their terminal; do not run them through a tool call. The agent may run
-  non-interactive commands such as `--version`, `show`, `env`, and the print-only
-  form of `cleanup`.
+- `create`, `shell`, `start`, and `cleanup` are the user's commands. `cleanup` and
+  `cleanup --yes` delete files; do not run them through a tool call. The agent may
+  run non-interactive commands such as `--version`, `show`, `env`, and
+  `cleanup --dry-run`.
 - An unencrypted key only after explicit agreement, using `--allow-unencrypted`.
 - Never sign in to the personal account on this machine: no `gh auth login`,
   `glab auth login`, browser session, or credential prompt. Authorize and revoke on
@@ -171,15 +171,19 @@ On the trusted device, delete the temporary key:
 Confirm revocation before local deletion. Then, in the user's terminal:
 
 ```sh
-temp-ssh-key cleanup            # prints the commands for $KEY_DIR; deletes nothing
-temp-ssh-key cleanup --remove   # prompts per file, then rmdir
+temp-ssh-key cleanup            # prompts per file, then rmdir $KEY_DIR
+temp-ssh-key cleanup --dry-run  # prints the commands; deletes nothing
 ```
 
+On 0.2.x, `cleanup` only prints and `cleanup --remove` deletes; `--dry-run` and
+`--yes` require 0.3.0 or newer.
+
 `KEY_DIR` defaults to `$KEY_DIR`, so no path is needed inside the session.
-`--remove` requires interactive terminals on stdin and stderr, writes its prompts
-to stderr, and must be the user's command, not the agent's. If deletion is
-declined or files remain, report incomplete cleanup. Never glob temporary
-directories or reuse paths from earlier sessions.
+`cleanup` requires interactive terminals on stdin and stderr, writes its prompts
+to stderr, and must be the user's command, not the agent's. `--yes` skips the
+prompts but still deletes; do not run it for the user. If deletion is declined or
+files remain, report incomplete cleanup. Never glob temporary directories or reuse
+paths from earlier sessions.
 
 Finally, in the isolated shell: `unset KEY_DIR KEY KEY_FINGERPRINT` and `exit`.
 
@@ -207,7 +211,7 @@ Finally, in the isolated shell: `unset KEY_DIR KEY KEY_FINGERPRINT` and `exit`.
 - `temp-ssh-key` is missing or older than `0.2.3`.
 - The session is not in a history-isolated shell.
 - The user cannot provide an interactive terminal for `create`, `shell`, `start`,
-  `--remove`, or a passphrase.
+  `cleanup`, or a passphrase.
 - The greeted account is not the intended one.
 - Revocation is not confirmed.
 - Cleanup refuses the directory or files remain.
