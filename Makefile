@@ -17,7 +17,7 @@ MAKEFLAGS += $(JOBS) $(OUTPUT_SYNC)
 include env.mk
 
 MODULES = \
-	  bin zsh alacritty fzf tmux git golang kubernetes helm terraform docker \
+	  bin zsh alacritty fzf tmux git tig golang kubernetes helm terraform docker \
 	  bat nvim psql ripgrep fonts rust agents opencode $(LOCAL_MODULES)
 
 # Optional modules — installed on demand (`make <module>`), not part of `make all`.

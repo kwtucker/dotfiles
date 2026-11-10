@@ -97,6 +97,7 @@ Configuration is split into independent modules, each in its own directory with 
 | `nvim/` | Neovim / LazyVim config |
 | `tmux/` | tmux config, TPM plugins |
 | `git/` | Git config, aliases, delta pager |
+| `tig/` | Tig Git browser config (binary: mise) |
 | `fzf/` | fzf config and shell integration |
 | `alacritty/` | Alacritty terminal config |
 | `golang/` | Go environment variables; `gofumpt`, `goimports`, `staticcheck`, `govulncheck` (binary: mise) |
