@@ -1,0 +1,3 @@
+set split-view-width = 75%
+set split-view-height = 80%
+set wrap-lines = yes
