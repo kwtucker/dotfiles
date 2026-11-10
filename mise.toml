@@ -9,13 +9,13 @@
 
 [tools]
 # ── Runtimes ──────────────────────────────────────────────────────────────────
-go   = "1.26"
-node = "24"       # required by Mason (LSP installer inside neovim)
+go = "1.27"
+node = "24"     # required by Mason (LSP installer inside neovim)
 python = "3.13"
-uv     = "0.13.0"
-ruff   = "0.17.0"
-rust   = "stable"
-tmux   = "3.7c"
+uv = "0.13.0"
+ruff = "0.17.0"
+rust = "stable"
+tmux = "3.7c"
 
 # ── Build tooling ─────────────────────────────────────────────────────────────
 # macOS ships GNU Make 3.81, which predates --output-sync: the parallel module
@@ -24,45 +24,48 @@ tmux   = "3.7c"
 make = "4"
 
 # ── Kubernetes / Infra ────────────────────────────────────────────────────────
-kubectl   = "1.35.3"
-helm      = "4.1.3"
+kubectl = "1.35.3"
+helm = "4.1.3"
 terraform = "1.14.8"
 
 # ── Neovim + shell tooling ────────────────────────────────────────────────────
-"aqua:neovim/neovim"         = "0.12.6"
-"github:junegunn/fzf"        = "0.74.4"
-"aqua:BurntSushi/ripgrep"    = "15.2.0"
-"aqua:sharkdp/fd"            = "10.5.0"
-"aqua:sharkdp/bat"           = "0.26.1"
+"aqua:neovim/neovim" = "0.12.6"
+"github:junegunn/fzf" = "0.74.4"
+"aqua:BurntSushi/ripgrep" = "15.2.0"
+"aqua:sharkdp/fd" = "10.5.0"
+"aqua:sharkdp/bat" = "0.26.1"
 "aqua:jesseduffield/lazygit" = "0.66.0"
-"conda:tig"                  = "2.6.1"
-"aqua:cli/cli"               = "2.102.0"
-"aqua:starship/starship"     = "1.26.0"
-"aqua:docker/cli"            = "29.9.0"
-"cargo:stylua"               = "2.5.2"
-"aqua:jqlang/jq"             = "1.8.2"
-"aqua:FiloSottile/age"       = "1.3.2"
-"aqua:getsops/sops"          = "3.11.0"
-"aqua:fullstorydev/grpcurl"  = "1.9.4"
+"conda:tig" = "2.6.1"
+"conda:libqrencode" = "4.1.1"           # Provides the qrencode CLI.
+# Register the bundled renderers so the conda installation supports PNG output.
+"conda:graphviz" = { version = "14.1.2", postinstall = "dot -c" }
+"aqua:cli/cli" = "2.102.0"
+"aqua:starship/starship" = "1.26.0"
+"aqua:docker/cli" = "29.9.0"
+"cargo:stylua" = "2.5.2"
+"aqua:jqlang/jq" = "1.8.2"
+"aqua:FiloSottile/age" = "1.3.2"
+"aqua:getsops/sops" = "3.11.0"
+"aqua:fullstorydev/grpcurl" = "1.9.4"
 
 # ── Go tooling ────────────────────────────────────────────────────────────────
 # Prebuilt binaries where upstream publishes them; goimports and govulncheck
 # have no release assets, so they build via `go install` (go: backend).
 # staticcheck releases are date-based (2026.2.2 is module v0.8.2).
-"aqua:mvdan/gofumpt"                   = "0.12.0"
-"github:dominikh/go-tools"             = "2026.2.2"  # staticcheck
-"go:golang.org/x/tools/cmd/goimports"  = "0.52.0"
+"aqua:mvdan/gofumpt" = "0.12.0"
+"github:dominikh/go-tools" = "2026.2.2"          # staticcheck
+"go:golang.org/x/tools/cmd/goimports" = "0.52.0"
 "go:golang.org/x/vuln/cmd/govulncheck" = "1.9.0"
 
 # ── Personal tools ────────────────────────────────────────────────────────────
-"github:kwtucker/temp-ssh-key" = "0.3.0"
+"github:kwtucker/temp-ssh-key" = "0.2.3"
 
 # ── LSP servers ───────────────────────────────────────────────────────────────
-"aqua:artempyanykh/marksman"     = "2026-02-08"
-"go:golang.org/x/tools/gopls"    = "0.23.0"
-"aqua:hashicorp/terraform-ls"    = "0.39.0"
-"aqua:terraform-linters/tflint"  = "0.64.0"
-"github:golangci/golangci-lint"  = "2.14.0"
+"aqua:artempyanykh/marksman" = "2026-02-08"
+"go:golang.org/x/tools/gopls" = "0.23.0"
+"aqua:hashicorp/terraform-ls" = "0.39.0"
+"aqua:terraform-linters/tflint" = "0.64.0"
+"github:golangci/golangci-lint" = "2.14.0"
 "aqua:terraform-docs/terraform-docs" = "0.24.0"
 
 # ── AI agents ────────────────────────────────────────────────────────────────
@@ -76,14 +79,14 @@ version = "1.0.105"
 # version_list_url — a future v3 will not arrive without a deliberate bump
 # here. Client-side only.
 [tools."http:opencode"]
-version           = "2"
-version_list_url  = "https://opencode.ai/update/api/latest/cli/npm"
+version = "2"
+version_list_url = "https://opencode.ai/update/api/latest/cli/npm"
 version_json_path = ".version"
 
 [tools."http:opencode".platforms]
-linux-x64   = { url = "https://opencode.ai/files/bin/{{version}}/opencode-linux-x64.tar.gz" }
+linux-x64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-linux-x64.tar.gz" }
 linux-arm64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-linux-arm64.tar.gz" }
-macos-x64   = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin-x64.zip" }
+macos-x64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin-x64.zip" }
 macos-arm64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin-arm64.zip" }
 
 [settings]
