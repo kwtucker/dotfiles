@@ -15,7 +15,7 @@ temp-ssh-key --version
 On another trusted machine:
 
 ```sh
-mise use -g github:kwtucker/temp-ssh-key@0.2.2
+mise use -g github:kwtucker/temp-ssh-key@0.2.3
 # or
 go install github.com/kwtucker/temp-ssh-key/cmd/temp-ssh-key@latest
 ```
@@ -24,7 +24,7 @@ On an untrusted machine, prefer a one-off pinned download over a persistent
 install, and get the user's explicit approval first:
 
 ```sh
-VERSION=0.2.2
+VERSION=0.2.3
 case "$(uname -s)" in
   Linux) os=linux ;;
   Darwin) os=darwin ;;
@@ -50,7 +50,7 @@ tar -xzf "$archive"
 Delete the temporary directory and archive when the session ends. Do not install to a
 persistent `PATH` location on a machine you do not trust unless the user asks.
 
-Require `0.2.2` or newer. If the tool is missing or older, stop rather than silently
+Require `0.2.3` or newer. If the tool is missing or older, stop rather than silently
 downloading a different version.
 
 ## Output contract
@@ -82,7 +82,7 @@ writes to stdout and does need stdout to be a terminal.
 - It refuses to overwrite an existing private or public key path.
 - It generates Ed25519 with `ssh-keygen` and the `--comment` value (default
   `temporary-ssh-access`; never use an email unless the user asks). The comment must
-  be one non-empty line.
+  be one non-empty line of printable text, at most 256 bytes.
 - It verifies that the private key is a regular, non-symlink, non-empty file at mode
   600. It parses the public key as one OpenSSH `ssh-ed25519` line and computes the
   `SHA256:...` fingerprint from the key blob. It does not call `ssh-keygen -lf`.
@@ -240,8 +240,11 @@ It sets `HISTFILE=/dev/null` and `SAVEHIST=0` (zsh) or `HISTSIZE=0` (bash), and
 `TEMP_SSH_KEY_ISOLATED=1`. `start` and `shell KEY_DIR` export the full session
 environment: `KEY_DIR`, `KEY`, `KEY_FINGERPRINT`, `GIT_SSH_COMMAND`,
 `GIT_TERMINAL_PROMPT=0`, the `core.sshCommand` override, optional identity, and Git
-config isolation. `shell` without a path only isolates history; create and export
-inside it.
+config isolation. They also unset inherited credential and repository overrides
+(including `SSH_AUTH_SOCK`, `SSH_ASKPASS`, `GIT_ASKPASS`, `GIT_CONFIG_PARAMETERS`,
+`GIT_DIR`, and numbered `GIT_CONFIG_KEY_*`/`GIT_CONFIG_VALUE_*` entries) so the
+session uses only the explicit temporary key. `shell` without a path only isolates
+history; create and export inside it.
 
 Git config isolation uses `GIT_CONFIG_GLOBAL` and `GIT_CONFIG_SYSTEM`, which
 require Git 2.32 or newer. On older Git, use `--no-isolate-config`; the explicit
@@ -314,7 +317,7 @@ location, never a repository or synced folder.
 
 - `temp-ssh-key: command not found`: install it; do not assume the skill directory
   contains the executable.
-- Version older than `0.2.2`: upgrade before running the flow.
+- Version older than `0.2.3`: upgrade before running the flow.
 - `create` refuses: stdin is not a terminal (needed for a passphrase) or stderr is
   not a terminal (needed for QR output). Run it in the user's terminal; use
   `--format png` or `text` if QR rendering is impossible. Versions before `0.1.3`
@@ -335,8 +338,6 @@ location, never a repository or synced folder.
 - Git commits fail with no identity: `start` isolates global config by default, so
   pass `--name` and `--email` (or use `--no-isolate-config`, or set the identity in
   the repository).
-- `env: GIT_CONFIG_COUNT is not a non-negative integer`: the shell has a malformed
-  override; unset or fix it before evaluating the exports.
 - Wrong account greeted: stop; do not push.
 - Push URL unexpectedly uses an internal host: an `insteadOf` or `pushInsteadOf`
   rule is active; inspect with the commands above and use an explicit personal SSH
