@@ -1,5 +1,6 @@
 {
   "autoUpdate": false,
   "defaultMode": "plan",
-  "includeCoAuthoredBy": false
+  "includeCoAuthoredBy": false,
+  "disabledSkills": []
 }
