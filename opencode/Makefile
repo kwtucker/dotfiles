@@ -16,9 +16,9 @@ install: .ensure.xdg.opencode
 	@$(DOTFILES_LINK) link_dir "$(CURDIR)" "$(XDG_CONFIG_HOME)/$(MODULE_NAME)"
 	@echo "🔗 Linked $(CURDIR) -> $(XDG_CONFIG_HOME)/$(MODULE_NAME)"
 	@if [ -w "$(MISE_DATA)" ] || [ ! -d "$(MISE_DATA)" ]; then \
-		MISE_YES=1 mise install $(OPENCODE_TOOL); \
+		MISE_YES=1 mise install --yes $(OPENCODE_TOOL); \
 		mise reshim; \
-		mise prune $(OPENCODE_TOOL) || true; \
+		MISE_YES=1 mise prune --yes $(OPENCODE_TOOL) || true; \
 		mise ls $(OPENCODE_TOOL); \
 	else \
 		echo "⚠️  $(MISE_DATA) not writable — skipping tool install"; \
@@ -28,19 +28,19 @@ install: .ensure.xdg.opencode
 # Remove superseded opencode versions (keeps the one mise.toml requests).
 prune:
 	@echo "Pruning old $(MODULE_NAME) versions..."
-	@mise prune $(OPENCODE_TOOL) || true
+	@MISE_YES=1 mise prune --yes $(OPENCODE_TOOL) || true
 	@mise ls $(OPENCODE_TOOL)
 
 upgrade:
 	@echo "Upgrading $(MODULE_NAME)..."
-	@MISE_YES=1 mise upgrade $(OPENCODE_TOOL)
+	@MISE_YES=1 mise upgrade --yes $(OPENCODE_TOOL)
 	@mise reshim
 	@mise ls $(OPENCODE_TOOL)
 	@echo "✅ $(MODULE_NAME) upgraded."
 
 clean: .remove.xdg.opencode
 	@echo "Cleaning $(MODULE_NAME) data..."
-	@mise uninstall $(OPENCODE_TOOL) || true
+	@MISE_YES=1 mise uninstall --yes $(OPENCODE_TOOL) || true
 	@echo "✅ $(MODULE_NAME) cleaned."
 
 # Compatibility alias: shared skills now belong to the agents module.

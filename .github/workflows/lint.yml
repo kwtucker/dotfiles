@@ -27,6 +27,7 @@ jobs:
       - uses: jdx/mise-action@c37c93293d6b742fc901e1406b8f764f6fb19dac # v2
         with:
           install: false
-      # Install only the linters; the full tool set is not needed here.
-      - run: mise install shellcheck shfmt
+      # Install only the linters; the full tool set is not needed here. Locked
+      # mode uses the committed checksums and avoids registry lookups.
+      - run: MISE_YES=1 MISE_LOCKED=1 mise install shellcheck shfmt
       - run: make lint

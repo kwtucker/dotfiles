@@ -128,7 +128,7 @@ fmt: ## Format shell scripts with shfmt
 		echo "error: shfmt not found — run 'mise install'" >&2; exit 1; \
 	fi
 
-upgrade.tools: ## Upgrade mise tools within pinned ranges + refresh completions
+upgrade.tools: ## Upgrade mise tools within pinned ranges + refresh lockfile/completions
 	@MISE_YES=1 mise upgrade --yes
 	@mise reshim
 	@for m in $(COMPLETION_MODULES); do \

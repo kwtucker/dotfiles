@@ -3,9 +3,10 @@
 #
 # Tools are pinned to exact versions by default so upgrades are deliberate and
 # reproducible; language runtimes keep their minor range so patch releases flow.
-# Bump a pin with `make outdated` → edit here → commit, then `mise install`
-# (or `./install`) on a live machine. `make upgrade.tools` never rewrites pins —
-# it only moves within ranges.
+# mise.lock records the exact resolved version, URL, and checksum for every tool
+# on linux and macOS (x64/arm64). Bump a pin with `make outdated` → edit here →
+# `mise install` (or `./install`), then commit both files. `make upgrade.tools`
+# never rewrites pins — it moves within ranges and refreshes the lockfile.
 
 [tools]
 # ── Runtimes ──────────────────────────────────────────────────────────────────
@@ -14,6 +15,8 @@ node = "24"     # required by Mason (LSP installer inside neovim)
 python = "3.13"
 uv = "0.13.0"
 ruff = "0.17.0"
+# Rust tracks the upstream `stable` channel and is intentionally not reproducible
+# from this file. Add a project `rust-toolchain.toml` when an exact compiler matters.
 rust = "stable"
 tmux = "3.7c"
 
@@ -90,13 +93,21 @@ version = "2"
 version_list_url = "https://opencode.ai/update/api/latest/cli/npm"
 version_json_path = ".version"
 
+# Upstream publishes no checksum sidecars. These SHA-256 digests are computed
+# from the 2.3.0 artifacts (`curl -fsSL <url> | sha256sum`); replace all four
+# when bumping `version`. The lockfile records the same values.
 [tools."http:opencode".platforms]
-linux-x64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-linux-x64.tar.gz" }
-linux-arm64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-linux-arm64.tar.gz" }
-macos-x64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin-x64.zip" }
-macos-arm64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin-arm64.zip" }
+linux-x64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-linux-x64.tar.gz", checksum = "sha256:fc0f81522aceeabac47693d88389efa2bc517ce74c2c38fd6967819fcc6e4d3b" }
+linux-arm64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-linux-arm64.tar.gz", checksum = "sha256:3207fb5cdec448d479242c0f1a14f4f7bdfcad3a79209b5eb8f9003725e93711" }
+macos-x64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin-x64.zip", checksum = "sha256:79a4841925e3344d5bb4b000acf6c50b11de301e9047aa9bea9e288e77fe4249" }
+macos-arm64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin-arm64.zip", checksum = "sha256:7907df2b12720a840fbb49c5b978b9b82925b6bf75479a5fd216afa8932b6702" }
 
 [settings]
 go.set_gobin = false
 not_found_auto_install = false
-yes = true
+# Record exact versions, URLs, and checksums in mise.lock. `mise install`
+# refreshes it when this file changes, so commit both together.
+lockfile = true
+# mise's default, made explicit: fuzzy selectors (go/node/python/make/rust) wait
+# 24h for a new release. Exact pins and versions in mise.lock are exempt.
+minimum_release_age = "24h"
