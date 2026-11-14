@@ -25,6 +25,12 @@ OPTIONAL_MODULES = copilot
 
 TARGETS := $(MODULES) $(filter-out $(MODULES),$(OPTIONAL_MODULES))
 
+# Shell sources checked by `make lint`. `install` has no .sh suffix.
+SHELL_SCRIPTS := install scripts/state scripts/fetch scripts/bootstrap-mise.sh $(wildcard scripts/lib/*.sh)
+SHELLCHECK ?= $(shell mise which shellcheck 2>/dev/null || command -v shellcheck 2>/dev/null)
+SHFMT ?= $(shell mise which shfmt 2>/dev/null || command -v shfmt 2>/dev/null)
+SHFMT_FLAGS := -i 2 -ci
+
 # Hidden, machine-readable metadata for scripts/state (read-only). Keeping the
 # module inventory here makes Make the single source of truth; no shell script
 # parses this Makefile.
@@ -98,6 +104,30 @@ doctor: ## Diagnose install state (read-only; offline unless ARGS=--online)
 status: ## Show repository, applied, and filesystem state (read-only)
 	@scripts/state status $(ARGS)
 
+lint: ## Lint shell scripts (bash -n, shellcheck, shfmt)
+	@fail=0; \
+	for f in $(SHELL_SCRIPTS); do \
+		bash -n "$$f" || fail=1; \
+	done; \
+	if [ -n "$(SHELLCHECK)" ]; then \
+		$(SHELLCHECK) -x $(SHELL_SCRIPTS) || fail=1; \
+	else \
+		echo "error: shellcheck not found — run 'mise install'" >&2; fail=1; \
+	fi; \
+	if [ -n "$(SHFMT)" ]; then \
+		$(SHFMT) -d $(SHFMT_FLAGS) $(SHELL_SCRIPTS) || fail=1; \
+	else \
+		echo "error: shfmt not found — run 'mise install'" >&2; fail=1; \
+	fi; \
+	exit $$fail
+
+fmt: ## Format shell scripts with shfmt
+	@if [ -n "$(SHFMT)" ]; then \
+		$(SHFMT) -w $(SHFMT_FLAGS) $(SHELL_SCRIPTS); \
+	else \
+		echo "error: shfmt not found — run 'mise install'" >&2; exit 1; \
+	fi
+
 upgrade.tools: ## Upgrade mise tools within pinned ranges + refresh completions
 	@MISE_YES=1 mise upgrade --yes
 	@mise reshim
@@ -117,7 +147,7 @@ upgrade.plugins: $(UPGRADE) ## Upgrade editor/shell plugins (nvim, tmux, zsh, op
 
 upgrade.all: upgrade.tools upgrade.plugins ## Upgrade tools + plugins
 
-.PHONY: $(TARGETS) $(CLEAN) $(UPGRADE) install update all clean.all outdated doctor status upgrade.tools prune.tools upgrade.plugins upgrade.all
+.PHONY: $(TARGETS) $(CLEAN) $(UPGRADE) install update all clean.all outdated doctor status lint fmt upgrade.tools prune.tools upgrade.plugins upgrade.all
 
 help: ## Show this help message
 	@echo "Available targets:"; \
@@ -134,6 +164,8 @@ help: ## Show this help message
 	echo "  make outdated       # Preview outdated tools (no changes)"; \
 	echo "  make doctor         # Diagnose install state (read-only)"; \
 	echo "  make status         # Show repo, applied, and filesystem state"; \
+	echo "  make lint           # Check shell scripts (bash -n, shellcheck, shfmt)"; \
+	echo "  make fmt            # Format shell scripts with shfmt"; \
 	echo "  make upgrade.tools  # Upgrade mise tools within pinned ranges"; \
 	echo "  make prune.tools    # Remove superseded mise tool versions"; \
 	echo "  make upgrade.plugins # Upgrade editor/shell plugins"; \
