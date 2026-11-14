@@ -1,0 +1,32 @@
+name: lint
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shell:
+    name: shell (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # The scripts target bash 3.2 on macOS and modern bash on Linux, so
+        # lint both rather than assuming one shell's behaviour.
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      # Pinned tags: bump the SHA and the comment together.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: jdx/mise-action@c37c93293d6b742fc901e1406b8f764f6fb19dac # v2
+        with:
+          install: false
+      # Install only the linters; the full tool set is not needed here.
+      - run: mise install shellcheck shfmt
+      - run: make lint
