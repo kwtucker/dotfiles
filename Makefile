@@ -25,6 +25,23 @@ OPTIONAL_MODULES = copilot
 
 TARGETS := $(MODULES) $(filter-out $(MODULES),$(OPTIONAL_MODULES))
 
+# Hidden, machine-readable metadata for scripts/state (read-only). Keeping the
+# module inventory here makes Make the single source of truth; no shell script
+# parses this Makefile.
+.PHONY: .list.modules .list.paths
+
+.list.modules:
+	@for m in $(MODULES); do printf 'enabled\t%s\n' "$$m"; done
+	@for m in $(filter-out $(MODULES),$(OPTIONAL_MODULES)); do printf 'optional\t%s\n' "$$m"; done
+
+.list.paths:
+	@printf 'config\t%s\n' "$(XDG_CONFIG_HOME)"
+	@printf 'cache\t%s\n' "$(XDG_CACHE_HOME)"
+	@printf 'data\t%s\n' "$(XDG_DATA_HOME)"
+	@printf 'state\t%s\n' "$(XDG_STATE_HOME)"
+	@printf 'completions\t%s\n' "$(ZSH_COMPLETIONS_DIR)"
+	@printf 'font\t%s\n' "$(FONT_DIR)"
+
 CLEAN := $(addsuffix .clean,$(TARGETS))
 
 UPGRADE := $(addsuffix .upgrade,$(TARGETS))
@@ -75,6 +92,12 @@ outdated: ## Show outdated tools (no changes)
 	@echo ""
 	@echo "Tip: 'mise outdated --bump' shows versions outside pinned ranges (bumps stay manual)."
 
+doctor: ## Diagnose install state (read-only; offline unless ARGS=--online)
+	@scripts/state doctor $(ARGS)
+
+status: ## Show repository, applied, and filesystem state (read-only)
+	@scripts/state status $(ARGS)
+
 upgrade.tools: ## Upgrade mise tools within pinned ranges + refresh completions
 	@MISE_YES=1 mise upgrade --yes
 	@mise reshim
@@ -94,7 +117,7 @@ upgrade.plugins: $(UPGRADE) ## Upgrade editor/shell plugins (nvim, tmux, zsh, op
 
 upgrade.all: upgrade.tools upgrade.plugins ## Upgrade tools + plugins
 
-.PHONY: $(TARGETS) $(CLEAN) $(UPGRADE) install update all clean.all outdated upgrade.tools prune.tools upgrade.plugins upgrade.all
+.PHONY: $(TARGETS) $(CLEAN) $(UPGRADE) install update all clean.all outdated doctor status upgrade.tools prune.tools upgrade.plugins upgrade.all
 
 help: ## Show this help message
 	@echo "Available targets:"; \
@@ -109,6 +132,8 @@ help: ## Show this help message
 	echo "  make clean.all      # Clean all modules"; \
 	echo "  make <module>.clean # Clean a specific module, e.g. 'make zsh.clean'"; \
 	echo "  make outdated       # Preview outdated tools (no changes)"; \
+	echo "  make doctor         # Diagnose install state (read-only)"; \
+	echo "  make status         # Show repo, applied, and filesystem state"; \
 	echo "  make upgrade.tools  # Upgrade mise tools within pinned ranges"; \
 	echo "  make prune.tools    # Remove superseded mise tool versions"; \
 	echo "  make upgrade.plugins # Upgrade editor/shell plugins"; \
