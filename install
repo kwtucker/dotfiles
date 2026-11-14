@@ -25,6 +25,20 @@ export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 mkdir -p "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"
 
+# ── Headless / container hint ─────────────────────────────────────────────────
+# Fonts only matter to a graphical terminal on this machine. Docker, Codespaces,
+# and devcontainers would still download tens of megabytes nobody renders, so
+# export the skip flag for the module pass. Set DOTFILES_SKIP_FONTS=0 to opt in
+# explicitly; the fonts module records the skip for `make doctor` / `make status`.
+CONTAINER=0
+[ -f /.dockerenv ] && CONTAINER=1
+case "${CODESPACES:-}" in true | 1) CONTAINER=1 ;; esac
+case "${REMOTE_CONTAINERS:-}" in true | 1) CONTAINER=1 ;; esac
+if [ "$CONTAINER" = "1" ] && [ "${DOTFILES_SKIP_FONTS:-}" != "0" ]; then
+  export DOTFILES_SKIP_FONTS=1
+  echo -e "  ${YELLOW}↷${RESET} headless/container detected — font download skipped (DOTFILES_SKIP_FONTS=0 overrides)"
+fi
+
 # ── Detect context ─────────────────────────────────────────────────────────────
 # If mise + key tools are already on PATH this is an *existing* machine, so we
 # take the update path: pull latest, top up anything missing, prune stale tools.
