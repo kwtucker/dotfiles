@@ -31,4 +31,5 @@ completions:
 
 clean: .remove.xdg.fzf
 	@echo "Cleaning $(MODULE_NAME) data..."
+	@rm -f "$(HOME)/.local/bin/fzf-tmux" "$(ZSH_COMPLETIONS_DIR)/_fzf"
 	@echo "✅ $(MODULE_NAME) cleaned."

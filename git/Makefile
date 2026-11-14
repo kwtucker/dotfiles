@@ -45,4 +45,5 @@ completions:
 
 clean: .remove.xdg.git
 	@echo "Cleaning $(MODULE_NAME) data..."
+	@rm -f "$(WT_BIN)" "$(ZSH_COMPLETIONS_DIR)/_wt"
 	@echo "✅ $(MODULE_NAME) cleaned."

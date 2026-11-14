@@ -20,4 +20,5 @@ completions:
 
 clean: .remove.xdg.helm
 	@echo "Cleaning $(MODULE_NAME) data..."
+	@rm -f "$(ZSH_COMPLETIONS_DIR)/_helm"
 	@echo "✅ $(MODULE_NAME) cleaned."

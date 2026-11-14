@@ -20,4 +20,5 @@ completions:
 
 clean: .remove.xdg.ripgrep
 	@echo "Cleaning $(MODULE_NAME) data..."
+	@rm -f "$(ZSH_COMPLETIONS_DIR)/_rg"
 	@echo "✅ $(MODULE_NAME) cleaned."

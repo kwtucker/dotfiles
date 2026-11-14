@@ -92,6 +92,7 @@ install: ## Install or update this machine in any context (runs ./install)
 update: install ## Update an existing machine (alias for `install`)
 
 clean.all: $(CLEAN) ## Clean all modules
+	@rmdir "$(ZSH_COMPLETIONS_DIR)" "$(XDG_DATA_HOME)/zsh" 2>/dev/null || true
 
 outdated: ## Show outdated tools (no changes)
 	@mise outdated || true

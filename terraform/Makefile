@@ -25,4 +25,5 @@ completions:
 
 clean: .remove.xdg.terraform
 	@echo "Cleaning $(MODULE_NAME) data..."
+	@rm -f "$(ZSH_COMPLETIONS_DIR)/_terraform"
 	@echo "✅ $(MODULE_NAME) cleaned."

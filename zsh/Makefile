@@ -120,6 +120,11 @@ regen-cache:
 
 clean: .remove.xdg.zsh
 	@echo "Cleaning $(MODULE_NAME) data..."
-	@rm -f $(HOME)/.zshenv
-	@rm -f $(ZSH_DIR)/antigen.zsh
+	@if [ -L "$(HOME)/.zshenv" ] && [ "$$(readlink "$(HOME)/.zshenv")" = "$(CURDIR)/zshenv" ]; then \
+		rm -f "$(HOME)/.zshenv"; \
+	fi
+	@for completion in _mise _uv _ruff _starship _gh _lazygit _terraform-docs; do \
+		rm -f "$(ZSH_COMPLETIONS_DIR)/$$completion"; \
+	done
+	@rmdir "$(ZSH_COMPLETIONS_DIR)" "$(XDG_DATA_HOME)/zsh" 2>/dev/null || true
 	@echo "✅ $(MODULE_NAME) cleaned."

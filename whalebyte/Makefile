@@ -28,6 +28,8 @@ install: .ensure.xdg.whalebyte
 
 clean: .remove.xdg.whalebyte
 	@echo "Cleaning $(MODULE_NAME) data..."
-	@rm -f $(LOCAL_BIN)/wbs
+	@if [ -L "$(LOCAL_BIN)/wbs" ] && [ "$$(readlink "$(LOCAL_BIN)/wbs")" = "$(CURDIR)/bin/wbs" ]; then \
+		rm -f "$(LOCAL_BIN)/wbs"; \
+	fi
 	@echo "   (vault at $(WHALEBYTE_DIR)/.secret left untouched)"
 	@echo "✅ $(MODULE_NAME) cleaned."

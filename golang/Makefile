@@ -20,4 +20,5 @@ completions:
 
 clean: .remove.xdg.golang
 	@echo "Cleaning $(MODULE_NAME) data..."
+	@rm -f "$(ZSH_COMPLETIONS_DIR)/_golangci-lint"
 	@echo "✅ $(MODULE_NAME) cleaned."
