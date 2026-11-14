@@ -40,9 +40,9 @@ fi
 # remote, a detached HEAD, or local divergence.
 if [ "$TOOLS_PRESENT" = true ]; then
   step "update"
-  if git -C "$DOTFILES_DIR" rev-parse --git-dir &>/dev/null \
-    && git -C "$DOTFILES_DIR" remote get-url origin &>/dev/null \
-    && [ "$(git -C "$DOTFILES_DIR" rev-parse --abbrev-ref HEAD)" != "HEAD" ]; then
+  if git -C "$DOTFILES_DIR" rev-parse --git-dir &>/dev/null &&
+    git -C "$DOTFILES_DIR" remote get-url origin &>/dev/null &&
+    [ "$(git -C "$DOTFILES_DIR" rev-parse --abbrev-ref HEAD)" != "HEAD" ]; then
     if git -C "$DOTFILES_DIR" pull --ff-only; then
       ok "pulled latest dotfiles"
     else
