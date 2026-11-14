@@ -262,6 +262,11 @@ Then run the module's `upgrade` target (or `./install` / `make fonts`) so
 and commit the pin, digest, and any vendored file together. Never push a bump
 whose download has not succeeded on a clean machine.
 
+`make tmux.upgrade`, the `prefix + r` binding, and TPM's own update commands act
+on the configured plugins only. TPM is installed and pinned by the tmux module
+and is deliberately not listed as a plugin, so it is never pulled off its tag.
+Change TPM only through `TPM_VERSION`/`TPM_COMMIT`.
+
 Terraform's zsh completion is vendored under `terraform/completions/` instead of
 being fetched. Fresh machines bootstrap mise with
 `scripts/bootstrap-mise.sh`; it never pipes a remote script into a shell, and it
