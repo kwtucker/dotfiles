@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# fetch — verified HTTPS download CLI used by module Makefiles.
+#
+#   scripts/fetch <https-url> <dest> <sha256> [mode]
+#
+# The digest for every pinned artifact lives next to its URL in the module
+# Makefile (for example WT_SHA256 in git/Makefile). Bump both together.
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib/fetch.sh
+. "$SCRIPT_DIR/lib/fetch.sh"
+
+if [ "$#" -lt 3 ] || [ "$#" -gt 4 ]; then
+  cat >&2 <<'EOF'
+usage: scripts/fetch <https-url> <dest> <sha256> [mode]
+
+Downloads <https-url>, verifies its SHA-256 digest, and moves it to <dest>.
+Optional [mode] is applied before the move (for example 755).
+EOF
+  exit 2
+fi
+
+fetch_verified "$@"

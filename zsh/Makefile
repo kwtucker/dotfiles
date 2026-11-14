@@ -4,6 +4,13 @@ MODULE_NAME := zsh
 ZSH_DIR := $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 LOCAL_BIN := $(HOME)/.local/bin
 
+# Antigen is vendored at zsh/antigen.zsh. Both install and upgrade verify the
+# pinned tag + digest before writing; bump ANTIGEN_VERSION and ANTIGEN_SHA256
+# together, then run `make zsh.upgrade` on a machine that should fetch it.
+ANTIGEN_VERSION := v2.3.0
+ANTIGEN_URL := https://raw.githubusercontent.com/zsh-users/antigen/$(ANTIGEN_VERSION)/bin/antigen.zsh
+ANTIGEN_SHA256 := 0f4e32690e75ec2839dacfc2f63447a2a1fe80767f24a1210fa318ff2ae5035e
+
 .PHONY: install clean upgrade regen-cache completions
 
 # Optional: set default shell (may fail in DevPod/containers)
@@ -25,21 +32,14 @@ set-default-shell:
 
 install: .ensure.xdg.zsh
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	# Remove existing directory if it's not a symlink
-	@if [ -d "$(ZSH_DIR)" ] && [ ! -L "$(ZSH_DIR)" ]; then \
-		echo "⚠️  Removing existing directory $(ZSH_DIR)"; \
-		rm -rf "$(ZSH_DIR)"; \
-	fi
-	# Create symlink
 	@$(DOTFILES_LINK) link_dir "$(CURDIR)" "$(ZSH_DIR)"
-	@echo "🔗 Linked $(CURDIR) -> $(ZSH_DIR)"
 	# Ensure local bin exists
 	@mkdir -p $(LOCAL_BIN)
 	# Install Antigen only if missing — keeps the tracked pin stable so
 	# installs never dirty the repo. Use `make zsh.upgrade` to bump it.
 	@[ -f $(ZSH_DIR)/antigen.zsh ] || { \
-		echo "Fetching antigen..."; \
-		curl -fsSL git.io/antigen -o $(ZSH_DIR)/antigen.zsh; \
+		echo "Fetching antigen $(ANTIGEN_VERSION)..."; \
+		"$(DOTFILES_FETCH)" "$(ANTIGEN_URL)" "$(ZSH_DIR)/antigen.zsh" "$(ANTIGEN_SHA256)"; \
 	}
 	# Link zshenv
 	@$(DOTFILES_LINK) link_file "$(CURDIR)/zshenv" "$(HOME)/.zshenv"
@@ -96,7 +96,8 @@ completions:
 
 upgrade:
 	@echo "Upgrading $(MODULE_NAME) plugins..."
-	@curl -fsSL git.io/antigen -o $(ZSH_DIR)/antigen.zsh
+	@echo "Verifying antigen $(ANTIGEN_VERSION)..."
+	@"$(DOTFILES_FETCH)" "$(ANTIGEN_URL)" "$(ZSH_DIR)/antigen.zsh" "$(ANTIGEN_SHA256)"
 	@rm -f "$${ADOTDIR:-$$HOME/.antigen}/.lock"
 	@zsh -ic 'antigen update'
 	# Rebuild in a fresh non-interactive shell: applying again in the update
