@@ -47,6 +47,7 @@ overwrites `.secret`.
 | `wbs` / `wbs edit` | Decrypt, edit in Neovim, validate, re-encrypt |
 | `wbs init` | Create a new empty vault (fails if one exists) |
 | `wbs get KEY` | Decrypt and print one value to stdout |
+| `wbs export KEY` | Zsh function: decrypt and export one value into the current shell without printing it |
 | `wbs list` | Decrypt and print key names, sorted (no values) |
 | `wbs validate` | Decrypt and validate the JSON, report the key count |
 | `wbs help` | Usage |
@@ -58,9 +59,32 @@ overwrites `.secret`.
 Nothing is auto-exported at shell startup. Pull values on demand:
 
 ```sh
-export API_KEY="$(wbs get API_KEY)"
+wbs export API_KEY
 OTHER_SECRET="$(wbs get OTHER_SECRET)" some-command
 ```
+
+`wbs export` is provided by `whalebyte/function.zsh`, which the module links
+into `${XDG_CONFIG_HOME:-$HOME/.config}/whalebyte/` and `.zshrc` sources with
+the rest of the module's `*.zsh` files. The standalone `bin/wbs` cannot change
+its parent shell, so only this wrapper can export a value. In an existing
+terminal that predates the module, load the function once:
+
+```sh
+source "${XDG_CONFIG_HOME:-$HOME/.config}/whalebyte/function.zsh"
+wbs export API_KEY
+```
+
+Each export prompts once to unlock the vault. The value is not printed or
+evaluated as shell code. If retrieval fails, the command returns an error
+without changing the existing variable. All other `wbs` commands pass through
+to the executable unchanged.
+
+The exported value stays in the current shell and is inherited by subsequently
+launched commands, including tests and Copilot CLI, until `unset EXAMPLE` or the
+shell exits. Other terminals and already-running applications do not receive it;
+child processes that inherited it retain their copy until they exit. This keeps
+the secret encrypted on disk, but exposes it in process memory and the
+environment while it is in use.
 
 ### How it works
 
