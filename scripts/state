@@ -423,6 +423,9 @@ cmd_status() {
     else
       printf '  overrides: none\n'
     fi
+    if module_enabled fonts && [ -f "$DOTFILES_STATE_DIR/fonts-skipped" ]; then
+      printf '  fonts:    intentionally skipped (%s)\n' "$(head -n 1 "$DOTFILES_STATE_DIR/fonts-skipped")"
+    fi
 
     section "Tools (offline)"
     if have_cmd mise; then
@@ -952,8 +955,12 @@ doctor_artifacts() {
 
   if module_enabled fonts; then
     __stamp="$FONT_DIR/.JetBrainsMono.version"
+    __skip="$DOTFILES_STATE_DIR/fonts-skipped"
     if [ -f "$__stamp" ]; then
       record_result PASS "artifacts.fonts" "JetBrains Mono $(head -n 1 "$__stamp") in $FONT_DIR"
+    elif [ -f "$__skip" ]; then
+      record_result PASS "artifacts.fonts" "font download intentionally skipped ($(head -n 1 "$__skip"))" \
+        "make fonts  # or: DOTFILES_SKIP_FONTS=0 ./install"
     else
       record_result WARN "artifacts.fonts" "font version stamp is missing" "make fonts"
     fi
