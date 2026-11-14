@@ -1,0 +1,1150 @@
+#!/usr/bin/env bash
+# state — read-only dotfiles diagnostics.
+#
+#   scripts/state check-links [--quiet] [--preflight] [--strict]
+#   scripts/state status [--exit-code] [--json]
+#   scripts/state doctor [--online] [--json] [--verbose]
+#
+# These commands never create directories, write state, install tools, or change
+# links. Network access is limited to `doctor --online`.
+
+set -eo pipefail
+
+# Keep git's optional index refresh out of the read-only path.
+export GIT_OPTIONAL_LOCKS=0
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib/common.sh
+. "$SCRIPT_DIR/lib/common.sh"
+# shellcheck source=scripts/lib/links.sh
+. "$SCRIPT_DIR/lib/links.sh"
+
+usage() {
+  cat <<'EOF'
+Usage: scripts/state <command> [options]
+
+Read-only dotfiles state commands. No command writes files or changes links.
+
+Commands:
+  check-links   Verify expected symlinks, conflicts, and orphans
+  status        Report repository, applied, and filesystem state
+  doctor        Run PASS/WARN/FAIL diagnostics with remediation
+
+check-links options:
+  --quiet       Print only problems (nothing when healthy)
+  --preflight   Report only destinations a default install would refuse
+  --strict      Also exit nonzero when orphan links point into this checkout
+
+status options:
+  --exit-code   Exit 1 when filesystem or applied state has drifted
+  --json        Machine-readable output
+
+doctor options:
+  --online      Allow network checks (mise outdated, origin reachability)
+  --json        Machine-readable output
+  --verbose     List every missing/conflicting path
+
+Exit codes:
+  doctor:       0 pass or warnings, 1 any FAIL, 2 usage error
+  status:       0 normally; 1 with --exit-code when drift is detected
+  check-links:  0 healthy, 1 drift/conflict, 2 usage error
+EOF
+}
+
+# ── Repository helpers ────────────────────────────────────────────────────────
+repo_head() {
+  git -C "$DOTFILES_ROOT" rev-parse HEAD 2>/dev/null || true
+}
+
+repo_branch() {
+  git -C "$DOTFILES_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || true
+}
+
+repo_remote() {
+  git -C "$DOTFILES_ROOT" remote get-url origin 2>/dev/null || true
+}
+
+repo_dirty() {
+  git -C "$DOTFILES_ROOT" status --porcelain 2>/dev/null || true
+}
+
+repo_upstream() {
+  git -C "$DOTFILES_ROOT" rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true
+}
+
+count_nonempty() {
+  if [ -z "$1" ]; then
+    printf '0'
+  else
+    printf '%s\n' "$1" | grep -c . || true
+  fi
+}
+
+mise_missing() {
+  if ! have_cmd mise; then
+    printf 'mise'
+    return 0
+  fi
+  mise ls --missing 2>/dev/null | grep -v '^[[:space:]]*$' | grep -v '^Tool' || true
+}
+
+short_sha() {
+  printf '%s' "$1" | cut -c1-7
+}
+
+file_hash() {
+  if [ -f "$1" ] && have_cmd git; then
+    git -C "$DOTFILES_ROOT" hash-object -- "$1" 2>/dev/null | cut -c1-12 || true
+  fi
+}
+
+# ── check-links ───────────────────────────────────────────────────────────────
+cmd_check_links() {
+  __quiet=0
+  __preflight=0
+  __strict=0
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --quiet) __quiet=1 ;;
+      --preflight) __preflight=1 ;;
+      --strict) __strict=1 ;;
+      -h | --help)
+        usage
+        exit 0
+        ;;
+      *)
+        echo "error: unknown check-links option: $1" >&2
+        usage >&2
+        exit 2
+        ;;
+    esac
+    shift
+  done
+
+  if ! load_modules; then
+    echo "error: cannot enumerate modules (make .list.modules failed)" >&2
+    exit 2
+  fi
+  load_paths || true
+
+  if ! build_expected_links; then
+    echo "error: cannot build the expected link model" >&2
+    exit 2
+  fi
+
+  verify_links
+  list_orphans
+
+  if [ "$__preflight" = "1" ]; then
+    if [ "$(link_conflict_count)" -eq 0 ]; then
+      [ "$__quiet" = "1" ] || printf 'preflight: no conflicting destinations\n'
+      exit 0
+    fi
+    if [ "${#FOREIGN_ITEMS[@]}" -gt 0 ]; then
+      for __item in "${FOREIGN_ITEMS[@]}"; do printf 'conflict: %s\n' "$__item"; done
+    fi
+    if [ "${#BLOCKED_ITEMS[@]}" -gt 0 ]; then
+      for __item in "${BLOCKED_ITEMS[@]}"; do printf 'conflict: %s\n' "$__item"; done
+    fi
+    printf 'preflight: %s destination(s) would block install\n' "$(link_conflict_count)"
+    exit 1
+  fi
+
+  __problems=$((LINK_MISSING + LINK_BROKEN + LINK_FOREIGN + LINK_BLOCKED))
+
+  if [ "${#MISSING_ITEMS[@]}" -gt 0 ]; then
+    for __item in "${MISSING_ITEMS[@]}"; do printf 'missing: %s\n' "$__item"; done
+  fi
+  if [ "${#BROKEN_ITEMS[@]}" -gt 0 ]; then
+    for __item in "${BROKEN_ITEMS[@]}"; do printf 'broken: %s\n' "$__item"; done
+  fi
+  if [ "${#FOREIGN_ITEMS[@]}" -gt 0 ]; then
+    for __item in "${FOREIGN_ITEMS[@]}"; do printf 'conflict: %s\n' "$__item"; done
+  fi
+  if [ "${#BLOCKED_ITEMS[@]}" -gt 0 ]; then
+    for __item in "${BLOCKED_ITEMS[@]}"; do printf 'conflict: %s\n' "$__item"; done
+  fi
+  if [ "${#ORPHAN_ITEMS[@]}" -gt 0 ]; then
+    for __item in "${ORPHAN_ITEMS[@]}"; do printf 'orphan: %s\n' "$__item"; done
+  fi
+
+  __rc=0
+  if [ "$__problems" -gt 0 ]; then __rc=1; fi
+  if [ "$__strict" = "1" ] && [ "$LINK_ORPHANS" -gt 0 ]; then
+    __rc=1
+  fi
+
+  if [ "$__quiet" = "0" ] || [ "$__rc" = "1" ]; then
+    printf 'links: %d ok, %d missing, %d broken, %d conflict(s), %d orphan(s)\n' \
+      "$LINK_OK" "$LINK_MISSING" "$LINK_BROKEN" "$(link_conflict_count)" "$LINK_ORPHANS"
+  fi
+
+  exit "$__rc"
+}
+
+# ── status ────────────────────────────────────────────────────────────────────
+cmd_status() {
+  __exit_code=0
+  JSON_MODE=0
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --exit-code) __exit_code=1 ;;
+      --json) JSON_MODE=1 ;;
+      -h | --help)
+        usage
+        exit 0
+        ;;
+      *)
+        echo "error: unknown status option: $1" >&2
+        usage >&2
+        exit 2
+        ;;
+    esac
+    shift
+  done
+
+  if ! load_modules; then
+    echo "error: cannot enumerate modules (make .list.modules failed)" >&2
+    exit 2
+  fi
+  load_paths || true
+
+  if ! build_expected_links; then
+    echo "error: cannot build the expected link model" >&2
+    exit 2
+  fi
+
+  verify_links
+  list_orphans
+
+  __head="$(repo_head)"
+  __branch="$(repo_branch)"
+  __remote="$(repo_remote)"
+  __dirty="$(repo_dirty)"
+  __dirty_count="$(count_nonempty "$__dirty")"
+  __upstream="$(repo_upstream)"
+  __ahead=0
+  __behind=0
+  if [ -n "$__upstream" ]; then
+    __counts="$(git -C "$DOTFILES_ROOT" rev-list --left-right --count "HEAD...$__upstream" 2>/dev/null || true)"
+    if [ -n "$__counts" ]; then
+      __ahead="${__counts%%[[:space:]]*}"
+      __behind="${__counts##*[[:space:]]}"
+    fi
+  fi
+
+  __stamp="$(stamp_head 2>/dev/null || true)"
+  __stamp_version="$(read_stamp_key version 2>/dev/null || true)"
+  __stamp_at="$(read_stamp_key applied_at 2>/dev/null || true)"
+  __stamp_verified=0
+  if stamp_verify; then __stamp_verified=1; fi
+  __stamp_diff="$STAMP_DIFF"
+  __stamp_detail="$STAMP_DIFF_DETAIL"
+  __missing_tools="$(mise_missing)"
+
+  OVERRIDE_ITEMS=()
+  for __f in modules.local.mk mise.local.toml git/config.local zsh/local; do
+    if [ -e "$DOTFILES_ROOT/$__f" ]; then
+      if [ -n "$(file_hash "$DOTFILES_ROOT/$__f")" ]; then
+        OVERRIDE_ITEMS[${#OVERRIDE_ITEMS[@]}]="$__f ($(file_hash "$DOTFILES_ROOT/$__f"))"
+      else
+        OVERRIDE_ITEMS[${#OVERRIDE_ITEMS[@]}]="$__f"
+      fi
+    fi
+  done
+
+  __conflicts="$(link_conflict_count)"
+  __filesystem_drift=$((LINK_MISSING + LINK_BROKEN + LINK_FOREIGN + LINK_BLOCKED + LINK_ORPHANS))
+
+  __backups_root="$DOTFILES_STATE_DIR/backups"
+  BACKUP_ITEMS=()
+  if [ -d "$__backups_root" ]; then
+    for __backup_dir in "$__backups_root"/*; do
+      [ -d "$__backup_dir" ] || continue
+      __entries="$(awk 'END { print NR }' "$__backup_dir/manifest.tsv" 2>/dev/null || true)"
+      BACKUP_ITEMS[${#BACKUP_ITEMS[@]}]="$(basename "$__backup_dir") (${__entries:-0} adopted)"
+    done
+  fi
+  __backup_count=${#BACKUP_ITEMS[@]}
+  __applied_drift=0
+  if [ "$__stamp_verified" != "1" ]; then
+    __applied_drift=1
+  fi
+  __tools_drift=0
+  if [ -n "$__missing_tools" ]; then __tools_drift=1; fi
+  __drift=0
+  if [ "$__filesystem_drift" -gt 0 ] || [ "$__applied_drift" -gt 0 ] || [ "$__tools_drift" -gt 0 ]; then
+    __drift=1
+  fi
+
+  if [ "$JSON_MODE" = "1" ]; then
+    printf '{'
+    printf '"repository": {'
+    printf '"root": "%s", ' "$(json_escape "$DOTFILES_ROOT")"
+    printf '"head": "%s", ' "$(json_escape "$__head")"
+    printf '"branch": "%s", ' "$(json_escape "$__branch")"
+    printf '"remote": "%s", ' "$(json_escape "$__remote")"
+    printf '"dirty": %s, ' "$(json_bool "$([ "$__dirty_count" -gt 0 ] && echo 1 || echo 0)")"
+    printf '"changes": %s, ' "$__dirty_count"
+    printf '"upstream": "%s", ' "$(json_escape "$__upstream")"
+    printf '"ahead": %s, ' "${__ahead:-0}"
+    printf '"behind": %s' "${__behind:-0}"
+    printf '}, '
+
+    printf '"applied": {'
+    printf '"stamp": "%s", ' "$(json_escape "$__stamp")"
+    printf '"version": "%s", ' "$(json_escape "$__stamp_version")"
+    printf '"applied_at": "%s", ' "$(json_escape "$__stamp_at")"
+    printf '"verified": %s, ' "$(json_bool "$__stamp_verified")"
+    printf '"mismatch": "%s", ' "$(json_escape "$__stamp_diff")"
+    printf '"matches_head": %s' "$(json_bool "$([ -n "$__head" ] && [ "$__stamp" = "$__head" ] && echo 1 || echo 0)")"
+    printf '}, '
+
+    printf '"filesystem": {'
+    printf '"links_ok": %s, ' "$LINK_OK"
+    printf '"missing": %s, ' "$LINK_MISSING"
+    printf '"broken": %s, ' "$LINK_BROKEN"
+    printf '"conflicts": %s, ' "$__conflicts"
+    printf '"orphans": %s, ' "$LINK_ORPHANS"
+    printf '"missing_paths": '
+    if [ "${#MISSING_ITEMS[@]}" -gt 0 ]; then json_items "${MISSING_ITEMS[@]}"; else printf '[]'; fi
+    printf ', "broken_paths": '
+    if [ "${#BROKEN_ITEMS[@]}" -gt 0 ]; then json_items "${BROKEN_ITEMS[@]}"; else printf '[]'; fi
+    printf ', "conflict_paths": '
+    if [ "${#FOREIGN_ITEMS[@]}" -gt 0 ] || [ "${#BLOCKED_ITEMS[@]}" -gt 0 ]; then
+      json_items "${FOREIGN_ITEMS[@]}" "${BLOCKED_ITEMS[@]}"
+    else
+      printf '[]'
+    fi
+    printf ', "orphan_paths": '
+    if [ "${#ORPHAN_ITEMS[@]}" -gt 0 ]; then json_items "${ORPHAN_ITEMS[@]}"; else printf '[]'; fi
+    printf '}, '
+
+    printf '"backups": {'
+    printf '"root": "%s", ' "$(json_escape "$__backups_root")"
+    printf '"count": %s' "$__backup_count"
+    printf '}, '
+
+    printf '"modules": {'
+    printf '"enabled": %s, ' "$(json_words "$MODULES_ENABLED")"
+    printf '"optional": %s' "$(json_words "$MODULES_OPTIONAL")"
+    printf '}, '
+
+    printf '"overrides": '
+    if [ "${#OVERRIDE_ITEMS[@]}" -gt 0 ]; then json_items "${OVERRIDE_ITEMS[@]}"; else printf '[]'; fi
+    printf ', '
+
+    printf '"tools": {'
+    if have_cmd mise; then
+      printf '"mise": "%s", ' "$(json_escape "$(mise --version 2>/dev/null | head -n 1)")"
+    else
+      printf '"mise": "missing", '
+    fi
+    printf '"missing_count": %s' "$(count_nonempty "$__missing_tools")"
+    printf '}, '
+
+    printf '"drift": %s' "$(json_bool "$__drift")"
+    printf '}\n'
+  else
+    printf '%sDotfiles status%s\n' "$C_BOLD" "$C_RESET"
+    printf '  root: %s\n' "$DOTFILES_ROOT"
+
+    section "Repository"
+    printf '  head:     %s (%s)\n' "${__head:-unknown}" "${__branch:-unknown}"
+    if [ "$__dirty_count" -eq 0 ]; then
+      printf '  worktree: clean\n'
+    else
+      printf '  worktree: %s uncommitted change(s)\n' "$__dirty_count"
+    fi
+    printf '  remote:   %s\n' "${__remote:-none}"
+    if [ -z "$__upstream" ]; then
+      printf '  sync:     no upstream\n'
+    elif [ "${__ahead:-0}" = "0" ] && [ "${__behind:-0}" = "0" ]; then
+      printf '  sync:     up to date with %s\n' "$__upstream"
+    else
+      printf '  sync:     %s ahead, %s behind %s\n' "${__ahead:-0}" "${__behind:-0}" "$__upstream"
+    fi
+
+    section "Applied"
+    if [ -z "$__stamp" ]; then
+      printf '  stamp:    none (not applied yet)\n'
+    elif [ "$__stamp_verified" = "1" ]; then
+      printf '  stamp:    %s (verified)\n' "$(short_sha "$__stamp")"
+    elif [ "$__stamp_version" != "2" ]; then
+      printf '  stamp:    %s (legacy v1 — re-run ./install)\n' "$(short_sha "$__stamp")"
+    else
+      printf '  stamp:    %s (HEAD is %s)\n' "$(short_sha "$__stamp")" "$(short_sha "$__head")"
+      if [ -n "$__stamp_diff" ]; then
+        printf '  mismatch: %s\n' "$__stamp_diff"
+      fi
+      if [ -n "$__stamp_detail" ]; then
+        printf '  detail:   %s\n' "$__stamp_detail"
+      fi
+    fi
+    if [ -n "$__stamp_at" ]; then
+      printf '  applied:  %s\n' "$__stamp_at"
+    fi
+    printf '  links:    %d/%d ok (%d missing, %d broken, %d conflict(s))\n' \
+      "$LINK_OK" "$((LINK_OK + LINK_MISSING + LINK_BROKEN + LINK_FOREIGN + LINK_BLOCKED))" \
+      "$LINK_MISSING" "$LINK_BROKEN" "$__conflicts"
+    printf '  orphans:  %d\n' "$LINK_ORPHANS"
+
+    section "Filesystem"
+    if [ "$__filesystem_drift" -eq 0 ]; then
+      printf '  no missing, broken, conflicting, or orphaned links\n'
+    else
+      print_status_items "missing" "${MISSING_ITEMS[@]}"
+      print_status_items "broken" "${BROKEN_ITEMS[@]}"
+      print_status_items "conflicts" "${FOREIGN_ITEMS[@]}" "${BLOCKED_ITEMS[@]}"
+      print_status_items "orphans" "${ORPHAN_ITEMS[@]}"
+    fi
+
+    section "Backups"
+    if [ "$__backup_count" -eq 0 ]; then
+      printf '  none under %s\n' "$__backups_root"
+    else
+      printf '  %s adoption run(s) under %s\n' "$__backup_count" "$__backups_root"
+      __i=$__backup_count
+      __shown=0
+      while [ "$__i" -gt 0 ] && [ "$__shown" -lt 3 ]; do
+        __i=$((__i - 1))
+        printf '    - %s\n' "${BACKUP_ITEMS[$__i]}"
+        __shown=$((__shown + 1))
+      done
+    fi
+
+    section "Modules"
+    printf '  enabled:  %s\n' "$MODULES_ENABLED"
+    printf '  optional: %s%s\n' "${MODULES_OPTIONAL:-none}" "$([ -n "$MODULES_OPTIONAL" ] && printf ' (not enabled)')"
+    if [ "${#OVERRIDE_ITEMS[@]}" -gt 0 ]; then
+      printf '  overrides: %s\n' "${OVERRIDE_ITEMS[*]}"
+    else
+      printf '  overrides: none\n'
+    fi
+
+    section "Tools (offline)"
+    if have_cmd mise; then
+      printf '  mise:     %s\n' "$(mise --version 2>/dev/null | head -n 1)"
+    else
+      printf '  mise:     not installed\n'
+    fi
+    if [ -n "$__missing_tools" ]; then
+      printf '  missing:  %s declared tool line(s)\n' "$(count_nonempty "$__missing_tools")"
+      printf '%s\n' "$__missing_tools" | head -n 3 | sed 's/^/            /'
+      __missing_total="$(count_nonempty "$__missing_tools")"
+      if [ "$__missing_total" -gt 3 ]; then
+        printf '            ... and %s more (mise ls --missing)\n' "$((__missing_total - 3))"
+      fi
+    else
+      printf '  missing:  none\n'
+    fi
+
+    section "Verdict"
+    if [ "$__drift" -eq 1 ]; then
+      printf '  %sdrift detected%s — review the items above, then run ./install (or make <module>)\n' "$C_YELLOW" "$C_RESET"
+    else
+      printf '  %sin sync%s\n' "$C_GREEN" "$C_RESET"
+    fi
+  fi
+
+  if [ "$__exit_code" = "1" ] && [ "$__drift" = "1" ]; then
+    exit 1
+  fi
+  exit 0
+}
+
+print_status_items() {
+  __label="$1"
+  shift
+  [ $# -gt 0 ] || return 0
+  printf '  %s:\n' "$__label"
+  __i=0
+  for __item in "$@"; do
+    __i=$((__i + 1))
+    [ "$__i" -le 10 ] && printf '    - %s\n' "$__item"
+  done
+  if [ $# -gt 10 ]; then
+    printf '    ... and %s more (scripts/state doctor --verbose)\n' "$(($# - 10))"
+  fi
+}
+
+# ── doctor ────────────────────────────────────────────────────────────────────
+doctor_platform() {
+  section "Platform"
+
+  __os="$(uname -s)"
+  case "$__os" in
+    Linux | Darwin) record_result PASS "platform.os" "$__os" ;;
+    *) record_result WARN "platform.os" "unsupported platform: $__os" "review platform.mk" ;;
+  esac
+
+  if have_cmd make; then
+    __make_version="$(make --version 2>/dev/null | head -n 1)"
+    case "$__make_version" in
+      GNU\ Make*)
+        __ver="${__make_version#GNU Make }"
+        __ver="${__ver%% *}"
+        __major="${__ver%%.*}"
+        case "$__major" in
+          [4-9] | [1-9][0-9])
+            record_result PASS "platform.make" "GNU Make $__ver"
+            ;;
+          *)
+            record_result WARN "platform.make" "GNU Make $__ver lacks --output-sync" "mise install make"
+            ;;
+        esac
+        ;;
+      *)
+        record_result FAIL "platform.make" "not GNU Make: $__make_version" "mise install make"
+        ;;
+    esac
+  else
+    record_result FAIL "platform.make" "make is not installed" "./install  # bootstraps mise and make"
+  fi
+
+  if have_cmd bash; then
+    record_result PASS "platform.bash" "$BASH_VERSION ($(command -v bash))"
+  else
+    record_result FAIL "platform.bash" "bash is not installed" "install bash"
+  fi
+
+  if have_cmd zsh; then
+    record_result PASS "platform.zsh" "$(command -v zsh)"
+  else
+    record_result WARN "platform.zsh" "zsh is not installed (shell config will not load)" "install zsh"
+  fi
+
+  if [ -d "$DOTFILES_ROOT" ] && [ -f "$DOTFILES_ROOT/Makefile" ]; then
+    record_result PASS "platform.root" "$DOTFILES_ROOT"
+  else
+    record_result FAIL "platform.root" "checkout is missing a Makefile: $DOTFILES_ROOT" "re-clone the dotfiles repository"
+  fi
+}
+
+doctor_tools() {
+  section "Tools"
+
+  for __cmd in git curl bash make; do
+    if have_cmd "$__cmd"; then
+      record_result PASS "tool.$__cmd" "$(command -v "$__cmd")"
+    else
+      record_result FAIL "tool.$__cmd" "required command is missing" "install $__cmd (./install uses mise)"
+
+    fi
+  done
+
+  for __cmd in zsh jq; do
+    if have_cmd "$__cmd"; then
+      if [ "$__cmd" = "jq" ]; then
+        record_result PASS "tool.$__cmd" "$(command -v "$__cmd") (optional)"
+      else
+        record_result PASS "tool.$__cmd" "$(command -v "$__cmd")"
+      fi
+    elif [ "$__cmd" = "zsh" ]; then
+      record_result WARN "tool.$__cmd" "recommended command is missing" "install zsh"
+    else
+      record_result PASS "tool.$__cmd" "not installed (optional; doctor does not require it)"
+    fi
+  done
+}
+
+doctor_mise() {
+  section "mise"
+
+  if ! have_cmd mise; then
+    record_result FAIL "mise.present" "mise is not installed" "./install  # bootstraps mise"
+    return 0
+  fi
+
+  record_result PASS "mise.version" "$(mise --version 2>/dev/null | head -n 1)"
+
+  __missing="$(mise_missing)"
+  if [ -n "$__missing" ]; then
+    MISSING_TOOL_ITEMS=()
+    while IFS= read -r __line; do
+      [ -n "$__line" ] && MISSING_TOOL_ITEMS[${#MISSING_TOOL_ITEMS[@]}]="$__line"
+    done <<<"$__missing"
+    record_result FAIL "mise.tools" \
+      "$(count_nonempty "$__missing") declared tool line(s) missing: $(summarize_items 3 "${MISSING_TOOL_ITEMS[@]}")" \
+      "mise install"
+  else
+    record_result PASS "mise.tools" "all declared tools are installed"
+  fi
+
+  __mise_global="${MISE_CONFIG_DIR:-$XDG_CONFIG_HOME/mise}/config.toml"
+  if [ -f "$__mise_global" ] && [ "$__mise_global" -ef "$DOTFILES_ROOT/mise.toml" ]; then
+    # mise implicitly trusts its global config and omits it from `trust --show`.
+    record_result PASS "mise.trust" "repository mise.toml is the global config (implicitly trusted)"
+  else
+    __repo_dir_real="$(cd "$DOTFILES_ROOT" && pwd -P)"
+    __trust="$(cd "$DOTFILES_ROOT" && mise trust --show 2>/dev/null || true)"
+    if printf '%s\n' "$__trust" | grep -Fxq "$__repo_dir_real/mise.toml: trusted" ||
+      printf '%s\n' "$__trust" | grep -Fxq "$__repo_dir_real: trusted"; then
+      record_result PASS "mise.trust" "repository mise.toml is trusted"
+    else
+      record_result WARN "mise.trust" "repository mise.toml is not listed as trusted" \
+        "mise trust $(sh_quote "$DOTFILES_ROOT/mise.toml")"
+    fi
+  fi
+
+  doctor_mise_path make
+  doctor_mise_path jq
+  doctor_mise_exec
+}
+
+# A tool binary installed by mise must stay executable. Aqua-backed tools have
+# historically missed the bit; the repair path is a forced reinstall, not a
+# blanket chmod over the whole installs tree.
+doctor_mise_exec() {
+  __checked=0
+  __bad=""
+  for __tool in kubectl helm terraform opencode; do
+    __path="$(mise which "$__tool" 2>/dev/null || true)"
+    [ -n "$__path" ] || continue
+    case "$__path" in
+      "$MISE_DATA_DIR"/* | "$HOME/.local/share/mise"/*) ;;
+      *) continue ;;
+    esac
+    __checked=$((__checked + 1))
+    if [ ! -x "$__path" ]; then
+      __bad="$__bad $__tool"
+    fi
+  done
+
+  if [ -n "$__bad" ]; then
+    record_result WARN "mise.exec" "tool binary missing its exec bit:$__bad" \
+      "mise install --force <tool>"
+  elif [ "$__checked" -gt 0 ]; then
+    record_result PASS "mise.exec" "$__checked mise-managed tool binar(y/ies) are executable"
+  else
+    record_result PASS "mise.exec" "no mise-managed tool binaries to check"
+  fi
+}
+
+doctor_mise_path() {
+  __cmd="$1"
+  __path="$(command -v "$__cmd" 2>/dev/null || true)"
+  [ -n "$__path" ] || return 0
+  case "$__path" in
+    "$MISE_DATA_DIR"/* | "$HOME/.local/share/mise"/*)
+      record_result PASS "mise.path.$__cmd" "$__cmd resolves from mise ($__path)"
+      ;;
+    *)
+      record_result WARN "mise.path.$__cmd" "$__cmd resolves outside mise: $__path" \
+        "exec zsh  # or: eval \"\$(mise activate bash)\""
+      ;;
+  esac
+}
+
+doctor_repo() {
+  section "Repository"
+
+  if ! have_cmd git; then
+    record_result FAIL "repo.git" "git is not installed" "install git"
+    return 0
+  fi
+  if ! git -C "$DOTFILES_ROOT" rev-parse --git-dir >/dev/null 2>&1; then
+    record_result FAIL "repo.git" "not a git checkout: $DOTFILES_ROOT" "git clone <dotfiles-url> ~/.dotfiles"
+    return 0
+  fi
+
+  __head="$(repo_head)"
+  __branch="$(repo_branch)"
+  __remote="$(repo_remote)"
+  __dirty="$(repo_dirty)"
+  __dirty_count="$(count_nonempty "$__dirty")"
+
+  if [ -n "$__head" ]; then
+    record_result PASS "repo.head" "$(short_sha "$__head") (${__branch:-detached})"
+  else
+    record_result FAIL "repo.head" "cannot resolve HEAD" "git status"
+  fi
+
+  if [ -n "$__remote" ]; then
+    record_result PASS "repo.remote" "$__remote"
+  else
+    record_result WARN "repo.remote" "no origin remote" "git remote add origin <dotfiles-url>"
+  fi
+
+  if [ "$__dirty_count" -eq 0 ]; then
+    record_result PASS "repo.worktree" "clean"
+  else
+    record_result WARN "repo.worktree" "$__dirty_count uncommitted change(s)" "git status --short"
+  fi
+
+  __upstream="$(repo_upstream)"
+  if [ -z "$__upstream" ]; then
+    record_result WARN "repo.sync" "branch has no upstream" \
+      "git branch --set-upstream-to=origin/${__branch:-main}"
+  else
+    __counts="$(git -C "$DOTFILES_ROOT" rev-list --left-right --count "HEAD...$__upstream" 2>/dev/null || true)"
+    __ahead="${__counts%%[[:space:]]*}"
+    __behind="${__counts##*[[:space:]]}"
+    if [ "${__ahead:-0}" = "0" ] && [ "${__behind:-0}" = "0" ]; then
+      record_result PASS "repo.sync" "up to date with $__upstream"
+    else
+      record_result WARN "repo.sync" "${__ahead:-0} ahead, ${__behind:-0} behind $__upstream" "git pull --ff-only"
+    fi
+  fi
+
+  __stamp="$(stamp_head 2>/dev/null || true)"
+  __stamp_version="$(read_stamp_key version 2>/dev/null || true)"
+  if stamp_verify; then
+    record_result PASS "repo.stamp" "applied inputs verified ($(short_sha "$__stamp"))"
+  elif [ -z "$__stamp" ]; then
+    record_result WARN "repo.stamp" "no applied-state stamp" "./install"
+  elif [ "$__stamp_version" != "2" ]; then
+    record_result WARN "repo.stamp" "legacy v1 stamp ($(short_sha "$__stamp")) — inputs unverified" "./install"
+  else
+    record_result WARN "repo.stamp" "applied state does not match: $STAMP_DIFF" \
+      "./install  # or: FORCE=1 ./install"
+  fi
+
+  OVERRIDE_ITEMS=()
+  for __f in modules.local.mk mise.local.toml git/config.local zsh/local; do
+    [ -e "$DOTFILES_ROOT/$__f" ] || continue
+    __hash="$(file_hash "$DOTFILES_ROOT/$__f")"
+    if [ -n "$__hash" ]; then
+      OVERRIDE_ITEMS[${#OVERRIDE_ITEMS[@]}]="$__f ($__hash)"
+    else
+      OVERRIDE_ITEMS[${#OVERRIDE_ITEMS[@]}]="$__f"
+    fi
+  done
+  if [ "${#OVERRIDE_ITEMS[@]}" -gt 0 ]; then
+    record_result PASS "repo.overrides" "$(summarize_items 5 "${OVERRIDE_ITEMS[@]}")"
+  else
+    record_result PASS "repo.overrides" "none"
+  fi
+}
+
+doctor_xdg() {
+  section "XDG"
+
+  __bad=0
+  __bad_list=""
+  for __var in XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME; do
+    __value="${!__var}"
+    if ! is_absolute "$__value"; then
+      __bad=$((__bad + 1))
+      __bad_list="$__bad_list $__var=$__value"
+    fi
+  done
+  if [ "$__bad" -eq 0 ]; then
+    record_result PASS "xdg.values" "all four XDG base directories are absolute"
+  else
+    record_result FAIL "xdg.values" "non-absolute value(s):$__bad_list" "export the XDG variables to absolute paths"
+  fi
+
+  __missing=0
+  for __dir in "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"; do
+    [ -d "$__dir" ] || __missing=$((__missing + 1))
+  done
+  if [ "$__missing" -eq 0 ]; then
+    record_result PASS "xdg.dirs" "config/cache/data/state directories exist"
+  else
+    record_result WARN "xdg.dirs" "$__missing base director(y/ies) missing" "./install  # creates XDG directories"
+  fi
+
+  if [ -d "$DOTFILES_STATE_DIR" ]; then
+    record_result PASS "xdg.state" "$DOTFILES_STATE_DIR"
+  else
+    record_result WARN "xdg.state" "state directory does not exist yet" "./install"
+  fi
+}
+
+doctor_links() {
+  section "Links"
+
+  if ! build_expected_links; then
+    record_result FAIL "links.model" "cannot build the expected link model" "check make .list.modules"
+    return 0
+  fi
+
+  verify_links
+  list_orphans
+
+  __total=$((LINK_OK + LINK_MISSING + LINK_BROKEN + LINK_FOREIGN + LINK_BLOCKED))
+  if [ "$LINK_MISSING" -eq 0 ] && [ "$LINK_BROKEN" -eq 0 ]; then
+    record_result PASS "links.expected" "$LINK_OK/$__total expected links are already in place"
+  else
+    record_result FAIL "links.expected" \
+      "$LINK_MISSING missing, $LINK_BROKEN broken out of $__total expected link(s)" \
+      "make all  # or: make <module>"
+    print_doctor_details "missing" "${MISSING_ITEMS[@]}"
+    print_doctor_details "broken" "${BROKEN_ITEMS[@]}"
+  fi
+
+  __conflicts="$(link_conflict_count)"
+  if [ "$__conflicts" -eq 0 ]; then
+    record_result PASS "links.conflicts" "no foreign links or real files at expected destinations"
+  else
+    __first_conflict="${FOREIGN_ITEMS[0]:-${BLOCKED_ITEMS[0]:-}}"
+    __first_conflict="${__first_conflict%% -> *}"
+    __first_conflict="${__first_conflict%% (*}"
+    record_result FAIL "links.conflicts" \
+      "$__conflicts destination(s) would block install: $(summarize_items 3 "${FOREIGN_ITEMS[@]}" "${BLOCKED_ITEMS[@]}")" \
+      "mv $(sh_quote "$__first_conflict") $(sh_quote "${__first_conflict}.bak")  # then: make all"
+    print_doctor_details "conflicts" "${FOREIGN_ITEMS[@]}" "${BLOCKED_ITEMS[@]}"
+  fi
+
+  if [ "$LINK_ORPHANS" -eq 0 ]; then
+    record_result PASS "links.orphans" "no stale links point into this checkout"
+  else
+    __first_orphan="${ORPHAN_ITEMS[0]%% -> *}"
+    record_result WARN "links.orphans" \
+      "$LINK_ORPHANS link(s) point into this checkout but are not expected: $(summarize_items 3 "${ORPHAN_ITEMS[@]}")" \
+      "rm $(sh_quote "$__first_orphan")  # review with: scripts/state status"
+    print_doctor_details "orphans" "${ORPHAN_ITEMS[@]}"
+  fi
+}
+
+print_doctor_details() {
+  [ "$JSON_MODE" = "1" ] && return 0
+  __label="$1"
+  shift
+  [ $# -gt 0 ] || return 0
+  if [ "$VERBOSE" != "1" ] && [ $# -gt 3 ]; then
+    return 0
+  fi
+  printf '       %s%s%s\n' "$C_DIM" "$__label" "$C_RESET"
+  __i=0
+  for __item in "$@"; do
+    __i=$((__i + 1))
+    if [ "$VERBOSE" = "1" ] || [ "$__i" -le 3 ]; then
+      printf '         %s\n' "$__item"
+    else
+      break
+    fi
+  done
+  return 0
+}
+
+doctor_modules() {
+  section "Modules"
+
+  if [ -z "$MODULES_ENABLED" ]; then
+    record_result FAIL "modules.enabled" "no enabled modules reported by Make" "check make .list.modules"
+    return 0
+  fi
+
+  __count=0
+  __bad=()
+  for __module in $MODULES_ENABLED; do
+    __count=$((__count + 1))
+    if [ ! -d "$DOTFILES_ROOT/$__module" ] || [ ! -f "$DOTFILES_ROOT/$__module/Makefile" ]; then
+      __bad[${#__bad[@]}]="$__module"
+    fi
+  done
+
+  if [ "${#__bad[@]}" -eq 0 ]; then
+    record_result PASS "modules.enabled" "$__count enabled module(s) have a directory and Makefile"
+  else
+    record_result FAIL "modules.enabled" \
+      "missing directory or Makefile for: $(summarize_items 5 "${__bad[@]}")" \
+      "check modules.local.mk and git status"
+  fi
+
+  if [ -z "$MODULES_OPTIONAL" ]; then
+    record_result PASS "modules.optional" "none declared"
+  else
+    __missing_optional=()
+    for __module in $MODULES_OPTIONAL; do
+      if [ ! -d "$DOTFILES_ROOT/$__module" ] || [ ! -f "$DOTFILES_ROOT/$__module/Makefile" ]; then
+        __missing_optional[${#__missing_optional[@]}]="$__module"
+      fi
+    done
+    if [ "${#__missing_optional[@]}" -eq 0 ]; then
+      record_result PASS "modules.optional" "$MODULES_OPTIONAL available but not enabled"
+    else
+      record_result WARN "modules.optional" \
+        "optional module source missing: $(summarize_items 5 "${__missing_optional[@]}")" \
+        "remove it from OPTIONAL_MODULES or restore its directory"
+    fi
+  fi
+}
+
+doctor_secrets() {
+  section "Secrets"
+
+  __sops_on=0
+  __whale_on=0
+  if module_enabled sops; then __sops_on=1; fi
+  if module_enabled whalebyte; then __whale_on=1; fi
+
+  if [ "$__sops_on" -eq 0 ] && [ "$__whale_on" -eq 0 ]; then
+    record_result PASS "secrets.scope" "sops and whalebyte are not enabled"
+    return 0
+  fi
+
+  if have_cmd age; then
+    record_result PASS "secrets.age" "$(command -v age)"
+  else
+    record_result WARN "secrets.age" "age is not on PATH" "mise install"
+  fi
+
+  if [ "$__sops_on" -eq 1 ]; then
+    if have_cmd sops; then
+      record_result PASS "secrets.sops" "$(command -v sops)"
+    else
+      record_result WARN "secrets.sops" "sops module is enabled but the binary is missing" "mise install"
+    fi
+
+    __helper="$HOME/.local/bin/sops-age-key-from-wbs"
+    if [ -x "$__helper" ]; then
+      record_result PASS "secrets.helper" "$__helper"
+    else
+      record_result WARN "secrets.helper" "sops age helper is missing or not executable" "make sops"
+    fi
+  fi
+
+  # The helper and module use ${XDG_CONFIG_HOME:-$HOME/.config}/age.
+  __age_dir="$XDG_CONFIG_HOME/age"
+  if [ -d "$__age_dir" ]; then
+    __mode="$(file_mode "$__age_dir")"
+    if [ "$__mode" = "700" ]; then
+      record_result PASS "secrets.age_dir" "$__age_dir is 700"
+    else
+      record_result WARN "secrets.age_dir" "$__age_dir is mode $__mode" "chmod 700 $(sh_quote "$__age_dir")"
+    fi
+  else
+    record_result WARN "secrets.age_dir" "$__age_dir does not exist" "make sops"
+  fi
+
+  __plaintext=""
+  for __candidate in "$__age_dir/wbs-identity" "$__age_dir/keys.txt"; do
+    [ -e "$__candidate" ] && __plaintext="$__plaintext $__candidate"
+  done
+  if [ -n "$__plaintext" ]; then
+    record_result FAIL "secrets.plaintext" "plaintext age identity present:$__plaintext" \
+      "remove it and use the encrypted identity"
+  else
+    record_result PASS "secrets.plaintext" "no plaintext age identity in $__age_dir"
+  fi
+
+  if [ -n "${SOPS_AGE_KEY_CMD:-}" ]; then
+    __cmd="${SOPS_AGE_KEY_CMD%% *}"
+    case "$__cmd" in
+      /*)
+        if [ -x "$__cmd" ]; then
+          record_result PASS "secrets.key_cmd" "SOPS_AGE_KEY_CMD is executable"
+        else
+          record_result FAIL "secrets.key_cmd" "SOPS_AGE_KEY_CMD is not executable: $__cmd" "fix SOPS_AGE_KEY_CMD"
+        fi
+        ;;
+      *)
+        if have_cmd "$__cmd"; then
+          record_result PASS "secrets.key_cmd" "SOPS_AGE_KEY_CMD resolves on PATH"
+        else
+          record_result FAIL "secrets.key_cmd" "SOPS_AGE_KEY_CMD is not on PATH: $__cmd" "fix SOPS_AGE_KEY_CMD"
+        fi
+        ;;
+    esac
+  else
+    record_result WARN "secrets.key_cmd" "SOPS_AGE_KEY_CMD is not set in this shell (exported by zsh)" \
+      "zsh -ic 'print -r -- \$SOPS_AGE_KEY_CMD'"
+  fi
+}
+
+doctor_artifacts() {
+  section "Artifacts"
+
+  if module_enabled fonts; then
+    __stamp="$FONT_DIR/.JetBrainsMono.version"
+    if [ -f "$__stamp" ]; then
+      record_result PASS "artifacts.fonts" "JetBrains Mono $(head -n 1 "$__stamp") in $FONT_DIR"
+    else
+      record_result WARN "artifacts.fonts" "font version stamp is missing" "make fonts"
+    fi
+  fi
+
+  if module_enabled tmux; then
+    if [ -d "$HOME/.tmux/plugins/tpm" ]; then
+      record_result PASS "artifacts.tpm" "$HOME/.tmux/plugins/tpm"
+    else
+      record_result WARN "artifacts.tpm" "TPM is not installed" "make tmux"
+    fi
+  fi
+
+  if module_enabled git; then
+    if [ -x "$HOME/.local/bin/wt" ]; then
+      record_result PASS "artifacts.wt" "$HOME/.local/bin/wt"
+    else
+      record_result WARN "artifacts.wt" "wt worktree manager is missing" "make git"
+    fi
+  fi
+
+  if module_enabled nvim; then
+    if [ -f "$DOTFILES_ROOT/nvim/lazy-lock.json" ]; then
+      record_result PASS "artifacts.lazy_lock" "nvim/lazy-lock.json is present"
+    else
+      record_result WARN "artifacts.lazy_lock" "nvim/lazy-lock.json is missing" "git status"
+    fi
+    if [ -d "$XDG_DATA_HOME/nvim/lazy" ]; then
+      record_result PASS "artifacts.nvim_plugins" "$XDG_DATA_HOME/nvim/lazy"
+    else
+      record_result WARN "artifacts.nvim_plugins" "Neovim plugins are not installed" "make nvim.restore"
+    fi
+  fi
+
+  if module_enabled opencode; then
+    if have_cmd opencode; then
+      record_result PASS "artifacts.opencode" "$(command -v opencode)"
+    else
+      record_result WARN "artifacts.opencode" "opencode is not on PATH" "mise install http:opencode"
+    fi
+  fi
+
+  if module_enabled copilot; then
+    if have_cmd copilot; then
+      record_result PASS "artifacts.copilot" "$(command -v copilot)"
+    else
+      record_result WARN "artifacts.copilot" "copilot CLI is not on PATH" "mise install"
+    fi
+  fi
+}
+
+doctor_online() {
+  section "Network (optional)"
+
+  if [ "$ONLINE" != "1" ]; then
+    record_result PASS "online.checks" "skipped by default (offline)"
+    return 0
+  fi
+
+  if ! have_cmd mise; then
+    record_result FAIL "online.mise" "mise is not installed" "./install"
+  else
+    __outdated="$(mise outdated 2>/dev/null | grep -v '^[[:space:]]*$' || true)"
+    __count="$(count_nonempty "$__outdated")"
+    if [ "$__count" -eq 0 ]; then
+      record_result PASS "online.mise" "no outdated tools within pinned ranges"
+    else
+      record_result WARN "online.mise" "$__count line(s) of outdated tools" "make outdated"
+    fi
+  fi
+
+  __remote="$(repo_remote)"
+  if [ -n "$__remote" ]; then
+    if git -C "$DOTFILES_ROOT" ls-remote --exit-code origin HEAD >/dev/null 2>&1; then
+      record_result PASS "online.remote" "origin is reachable"
+    else
+      record_result WARN "online.remote" "cannot reach origin" "check network access and git credentials"
+    fi
+  fi
+}
+
+doctor_summary() {
+  section "Summary"
+  __total=$((PASS_COUNT + WARN_COUNT + FAIL_COUNT))
+
+  if [ "$FAIL_COUNT" -gt 0 ]; then
+    __verdict="FAIL"
+    __status="fail"
+  elif [ "$WARN_COUNT" -gt 0 ]; then
+    __verdict="WARN"
+    __status="warn"
+  else
+    __verdict="PASS"
+    __status="pass"
+  fi
+
+  if [ "$JSON_MODE" = "1" ]; then
+    printf '{'
+    printf '"status": "%s", ' "$__status"
+    printf '"verdict": "%s", ' "$__verdict"
+    printf '"total": %s, ' "$__total"
+    printf '"passed": %s, ' "$PASS_COUNT"
+    printf '"warnings": %s, ' "$WARN_COUNT"
+    printf '"failures": %s, ' "$FAIL_COUNT"
+    printf '"results": ['
+    __i=0
+    while [ "$__i" -lt "${#RESULT_STATUS[@]}" ]; do
+      [ "$__i" -gt 0 ] && printf ', '
+      printf '{"check": "%s", "status": "%s", "message": "%s", "remediation": "%s"}' \
+        "$(json_escape "${RESULT_CHECK[$__i]}")" \
+        "$(printf '%s' "${RESULT_STATUS[$__i]}" | tr '[:upper:]' '[:lower:]')" \
+        "$(json_escape "${RESULT_MESSAGE[$__i]}")" \
+        "$(json_escape "${RESULT_FIX[$__i]}")"
+      __i=$((__i + 1))
+    done
+    printf ']}\n'
+  else
+    printf '  %s passed, %s warning(s), %s failure(s)\n' "$PASS_COUNT" "$WARN_COUNT" "$FAIL_COUNT"
+    case "$__verdict" in
+      PASS) printf '\n  %sVerdict: PASS%s\n' "$C_GREEN" "$C_RESET" ;;
+      WARN) printf '\n  %sVerdict: WARN%s — review the fixes above\n' "$C_YELLOW" "$C_RESET" ;;
+      FAIL) printf '\n  %sVerdict: FAIL%s — resolve the failures above\n' "$C_RED" "$C_RESET" ;;
+    esac
+  fi
+
+  [ "$FAIL_COUNT" -gt 0 ] && exit 1
+  exit 0
+}
+
+cmd_doctor() {
+  ONLINE=0
+  JSON_MODE=0
+  VERBOSE=0
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --online) ONLINE=1 ;;
+      --json) JSON_MODE=1 ;;
+      --verbose) VERBOSE=1 ;;
+      -h | --help)
+        usage
+        exit 0
+        ;;
+      *)
+        echo "error: unknown doctor option: $1" >&2
+        usage >&2
+        exit 2
+        ;;
+    esac
+    shift
+  done
+
+  if ! load_modules; then
+    section "Modules"
+    record_result FAIL "modules.list" "cannot enumerate modules (make .list.modules failed)" \
+      "run 'make help' to check the checkout"
+  fi
+  load_paths || true
+
+  doctor_platform
+  doctor_tools
+  doctor_mise
+  doctor_repo
+  doctor_xdg
+  doctor_links
+  doctor_modules
+  doctor_secrets
+  doctor_artifacts
+  doctor_online
+  doctor_summary
+}
+
+# ── Dispatch ──────────────────────────────────────────────────────────────────
+COMMAND="${1:-}"
+[ -n "$COMMAND" ] || {
+  usage >&2
+  exit 2
+}
+shift || true
+
+case "$COMMAND" in
+  check-links) cmd_check_links "$@" ;;
+  status) cmd_status "$@" ;;
+  doctor) cmd_doctor "$@" ;;
+  help | -h | --help)
+    usage
+    exit 0
+    ;;
+  *)
+    echo "error: unknown command: $COMMAND" >&2
+    usage >&2
+    exit 2
+    ;;
+esac
