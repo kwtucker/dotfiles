@@ -80,7 +80,7 @@ else
   fi
 
   eval "$(mise activate bash)" 2>/dev/null || true
-  mise install --yes
+  MISE_YES=1 mise install --yes
 
   export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 

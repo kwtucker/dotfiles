@@ -162,6 +162,21 @@ a tool: `make outdated` to preview → edit the pin here → commit/push → on 
 machine run `./install` (or `mise install`). `make upgrade.tools` will not move
 exact pins, and `make prune.tools` cleans up superseded versions.
 
+`mise.lock` records the exact resolved version, download URL, and checksum for
+every tool on `linux-x64`, `linux-arm64`, `macos-x64`, and `macos-arm64`.
+`mise install` refreshes it when pins or ranges change, so commit it with the
+change. To refresh every platform after a pin bump, run
+`mise lock --global -p linux-x64,linux-arm64,macos-x64,macos-arm64` (set
+`GITHUB_TOKEN` if GitHub rate-limits you). CI installs the linters with
+`MISE_LOCKED=1` to exercise the recorded checksums. A few tools (Docker CLI,
+ttyd) publish no checksums, so strict locked mode is used only where the
+lockfile has one.
+
+New versions requested by a range (`go`, `node`, `python`, `make`, `rust`) are
+held back for mise's default 24 hours (`minimum_release_age`). Exact pins and
+versions already recorded in `mise.lock` are exempt, so installs of the
+committed set do not wait.
+
 Long-running processes keep the old binary until they restart, so `./install`
 recycles the tmux server automatically when its version changes (skipped when run
 from inside tmux). Editors are not touched — restart Neovim after changing its
@@ -300,7 +315,7 @@ repo's `nvim/` config at a pinned commit and sets `K8S_DEBUG=1`, which makes
 | `make [module]` | Install a specific module, e.g. `make nvim` |
 | `make [module].clean` | Clean a specific module, e.g. `make nvim.clean` |
 | `make outdated` | Preview outdated tools for `mise.toml` (no changes) |
-| `make upgrade.tools` | Upgrade mise tools within pinned ranges + refresh completions |
+| `make upgrade.tools` | Upgrade mise tools within pinned ranges, refresh `mise.lock` + completions |
 | `make prune.tools` | Remove superseded mise tool versions (keeps referenced ones) |
 | `make upgrade.plugins` | Upgrade plugins with an `upgrade` target (`nvim`, `tmux`, `zsh`, `opencode`); skips the rest |
 | `make upgrade.all` | `upgrade.tools` + `upgrade.plugins` (tools first) |
@@ -309,7 +324,8 @@ repo's `nvim/` config at a pinned commit and sets `K8S_DEBUG=1`, which makes
 
 Upgrades are split by design: `upgrade.tools` never rewrites version pins
 (`mise upgrade` stays within the ranges in `mise.toml`; bumps stay manual via
-`make outdated` → edit → commit).
+`make outdated` → edit → commit). It refreshes `mise.lock`, so commit that
+alongside the pin change.
 
 `copilot` is an optional module: install it with `make copilot`, or append it to
 `LOCAL_MODULES` in `modules.local.mk` to include it in `make all` on that machine.
