@@ -70,7 +70,9 @@ if [ "$TOOLS_PRESENT" = true ]; then
 else
   if ! command -v mise &>/dev/null; then
     echo "  installing mise..."
-    curl https://mise.run | sh
+    # Pinned release + verified checksum; no `curl | sh`. See
+    # scripts/bootstrap-mise.sh and the README supply-chain notes.
+    "$DOTFILES_DIR/scripts/bootstrap-mise.sh"
     export PATH="$HOME/.local/bin:$PATH"
     ok "mise installed"
   else
@@ -82,13 +84,10 @@ else
 
   export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
-  # Fix permissions on all mise-installed binaries (aqua backend sometimes misses this)
-  find "$HOME/.local/share/mise/installs" -type f -exec chmod +x {} + 2>/dev/null || true
-
-  # Trust all possible mise config locations up front
+  # Trust only the repository's global config. A missing exec bit on a tool
+  # binary is diagnosed by `make doctor` (mise.exec) and repaired with
+  # `mise install --force <tool>` — never by chmod-ing every mise file.
   MISE_YES=1 mise trust "$DOTFILES_DIR/mise.toml" 2>/dev/null || true
-  MISE_YES=1 mise trust /workspaces/dotfiles/mise.toml 2>/dev/null || true
-  MISE_YES=1 mise trust --all 2>/dev/null || true
 
   ok "tools up to date"
 fi

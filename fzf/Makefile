@@ -2,6 +2,12 @@ include ../env.mk
 
 MODULE_NAME := fzf
 
+# fzf-tmux is fetched from the fzf release matching the mise pin in mise.toml.
+# Bump FZF_TMUX_VERSION and FZF_TMUX_SHA256 together.
+FZF_TMUX_VERSION := v0.74.4
+FZF_TMUX_URL := https://raw.githubusercontent.com/junegunn/fzf/$(FZF_TMUX_VERSION)/bin/fzf-tmux
+FZF_TMUX_SHA256 := ea14943d739fc81952d5071a642591df25ed8dac166040a6d6036b3be197cecd
+
 .PHONY: install completions clean
 
 install: .ensure.xdg.fzf
@@ -17,9 +23,8 @@ completions:
 	@rm -f $(ZSH_COMPLETIONS_DIR)/_fzf
 	@if command -v fzf >/dev/null 2>&1; then \
 		echo "Installing fzf helpers..."; \
-		curl -fsSL https://raw.githubusercontent.com/junegunn/fzf/master/bin/fzf-tmux \
-			-o $(HOME)/.local/bin/fzf-tmux && \
-		chmod +x $(HOME)/.local/bin/fzf-tmux; \
+		mkdir -p "$(HOME)/.local/bin"; \
+		"$(DOTFILES_FETCH)" "$(FZF_TMUX_URL)" "$(HOME)/.local/bin/fzf-tmux" "$(FZF_TMUX_SHA256)" 755; \
 	else \
 		echo "⚠️  fzf not installed, skipping helpers"; \
 	fi

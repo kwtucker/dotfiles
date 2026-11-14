@@ -5,9 +5,11 @@ MODULE_NAME := git
 # wt — git worktree manager (POSIX sh). Must run as an executable, NOT be
 # sourced: `wt version` self-updates by writing to $0, which would be the
 # shell itself when sourced.
-# Pinned by default like mise tools — bump WT_VERSION, then `make git.upgrade`.
+# Pinned by default like mise tools — bump WT_VERSION and WT_SHA256 together,
+# then `make git.upgrade`. The digest is verified before anything is installed.
 WT_VERSION ?= v0.2.2
 WT_URL ?= https://codeberg.org/tuck/wt/raw/tag/$(WT_VERSION)/wt.sh
+WT_SHA256 ?= abb08d38ffa8f8507abba3e0db68970356749bd3ec9123b4de65e0720ef0dbac
 WT_BIN ?= $(HOME)/.local/bin/wt
 
 .PHONY: install clean upgrade completions
@@ -21,7 +23,8 @@ install: .ensure.xdg.git
 	# Install wt only if missing — keeps `make all` idempotent/offline.
 	@if [ ! -x "$(WT_BIN)" ]; then \
 		echo "Installing wt $(WT_VERSION)..."; \
-		curl -fsSL "$(WT_URL)" -o "$(WT_BIN)" && chmod +x "$(WT_BIN)"; \
+		mkdir -p "$(HOME)/.local/bin"; \
+		"$(DOTFILES_FETCH)" "$(WT_URL)" "$(WT_BIN)" "$(WT_SHA256)" 755 || exit 1; \
 	else \
 		echo "✅ wt already installed (run 'make git.upgrade' to bump)"; \
 	fi
@@ -31,7 +34,7 @@ upgrade:
 	@echo "Upgrading $(MODULE_NAME) tools..."
 	@mkdir -p $(HOME)/.local/bin
 	@echo "Updating wt to $(WT_VERSION)..."
-	@curl -fsSL "$(WT_URL)" -o "$(WT_BIN)" && chmod +x "$(WT_BIN)"
+	@"$(DOTFILES_FETCH)" "$(WT_URL)" "$(WT_BIN)" "$(WT_SHA256)" 755
 	@echo "✅ wt updated to $(WT_VERSION)."
 	@$(MAKE) completions
 

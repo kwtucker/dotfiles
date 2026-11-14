@@ -11,6 +11,7 @@ ZSH_COMPLETIONS_DIR ?= ${XDG_DATA_HOME}/zsh/completions
 # `env.mk` (root) or `../env.mk` (module).
 DOTFILES_ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 DOTFILES_LINK := $(DOTFILES_ROOT_DIR)/scripts/lib/link.sh
+DOTFILES_FETCH := $(DOTFILES_ROOT_DIR)/scripts/fetch
 
 # Module recipes run the helper as a child process. It reads DOTFILES_ADOPT from
 # the environment and must honour the state directory chosen for this Make run.
