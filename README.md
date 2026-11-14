@@ -15,6 +15,11 @@ These dotfiles are designed to work identically across all of the following:
 
 **Chromebook or any thin client** — SSH in from a browser-based terminal or any SSH client. The computer you're working from doesn't matter.
 
+**Headless containers and cloud workspaces** — Docker, Codespaces, and
+devcontainers install everything except the local font files, which no terminal
+on the remote host would render. See [Headless and container
+installs](#headless-and-container-installs).
+
 ## Quick Start
 
 ### Local machine or bare server
@@ -52,6 +57,25 @@ atomically only after a successful module pass, so a failed or interrupted run i
 never mistaken for a verified state. A v1 stamp (a bare commit line) or an
 unreadable stamp is treated as stale and the next run applies.
 
+### Headless and container installs
+
+`./install` detects Docker (`/.dockerenv`), GitHub Codespaces (`CODESPACES`), and
+devcontainers (`REMOTE_CONTAINERS`). In those environments it exports
+`DOTFILES_SKIP_FONTS=1`, so the `fonts` module skips both downloads and records
+the omission in `${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/fonts-skipped`
+for `make doctor` and `make status`.
+
+Override the detection when the fonts are genuinely useful (for example a
+container that hosts a terminal):
+
+```bash
+DOTFILES_SKIP_FONTS=0 ./install   # download fonts anyway
+DOTFILES_SKIP_FONTS=1 make fonts  # explicit skip on any machine
+make fonts                        # install fonts and clear the skip marker
+```
+
+The skip covers only the local font files; every other module installs normally.
+
 ## Checking installation state
 
 `make status` and `make doctor` are read-only: they do not create directories,
@@ -63,6 +87,8 @@ make status                 # repository + applied + filesystem overview
 make doctor                 # PASS/WARN/FAIL with a fix for each problem
 make doctor ARGS=--online   # also check mise updates and origin reachability
 make status ARGS=--json     # machine-readable status
+make prune.links            # list stale links into this checkout (dry run)
+make prune.links ARGS=--force  # remove them
 scripts/state check-links   # fast expected-link verification
 ```
 
@@ -84,6 +110,13 @@ failure from a usage error.
 and resolves to this checkout. `--preflight` reports only destinations a default
 install would refuse to replace; `--strict` also fails on links that point into
 this checkout but are no longer expected.
+
+`make prune.links` lists symlinks that point into this checkout but are no
+longer in the expected set (for example after removing a module from
+`modules.local.mk`). It is a dry run; `make prune.links ARGS=--force` removes
+them. Only symlinks whose target still resolves inside this checkout are
+touched, and `scripts/lib/link.sh` re-checks ownership immediately before each
+unlink.
 
 ### Conflicts, adoption, and backups
 
@@ -123,10 +156,28 @@ mv "$backup/.config/bat" ~/.config/bat
 Re-running the module afterwards will treat that path as a conflict again, which
 is the intended guard: choose adoption or move it aside deliberately.
 
-`make status` lists backup runs so you can find the right timestamp. Rollback to
-an older revision is still `git switch --detach <rev> && FORCE=1 ./install`
-(plus `mise install` if tool versions changed); backups cover individual
-conflicting paths, not whole-home snapshots.
+`make status` lists backup runs so you can find the right timestamp.
+
+### Recovery and rollback
+
+Adoption backups cover individual conflicting paths, not whole-home snapshots.
+For a configuration rollback:
+
+```bash
+cd ~/.dotfiles
+git switch --detach <known-good-rev>   # or: git switch main to return
+mise install                           # only if mise.toml/mise.lock changed
+FORCE=1 ./install                      # ignore the applied stamp, relink everything
+```
+
+`FORCE=1` matters when the stamp still describes the current commit and would
+otherwise take the fast path. A full pass re-checks every destination, so a path
+that became foreign since the last install still aborts before anything changes.
+
+After a rollback, restart long-running processes: open a new shell, recycle tmux
+(`tmux kill-server` once detached), and restart Neovim and any LSP clients so
+they load the older binaries and configs. `make doctor` reports leftovers such as
+stale links, missing tools, or a stamp that no longer matches.
 
 ## How it works
 
@@ -204,6 +255,12 @@ version/commit and digest together:
 | `fzf-tmux` | `FZF_TMUX_VERSION` + `FZF_TMUX_SHA256` in `fzf/Makefile` |
 | TPM | `TPM_VERSION` + `TPM_COMMIT` in `tmux/Makefile` |
 | fonts | `INCONSOLATA_COMMIT`/`INCONSOLATA_SHA256` and `JETBRAINS_VERSION`/`JETBRAINS_SHA256` in `fonts/Makefile` |
+
+A pin bump is always two edits: the version/commit and the matching SHA-256.
+Then run the module's `upgrade` target (or `./install` / `make fonts`) so
+`scripts/fetch` verifies the new artifact, confirm the result with `make doctor`,
+and commit the pin, digest, and any vendored file together. Never push a bump
+whose download has not succeeded on a clean machine.
 
 Terraform's zsh completion is vendored under `terraform/completions/` instead of
 being fetched. Fresh machines bootstrap mise with
@@ -293,8 +350,17 @@ Some files are intentionally not tracked in git. Create these locally as needed:
 | File | Purpose |
 |---|---|
 | `modules.local.mk` | Add extra modules: `LOCAL_MODULES = terraform` |
+| `mise.local.toml` | Project-local mise overrides for this checkout only |
 | `git/config.local` | Per-machine git identity + auth per environment (copy from `git/config.local.example`) |
 | `zsh/local` | Local env vars, tokens, secrets |
+
+`mise.local.toml` is scoped to the checkout, like any project-local mise file.
+It does not modify the global `~/.config/mise/config.toml` link, so tools started
+outside `~/.dotfiles` keep the pin from `mise.toml`. Use it for temporary
+experiments in this repository; make lasting machine-wide changes in `mise.toml`
+and commit them. The applied-state stamp hashes `modules.local.mk` and
+`mise.local.toml`, so editing either triggers a full module pass on the next
+`./install`.
 
 ## Kubernetes debugging
 
@@ -311,7 +377,8 @@ repo's `nvim/` config at a pinned commit and sets `K8S_DEBUG=1`, which makes
 | `make all` | Relink all modules in parallel (no pull, top-up, or prune) |
 | `make status` | Show repository, applied, and filesystem state (read-only) |
 | `make doctor` | Diagnose install state with PASS/WARN/FAIL (read-only, offline) |
-| `make clean.all` | Remove all installed modules |
+| `make prune.links` | List stale links into this checkout (dry run; `ARGS=--force` removes) |
+| `make clean.all` | Remove owned links, completions, and helper binaries |
 | `make [module]` | Install a specific module, e.g. `make nvim` |
 | `make [module].clean` | Clean a specific module, e.g. `make nvim.clean` |
 | `make outdated` | Preview outdated tools for `mise.toml` (no changes) |
@@ -326,6 +393,14 @@ Upgrades are split by design: `upgrade.tools` never rewrites version pins
 (`mise upgrade` stays within the ranges in `mise.toml`; bumps stay manual via
 `make outdated` → edit → commit). It refreshes `mise.lock`, so commit that
 alongside the pin change.
+
+`make clean.all` (or `make <module>.clean`) removes only paths this repository
+owns: module links, generated completion files, `~/.zshenv`, `wt`, `fzf-tmux`,
+fonts it fetched, its module cache, and empty module data directories. It never
+follows a tracked file, removes a real config directory, or deletes an unrelated
+file in a shared directory such as `~/.local/bin`. Fonts are copied rather than
+linked, so only the exact pinned filenames and version markers are removed.
+`make prune.links` is the separate pass for links that are no longer expected.
 
 `copilot` is an optional module: install it with `make copilot`, or append it to
 `LOCAL_MODULES` in `modules.local.mk` to include it in `make all` on that machine.

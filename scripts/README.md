@@ -10,9 +10,10 @@ must work without `jq`, `python`, or any non-POSIX tool beyond `git`, `curl`,
 | File | Kind | Reads | Writes | Exit codes |
 | --- | --- | --- | --- | --- |
 | `state` | executable | git, Make metadata, XDG/mise paths, links, artifacts | **nothing** | `check-links` 0/1/2; `status` 0 (1 with `--exit-code`); `doctor` 0/1/2 |
+| `prune-links` | executable | expected-link model, filesystem | stale symlinks (only with `--force`) | 0 clean/pruned, 1 failed, 2 usage |
 | `lib/common.sh` | sourced | environment | nothing | n/a |
 | `lib/links.sh` | sourced | expected-link model, filesystem | nothing | n/a |
-| `lib/link.sh` | executable | source paths, destinations | symlinks, parent directories, adoption backups | 0 ok, 1 conflict, 2 usage/fatal |
+| `lib/link.sh` | executable | source paths, destinations | symlinks, parent directories, adoption backups, stale owned links | 0 ok, 1 conflict, 2 usage/fatal |
 | `lib/stamp.sh` | sourced | git, XDG paths, local overrides | `${XDG_STATE_HOME}/dotfiles/last-applied` (atomic) | 0 verified/applied, 1 stale/failed |
 | `lib/fetch.sh` | sourced | HTTPS URL + SHA-256 | destination + temporary file | 0 ok, 1 download/verify failure, 2 usage |
 | `fetch` | executable | same as `lib/fetch.sh` | same as `lib/fetch.sh` | 0 ok, 1 failure, 2 usage |
@@ -20,7 +21,9 @@ must work without `jq`, `python`, or any non-POSIX tool beyond `git`, `curl`,
 
 The top-level `install` is the orchestrator: it pulls the checkout, installs
 mise/tools, runs the link preflight, invokes the module Makefiles, and writes the
-stamp only after a successful pass.
+stamp only after a successful pass. In Docker, Codespaces, and devcontainers it
+exports `DOTFILES_SKIP_FONTS=1` before the module pass; the `fonts` module leaves
+a marker in the state directory instead of downloading fonts.
 
 ## Read-only tooling
 
@@ -44,7 +47,12 @@ Only these files may change the machine:
 
 - `lib/link.sh` — creates/repairs symlinks and, with `DOTFILES_ADOPT=1`, moves
   conflicting paths under `${XDG_STATE_HOME}/dotfiles/backups/<timestamp>/` and
-  appends to `manifest.tsv`. It never deletes a real destination.
+  appends to `manifest.tsv`. Its `prune_link` command removes a symlink only
+  after confirming its target still resolves inside the checkout. It never
+  deletes a real destination.
+- `prune-links` — lists stale links into this checkout by default; `--force`
+  asks `lib/link.sh` to unlink each one. It never touches foreign links or real
+  files.
 - `lib/stamp.sh` — `stamp_write` records the applied inputs after a successful
   module pass. It is atomic; a failed or interrupted run leaves no fresh stamp.
 - `lib/fetch.sh` / `fetch` — download to a temporary file, verify size and
@@ -62,6 +70,7 @@ Only these files may change the machine:
 | `XDG_CONFIG_HOME`, `XDG_CACHE_HOME`, `XDG_DATA_HOME`, `XDG_STATE_HOME` | most scripts | Default to `$HOME/.config`, `$HOME/.cache`, `$HOME/.local/share`, `$HOME/.local/state` |
 | `DOTFILES_ADOPT` | `lib/link.sh` | `1` adopts conflicting destinations with a backup |
 | `DOTFILES_BACKUP_ROOT`, `DOTFILES_BACKUP_ID` | `lib/link.sh` | Override the backup parent or run directory name |
+| `DOTFILES_SKIP_FONTS` | `install`, `fonts` | `1` skips the font download and records `${XDG_STATE_HOME}/dotfiles/fonts-skipped`; `0` overrides container detection |
 | `FETCH_MAX_BYTES` | `lib/fetch.sh` | Reject downloads larger than this (default 256 MiB) |
 | `MISE_BOOTSTRAP_VERSION`, `MISE_BOOTSTRAP_DEST` | `bootstrap-mise.sh` | Override the pinned mise release or install path |
 | `FORCE` | `install` | `1` bypasses the applied-state fast path |
