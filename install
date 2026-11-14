@@ -130,20 +130,39 @@ else
 fi
 
 # ── Dotfile modules ────────────────────────────────────────────────────────────
-# Fast path: when the checkout is identical to the last successful apply and the
-# tree is clean, every module is already linked — skip the pass entirely. Any
-# new commit (or uncommitted edit) falls through to the full module install.
-# Override with FORCE=1.
+# Fast path: skip the module pass only when the applied-state stamp (v2) still
+# matches every input — commit, checkout root, XDG bases, and the ignored local
+# override files — the worktree is clean, and the expected links are verified in
+# place. A stale link with a matching stamp must not be skipped. FORCE=1 always
+# applies. See scripts/lib/stamp.sh and `scripts/state status`.
 step "dotfile modules"
-STAMP_DIR="$XDG_STATE_HOME/dotfiles"
-STAMP="$STAMP_DIR/last-applied"
-CURRENT_HEAD="$(git -C "$DOTFILES_DIR" rev-parse HEAD 2>/dev/null || echo unknown)"
+DOTFILES_ROOT="$DOTFILES_DIR"
+DOTFILES_STATE_DIR="$XDG_STATE_HOME/dotfiles"
+export DOTFILES_ROOT DOTFILES_STATE_DIR
+# shellcheck source=scripts/lib/stamp.sh
+. "$DOTFILES_DIR/scripts/lib/stamp.sh"
 
-if [ "${FORCE:-0}" != "1" ] && [ "$CURRENT_HEAD" != "unknown" ] \
-  && [ "$(cat "$STAMP" 2>/dev/null)" = "$CURRENT_HEAD" ] \
-  && git -C "$DOTFILES_DIR" diff --quiet 2>/dev/null \
-  && git -C "$DOTFILES_DIR" diff --cached --quiet 2>/dev/null; then
-  skip "already applied ${CURRENT_HEAD:0:7} — nothing changed"
+APPLY=1
+if [ "${FORCE:-0}" = "1" ]; then
+  echo -e "  ${YELLOW}↷${RESET} FORCE=1 — applying every module"
+elif ! stamp_verify; then
+  echo "  applied state changed: $STAMP_DIFF"
+  [ -z "$STAMP_DIFF_DETAIL" ] || echo "  $STAMP_DIFF_DETAIL"
+elif ! git -C "$DOTFILES_DIR" diff --quiet 2>/dev/null ||
+  ! git -C "$DOTFILES_DIR" diff --cached --quiet 2>/dev/null; then
+  echo "  worktree has uncommitted changes — applying"
+else
+  LINKS_RC=0
+  "$DOTFILES_DIR/scripts/state" check-links --quiet || LINKS_RC=$?
+  case "$LINKS_RC" in
+    0) APPLY=0 ;;
+    2) echo "  link verification unavailable — applying" ;;
+    *) echo "  links drifted since the last apply — re-applying" ;;
+  esac
+fi
+
+if [ "$APPLY" = "0" ]; then
+  skip "already applied $(stamp_head | cut -c1-7) — links verified, nothing changed"
 else
   # Abort before any module mutates the home directory when a destination is a
   # real file/directory or a foreign symlink. DOTFILES_ADOPT=1 opts into backing
@@ -171,8 +190,13 @@ else
 
   make -C "$DOTFILES_DIR" all
   ok "modules installed"
-  mkdir -p "$STAMP_DIR"
-  printf '%s\n' "$CURRENT_HEAD" >"$STAMP"
+  # Record the applied inputs only after the pass succeeded, so an interrupted or
+  # failed pass is never mistaken for a verified state.
+  if stamp_write; then
+    ok "applied state recorded"
+  else
+    echo -e "  ${YELLOW}↷${RESET} applied-state stamp not written — the next run will re-apply"
+  fi
 fi
 
 # ── Cleanup ────────────────────────────────────────────────────────────────────
