@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+# prune-links — remove stale symlinks that point into this checkout.
+#
+# Dry-run by default. Pass --force to unlink. Only destinations that are
+# symlinks into $DOTFILES_ROOT and are absent from the expected-link model are
+# considered; link.sh re-checks ownership immediately before unlinking.
+
+set -eo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/lib/common.sh
+. "$SCRIPT_DIR/lib/common.sh"
+# shellcheck source=scripts/lib/links.sh
+. "$SCRIPT_DIR/lib/links.sh"
+
+usage() {
+  cat <<'EOF'
+Usage: scripts/prune-links [--force]
+
+Remove symlinks that resolve into this checkout but are not expected by the
+enabled modules. The default is a dry run; --force unlinks them.
+
+Options:
+  --force   Remove the listed links
+  -h, --help
+            Show this help
+
+Exit codes: 0 clean or pruned, 1 a link could not be pruned, 2 usage error.
+EOF
+}
+
+FORCE=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --force) FORCE=1 ;;
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "error: unknown option: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+if ! load_modules; then
+  echo "error: cannot enumerate modules (make .list.modules failed)" >&2
+  exit 2
+fi
+load_paths || true
+
+if ! build_expected_links; then
+  echo "error: cannot build the expected link model" >&2
+  exit 2
+fi
+
+list_orphans
+
+if [ "${#ORPHAN_PATHS[@]}" -eq 0 ]; then
+  printf 'prune-links: no stale links point into %s\n' "$DOTFILES_ROOT"
+  exit 0
+fi
+
+if [ "$FORCE" = "1" ]; then
+  printf 'prune-links: removing %d stale link(s)\n' "${#ORPHAN_PATHS[@]}"
+else
+  printf 'prune-links: %d stale link(s) would be removed (dry run)\n' "${#ORPHAN_PATHS[@]}"
+fi
+
+__rc=0
+__i=0
+while [ "$__i" -lt "${#ORPHAN_PATHS[@]}" ]; do
+  __path="${ORPHAN_PATHS[$__i]}"
+  if [ "$FORCE" = "1" ]; then
+    "$DOTFILES_ROOT/scripts/lib/link.sh" prune_link "$__path" || __rc=1
+  else
+    printf '  would prune: %s -> %s\n' "$__path" "$(readlink "$__path" 2>/dev/null || printf '?')"
+  fi
+  __i=$((__i + 1))
+done
+
+if [ "$FORCE" != "1" ]; then
+  printf 'Re-run with --force to remove them.\n'
+fi
+
+exit "$__rc"

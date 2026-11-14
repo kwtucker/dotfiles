@@ -151,7 +151,10 @@ link_conflict_count() {
 }
 
 # ── Orphans ───────────────────────────────────────────────────────────────────
+# ORPHAN_ITEMS holds human-readable "<dest> -> <target>" strings; ORPHAN_PATHS
+# holds the matching destination paths for pruners that need exact arguments.
 ORPHAN_ITEMS=()
+ORPHAN_PATHS=()
 # Read by scripts/state for `check-links --strict` and the summary line.
 # shellcheck disable=SC2034
 LINK_ORPHANS=0
@@ -174,12 +177,14 @@ is_repo_target() {
 
 add_orphan() {
   __item="$1"
+  __path="$2"
   __i=0
-  while [ "$__i" -lt "${#ORPHAN_ITEMS[@]}" ]; do
-    [ "${ORPHAN_ITEMS[$__i]}" = "$__item" ] && return 0
+  while [ "$__i" -lt "${#ORPHAN_PATHS[@]}" ]; do
+    [ "${ORPHAN_PATHS[$__i]}" = "$__path" ] && return 0
     __i=$((__i + 1))
   done
   ORPHAN_ITEMS[${#ORPHAN_ITEMS[@]}]="$__item"
+  ORPHAN_PATHS[${#ORPHAN_PATHS[@]}]="$__path"
 }
 
 check_orphan_path() {
@@ -188,11 +193,12 @@ check_orphan_path() {
   __target="$(readlink "$__link")"
   is_repo_target "$__target" || return 0
   is_expected_dest "$__link" && return 0
-  add_orphan "$__link -> $__target"
+  add_orphan "$__link -> $__target" "$__link"
 }
 
 list_orphans() {
   ORPHAN_ITEMS=()
+  ORPHAN_PATHS=()
 
   for __entry in "$XDG_CONFIG_HOME"/*; do
     check_orphan_path "$__entry"

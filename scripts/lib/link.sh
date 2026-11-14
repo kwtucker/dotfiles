@@ -5,6 +5,7 @@
 #   scripts/lib/link.sh [--adopt] link_file SRC DEST
 #   scripts/lib/link.sh preflight_dir SRC DEST
 #   scripts/lib/link.sh preflight_file SRC DEST
+#   scripts/lib/link.sh prune_link DEST
 #
 # Semantics:
 #   absent destination             -> create the link
@@ -15,6 +16,8 @@
 #
 # "Owned" means the link target resolves inside DOTFILES_ROOT. A destination
 # directory is never deleted: adoption moves it into the backup directory.
+# prune_link removes a stale symlink only after re-checking that it still points
+# into this checkout; callers decide which links are stale.
 #
 # Environment:
 #   DOTFILES_ADOPT=1       adopt conflicting destinations (back up, then link)
@@ -36,12 +39,14 @@ LINK_BACKUP_ROOT="${DOTFILES_BACKUP_ROOT:-$DOTFILES_STATE_DIR/backups}"
 link_usage() {
   cat <<'EOF'
 Usage: scripts/lib/link.sh [--adopt] <command> SRC DEST
+       scripts/lib/link.sh prune_link DEST
 
 Commands:
   link_dir        Create, keep, or repair a directory link
   link_file       Create, keep, or repair a file link
   preflight_dir   Check a directory link without changing anything
   preflight_file  Check a file link without changing anything
+  prune_link      Remove DEST only if it is an owned symlink into this checkout
 
 Options:
   --adopt         Back up and replace a conflicting destination
@@ -263,6 +268,30 @@ link_preflight() {
   esac
 }
 
+# Remove a stale symlink after re-checking that it still points into this
+# checkout. A path that changed since discovery (real file, foreign link) is
+# refused rather than deleted.
+link_prune() {
+  __dest="$1"
+
+  if [ ! -e "$__dest" ] && [ ! -L "$__dest" ]; then
+    return 0
+  fi
+
+  if [ ! -L "$__dest" ]; then
+    link_fatal "refusing to prune a non-symlink: $__dest ($(link_describe "$__dest"))"
+  fi
+
+  __target="$(readlink "$__dest")"
+  __resolved="$(link_target_path "$__target" "$__dest")"
+  if ! link_is_owned "$__resolved"; then
+    link_fatal "refusing to prune a link outside $DOTFILES_ROOT: $__dest -> $__target"
+  fi
+
+  rm -f "$__dest"
+  printf 'pruned: %s -> %s\n' "$__dest" "$__target"
+}
+
 link_main() {
   while [ $# -gt 0 ]; do
     case "$1" in
@@ -278,20 +307,33 @@ link_main() {
     esac
   done
 
-  [ $# -eq 3 ] || link_die_usage "expected a command and two paths"
+  [ $# -ge 2 ] || link_die_usage "expected a command and its paths"
 
   __command="$1"
-  __src="$2"
-  __dest="$3"
-
-  is_absolute "$__src" || link_fatal "source path must be absolute: $__src"
-  is_absolute "$__dest" || link_fatal "destination path must be absolute: $__dest"
+  shift
 
   case "$__command" in
-    link_dir) link_apply dir "$__src" "$__dest" ;;
-    link_file) link_apply file "$__src" "$__dest" ;;
-    preflight_dir) link_preflight dir "$__src" "$__dest" ;;
-    preflight_file) link_preflight file "$__src" "$__dest" ;;
+    link_dir | link_file | preflight_dir | preflight_file)
+      [ $# -eq 2 ] || link_die_usage "expected SRC and DEST for $__command"
+      __src="$1"
+      __dest="$2"
+
+      is_absolute "$__src" || link_fatal "source path must be absolute: $__src"
+      is_absolute "$__dest" || link_fatal "destination path must be absolute: $__dest"
+
+      case "$__command" in
+        link_dir) link_apply dir "$__src" "$__dest" ;;
+        link_file) link_apply file "$__src" "$__dest" ;;
+        preflight_dir) link_preflight dir "$__src" "$__dest" ;;
+        preflight_file) link_preflight file "$__src" "$__dest" ;;
+      esac
+      ;;
+    prune_link)
+      [ $# -eq 1 ] || link_die_usage "expected DEST for prune_link"
+      __dest="$1"
+      is_absolute "$__dest" || link_fatal "destination path must be absolute: $__dest"
+      link_prune "$__dest"
+      ;;
     *) link_die_usage "unknown command: $__command" ;;
   esac
 }

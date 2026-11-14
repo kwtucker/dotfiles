@@ -26,7 +26,7 @@ OPTIONAL_MODULES = copilot
 TARGETS := $(MODULES) $(filter-out $(MODULES),$(OPTIONAL_MODULES))
 
 # Shell sources checked by `make lint`. `install` has no .sh suffix.
-SHELL_SCRIPTS := install scripts/state scripts/fetch scripts/bootstrap-mise.sh $(wildcard scripts/lib/*.sh)
+SHELL_SCRIPTS := install scripts/state scripts/fetch scripts/prune-links scripts/bootstrap-mise.sh $(wildcard scripts/lib/*.sh)
 SHELLCHECK ?= $(shell mise which shellcheck 2>/dev/null || command -v shellcheck 2>/dev/null)
 SHFMT ?= $(shell mise which shfmt 2>/dev/null || command -v shfmt 2>/dev/null)
 SHFMT_FLAGS := -i 2 -ci
@@ -105,6 +105,9 @@ doctor: ## Diagnose install state (read-only; offline unless ARGS=--online)
 status: ## Show repository, applied, and filesystem state (read-only)
 	@scripts/state status $(ARGS)
 
+prune.links: ## Remove stale links into this checkout (dry run; ARGS=--force)
+	@scripts/prune-links $(ARGS)
+
 lint: ## Lint shell scripts (bash -n, shellcheck, shfmt)
 	@fail=0; \
 	for f in $(SHELL_SCRIPTS); do \
@@ -148,7 +151,7 @@ upgrade.plugins: $(UPGRADE) ## Upgrade editor/shell plugins (nvim, tmux, zsh, op
 
 upgrade.all: upgrade.tools upgrade.plugins ## Upgrade tools + plugins
 
-.PHONY: $(TARGETS) $(CLEAN) $(UPGRADE) install update all clean.all outdated doctor status lint fmt upgrade.tools prune.tools upgrade.plugins upgrade.all
+.PHONY: $(TARGETS) $(CLEAN) $(UPGRADE) install update all clean.all outdated doctor status prune.links lint fmt upgrade.tools prune.tools upgrade.plugins upgrade.all
 
 help: ## Show this help message
 	@echo "Available targets:"; \
@@ -165,6 +168,7 @@ help: ## Show this help message
 	echo "  make outdated       # Preview outdated tools (no changes)"; \
 	echo "  make doctor         # Diagnose install state (read-only)"; \
 	echo "  make status         # Show repo, applied, and filesystem state"; \
+	echo "  make prune.links    # Remove stale links (dry run; ARGS=--force)"; \
 	echo "  make lint           # Check shell scripts (bash -n, shellcheck, shfmt)"; \
 	echo "  make fmt            # Format shell scripts with shfmt"; \
 	echo "  make upgrade.tools  # Upgrade mise tools within pinned ranges"; \
