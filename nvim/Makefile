@@ -8,14 +8,7 @@ CONFIG_LINK := $(XDG_CONFIG_HOME)/$(MODULE_NAME)
 
 install:
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	@if [ -e "$(CONFIG_LINK)" ] || [ -L "$(CONFIG_LINK)" ]; then \
-		if [ ! -L "$(CONFIG_LINK)" ] || [ "$$(readlink "$(CONFIG_LINK)")" != "$(CURDIR)" ]; then \
-			echo "Conflict: $(CONFIG_LINK) already exists; review and move it aside before installing." >&2; \
-			exit 1; \
-		fi; \
-	fi
-	@mkdir -p "$(XDG_CONFIG_HOME)"
-	@if [ ! -L "$(CONFIG_LINK)" ]; then ln -s "$(CURDIR)" "$(CONFIG_LINK)"; fi
+	@$(DOTFILES_LINK) link_dir "$(CURDIR)" "$(CONFIG_LINK)"
 	@echo "✅ $(MODULE_NAME) installed."
 
 # Restore honors lazy-lock.json; only upgrade deliberately advances revisions.

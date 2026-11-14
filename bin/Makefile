@@ -24,16 +24,7 @@ install:
 			continue; \
 		fi; \
 		found=1; \
-		target="$(BIN_DIR)/$$name"; \
-		if [ -e "$$target" ] || [ -L "$$target" ]; then \
-			if [ ! -L "$$target" ] || [ "$$(readlink "$$target")" != "$$script" ]; then \
-				echo "Conflict: $$target already exists; move it aside before installing." >&2; \
-				exit 1; \
-			fi; \
-		else \
-			ln -s "$$script" "$$target"; \
-			echo "Linked $$target."; \
-		fi; \
+		$(DOTFILES_LINK) link_file "$$script" "$(BIN_DIR)/$$name"; \
 	done; \
 	if [ "$$found" -eq 0 ]; then \
 		echo "No executable scripts in $(SCRIPT_DIR); nothing to link."; \

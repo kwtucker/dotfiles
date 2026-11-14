@@ -6,7 +6,7 @@ MODULE_NAME := kubernetes
 
 install: .ensure.xdg.kubernetes
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+	@$(DOTFILES_LINK) link_dir "$(CURDIR)" "$(XDG_CONFIG_HOME)/$(MODULE_NAME)"
 	@echo "✅ $(MODULE_NAME) installed."
 
 completions:

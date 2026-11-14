@@ -13,11 +13,7 @@ MISE_DATA := $(or $(MISE_DATA_DIR),$(HOME)/.local/share/mise)
 
 install: .ensure.xdg.opencode
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	@if [ -d "$(XDG_CONFIG_HOME)/$(MODULE_NAME)" ] && [ ! -L "$(XDG_CONFIG_HOME)/$(MODULE_NAME)" ]; then \
-		echo "⚠️  Removing existing directory $(XDG_CONFIG_HOME)/$(MODULE_NAME)"; \
-		rm -rf "$(XDG_CONFIG_HOME)/$(MODULE_NAME)"; \
-	fi
-	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+	@$(DOTFILES_LINK) link_dir "$(CURDIR)" "$(XDG_CONFIG_HOME)/$(MODULE_NAME)"
 	@echo "🔗 Linked $(CURDIR) -> $(XDG_CONFIG_HOME)/$(MODULE_NAME)"
 	@if [ -w "$(MISE_DATA)" ] || [ ! -d "$(MISE_DATA)" ]; then \
 		MISE_YES=1 mise install $(OPENCODE_TOOL); \

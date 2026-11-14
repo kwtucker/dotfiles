@@ -31,7 +31,7 @@ install: .ensure.xdg.zsh
 		rm -rf "$(ZSH_DIR)"; \
 	fi
 	# Create symlink
-	@ln -sfn $(CURDIR) $(ZSH_DIR)
+	@$(DOTFILES_LINK) link_dir "$(CURDIR)" "$(ZSH_DIR)"
 	@echo "🔗 Linked $(CURDIR) -> $(ZSH_DIR)"
 	# Ensure local bin exists
 	@mkdir -p $(LOCAL_BIN)
@@ -42,7 +42,7 @@ install: .ensure.xdg.zsh
 		curl -fsSL git.io/antigen -o $(ZSH_DIR)/antigen.zsh; \
 	}
 	# Link zshenv
-	@ln -sf $(CURDIR)/zshenv $(HOME)/.zshenv
+	@$(DOTFILES_LINK) link_file "$(CURDIR)/zshenv" "$(HOME)/.zshenv"
 	# Set default shell (optional)
 	# @$(MAKE) set-default-shell
 	@echo "✅ $(MODULE_NAME) installed."

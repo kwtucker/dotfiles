@@ -145,6 +145,30 @@ if [ "${FORCE:-0}" != "1" ] && [ "$CURRENT_HEAD" != "unknown" ] \
   && git -C "$DOTFILES_DIR" diff --cached --quiet 2>/dev/null; then
   skip "already applied ${CURRENT_HEAD:0:7} — nothing changed"
 else
+  # Abort before any module mutates the home directory when a destination is a
+  # real file/directory or a foreign symlink. DOTFILES_ADOPT=1 opts into backing
+  # those up instead (see scripts/lib/link.sh and the README recovery notes).
+  step "link preflight"
+  PREFLIGHT_RC=0
+  "$DOTFILES_DIR/scripts/state" check-links --preflight --quiet || PREFLIGHT_RC=$?
+  case "$PREFLIGHT_RC" in
+    0)
+      ok "no conflicting destinations"
+      ;;
+    1)
+      if [ "${DOTFILES_ADOPT:-0}" = "1" ]; then
+        echo -e "  ${YELLOW}↷${RESET} adopting conflicting destinations (backups in $XDG_STATE_HOME/dotfiles/backups)"
+      else
+        echo -e "\n${BOLD}Aborting before any changes.${RESET} Move the paths above aside," >&2
+        echo -e "or re-run with DOTFILES_ADOPT=1 to back them up automatically." >&2
+        exit 1
+      fi
+      ;;
+    *)
+      echo -e "  ${YELLOW}↷${RESET} link preflight unavailable — each module will re-check its destination"
+      ;;
+  esac
+
   make -C "$DOTFILES_DIR" all
   ok "modules installed"
   mkdir -p "$STAMP_DIR"

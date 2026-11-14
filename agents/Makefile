@@ -9,22 +9,19 @@ LINKS := skills/conventional-commits skills/go-development skills/caveman skills
 install:
 	@for path in $(LINKS); do \
 		source="$(CURDIR)/$$path"; target="$(AGENTS_HOME)/$$path"; \
-		if [ ! -e "$$source" ]; then echo "Missing source: $$source" >&2; exit 1; fi; \
-		parent="$$(dirname "$$target")"; \
-		if { [ -e "$$parent" ] || [ -L "$$parent" ]; } && [ ! -d "$$parent" ]; then \
-			echo "Conflict: $$parent is not a directory." >&2; exit 1; \
-		fi; \
-		if [ -e "$$target" ] || [ -L "$$target" ]; then \
-			if [ ! -L "$$target" ] || [ "$$(readlink "$$target")" != "$$source" ]; then \
-				echo "Conflict: $$target already exists; move it aside before installing." >&2; \
-				exit 1; \
-			fi; \
+		if [ -d "$$source" ]; then \
+			$(DOTFILES_LINK) preflight_dir "$$source" "$$target"; \
+		else \
+			$(DOTFILES_LINK) preflight_file "$$source" "$$target"; \
 		fi; \
 	done
-	@set -e; for path in $(LINKS); do \
-		target="$(AGENTS_HOME)/$$path"; \
-		mkdir -p "$$(dirname "$$target")"; \
-		if [ ! -L "$$target" ]; then ln -s "$(CURDIR)/$$path" "$$target"; fi; \
+	@for path in $(LINKS); do \
+		source="$(CURDIR)/$$path"; target="$(AGENTS_HOME)/$$path"; \
+		if [ -d "$$source" ]; then \
+			$(DOTFILES_LINK) link_dir "$$source" "$$target"; \
+		else \
+			$(DOTFILES_LINK) link_file "$$source" "$$target"; \
+		fi; \
 	done
 	@echo "Shared agent instructions and skills installed."
 
