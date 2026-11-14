@@ -37,9 +37,96 @@ cd ~/.dotfiles
 ./install          # or: make update  (or: make install)
 ```
 
-When the checkout is unchanged since the last successful run, the module pass is
-skipped automatically (tools are still topped up). Force a full pass with
-`FORCE=1 ./install`.
+When the applied-state stamp still matches — same commit, checkout path, XDG base
+directories, and ignored local overrides (`modules.local.mk`, `mise.local.toml`) —
+and `scripts/state check-links --quiet` confirms every expected link, the module
+pass is skipped and reported as verified (tools are still topped up). A missing or
+drifted link, an edited override, a moved checkout, or an uncommitted change falls
+through to a full pass. Force one with `FORCE=1 ./install`.
+
+The stamp lives at
+`${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/last-applied` and holds v2
+`key=value` lines: `version`, `head`, `root`, `xdg_config`, `xdg_data`,
+`xdg_state`, `modules_local`, `mise_local`, and `applied_at`. It is written
+atomically only after a successful module pass, so a failed or interrupted run is
+never mistaken for a verified state. A v1 stamp (a bare commit line) or an
+unreadable stamp is treated as stale and the next run applies.
+
+## Checking installation state
+
+`make status` and `make doctor` are read-only: they do not create directories,
+change links, or write the applied-state stamp. They work offline; only
+`doctor --online` makes network requests.
+
+```bash
+make status                 # repository + applied + filesystem overview
+make doctor                 # PASS/WARN/FAIL with a fix for each problem
+make doctor ARGS=--online   # also check mise updates and origin reachability
+make status ARGS=--json     # machine-readable status
+scripts/state check-links   # fast expected-link verification
+```
+
+`make status` separates three domains: the git checkout, the last applied state
+(stamp and link health), and the filesystem. It reports drift but exits `0` by
+default; add `ARGS=--exit-code` to fail when links, the stamp, or declared tools
+have drifted. Local edits and untracked files are reported but do not by
+themselves count as drift.
+
+`scripts/state doctor` exits `0` with warnings, `1` on any failure, and `2` on a
+usage error. It checks the platform, base tools, mise/tools/trust, repository and
+stamp, XDG paths, expected links, module sources, secrets permissions, and
+installed artifacts. Every warning and failure prints a remediation command.
+When run through `make`, GNU Make reports any failed recipe with its own status
+(`2`), so call `scripts/state doctor` directly if you need to distinguish a
+failure from a usage error.
+
+`scripts/state check-links` exits `0` only when every expected link is present
+and resolves to this checkout. `--preflight` reports only destinations a default
+install would refuse to replace; `--strict` also fails on links that point into
+this checkout but are no longer expected.
+
+### Conflicts, adoption, and backups
+
+Installs never delete an existing configuration. If an expected destination is a
+real file, a real directory, or a symlink that points outside this checkout, the
+module refuses and names the path. `./install` runs the same preflight for every
+module before changing anything, so a conflict aborts the whole pass.
+
+Move the path aside and re-run, or opt into automatic adoption:
+
+```bash
+DOTFILES_ADOPT=1 ./install          # full update
+DOTFILES_ADOPT=1 FORCE=1 ./install  # when the stamp says "already applied"
+DOTFILES_ADOPT=1 make bat           # one module
+```
+
+Adoption moves the existing path into
+
+```
+${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/backups/<UTC timestamp>/
+```
+
+keeping its path relative to `$HOME` (paths outside `$HOME` go under
+`external/`). Each run appends `adopt<TAB>dest<TAB>backup` to `manifest.tsv` in
+that directory. Links that point into this checkout are repaired in place without
+a backup. Sockets, pipes, and device nodes are always refused.
+
+To restore one adopted path, remove the link this repo installed and move the
+backup back into place:
+
+```bash
+backup=~/.local/state/dotfiles/backups/<timestamp>
+rm ~/.config/bat
+mv "$backup/.config/bat" ~/.config/bat
+```
+
+Re-running the module afterwards will treat that path as a conflict again, which
+is the intended guard: choose adoption or move it aside deliberately.
+
+`make status` lists backup runs so you can find the right timestamp. Rollback to
+an older revision is still `git switch --detach <rev> && FORCE=1 ./install`
+(plus `mise install` if tool versions changed); backups cover individual
+conflicting paths, not whole-home snapshots.
 
 ## How it works
 
@@ -87,6 +174,29 @@ that matters.
 
 Per-project overrides are supported — drop a `mise.toml` in any project directory and mise will switch tool versions automatically when you `cd` into it.
 
+### Pinned downloads
+
+Everything installed outside mise is fetched by `scripts/fetch`, which rejects
+non-HTTPS URLs, empty or oversized responses, and SHA-256 mismatches before the
+file is moved into place. Pins live next to the URL in tracked files — edit the
+version/commit and digest together:
+
+| Artifact | Pin |
+|---|---|
+| mise bootstrap | `MISE_BOOTSTRAP_VERSION` in `scripts/bootstrap-mise.sh`; the release archive is verified against the release's `SHASUMS256.txt` |
+| `wt` | `WT_VERSION` + `WT_SHA256` in `git/Makefile` |
+| antigen | `ANTIGEN_VERSION` + `ANTIGEN_SHA256` in `zsh/Makefile` (vendored at `zsh/antigen.zsh`) |
+| `fzf-tmux` | `FZF_TMUX_VERSION` + `FZF_TMUX_SHA256` in `fzf/Makefile` |
+| TPM | `TPM_VERSION` + `TPM_COMMIT` in `tmux/Makefile` |
+| fonts | `INCONSOLATA_COMMIT`/`INCONSOLATA_SHA256` and `JETBRAINS_VERSION`/`JETBRAINS_SHA256` in `fonts/Makefile` |
+
+Terraform's zsh completion is vendored under `terraform/completions/` instead of
+being fetched. Fresh machines bootstrap mise with
+`scripts/bootstrap-mise.sh`; it never pipes a remote script into a shell, and it
+fails instead of silently falling back when the checksum cannot be fetched. The
+module upgrade targets (`make git.upgrade`, `make zsh.upgrade`,
+`make tmux.upgrade`) fetch the pinned artifact and fail on a digest mismatch.
+
 ### Dotfiles — Make modules
 
 Configuration is split into independent modules, each in its own directory with a `Makefile`. The root `Makefile` coordinates them all.
@@ -115,7 +225,7 @@ Configuration is split into independent modules, each in its own directory with 
 | `opencode/` | OpenCode config, commands, and plugins (binary: mise) |
 | `copilot/` | Optional Copilot CLI config and MCP servers (binary: mise) |
 
-Each module symlinks its config files into the appropriate XDG directory (`~/.config`, `~/.local/share`, etc). Modules are independent — install only what you need. Tool binaries are *not* installed by modules; everything comes from `mise.toml`, so Kubectl, Helm, Docker, and Rust work identically on Linux and macOS (Apple Silicon).
+Each module symlinks its config files into the appropriate XDG directory (`~/.config`, `~/.local/share`, etc). Modules are independent — install only what you need. Tool binaries are *not* installed by modules; everything comes from `mise.toml`, so Kubectl, Helm, Docker, and Rust work identically on Linux and macOS (Apple Silicon). A destination that is already a real file, directory, or foreign symlink is refused rather than replaced; see [Conflicts, adoption, and backups](#conflicts-adoption-and-backups).
 
 See [`nvim/README.md`](./nvim/README.md) for editor setup and maintenance.
 
@@ -184,6 +294,8 @@ repo's `nvim/` config at a pinned commit and sets `K8S_DEBUG=1`, which makes
 |---|---|
 | `make install` / `make update` | Install or update this machine (runs `./install`) |
 | `make all` | Relink all modules in parallel (no pull, top-up, or prune) |
+| `make status` | Show repository, applied, and filesystem state (read-only) |
+| `make doctor` | Diagnose install state with PASS/WARN/FAIL (read-only, offline) |
 | `make clean.all` | Remove all installed modules |
 | `make [module]` | Install a specific module, e.g. `make nvim` |
 | `make [module].clean` | Clean a specific module, e.g. `make nvim.clean` |

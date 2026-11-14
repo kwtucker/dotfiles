@@ -27,6 +27,15 @@
   `LOCAL_MODULES` adds machine-specific choices. Preserve parallel-install ordering.
 - `install`: bootstrap/update entry point. It can pull Git changes, install/prune
   tools, relink modules, and recycle tmux; it is not a harmless validation command.
+- `scripts/`: state and deployment helpers. `scripts/state` backs `make doctor`
+  and `make status`; keep it write-free, offline by default, and dependent only
+  on bash, git, and standard POSIX tools. `scripts/lib/link.sh` is the
+  conflict-safe link helper the module Makefiles call; only it may mutate the
+  home directory, and only through the documented adopt/backup path.
+  `scripts/lib/stamp.sh` owns the v2 applied-state stamp that gates the install
+  fast path; write it only after a successful module pass. `scripts/fetch`
+  verifies pinned downloads, and `scripts/bootstrap-mise.sh` installs the pinned
+  mise release from verified release checksums.
 - `image/`: a separate, deliberately slim Linux workspace image/tool manifest.
   Do not automatically mirror every laptop tool or agent into it.
 - `agents/`: single source for shared engineering instructions and portable skills,
