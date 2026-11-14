@@ -8,17 +8,9 @@ TPM_DIR := $(HOME)/.tmux/plugins/tpm
 
 install: .ensure.xdg.tmux
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	# Link tmux config dir
-	@# `test -L` is true for a *dangling* symlink too, so a link left behind by
-	@# a moved/rename repo (e.g. ~/dotfiles -> ~/.dotfiles) would look 
-	@# "already linked" forever and silently disable the whole tmux config.
-	@# Require the link to actually resolve to this checkout before skipping.
-	@if [ ! -L "$(TMUX_DIR)" ] || [ "$$(readlink "$(TMUX_DIR)")" != "$(CURDIR)" ]; then \
-		ln -sfn $(CURDIR) $(TMUX_DIR); \
-		echo "Linked $(CURDIR) -> $(TMUX_DIR)"; \
-	else \
-		echo "✅ $(TMUX_DIR) already linked"; \
-	fi
+	# The helper repairs links left behind by a moved/renamed checkout and
+	# refuses real directories unless DOTFILES_ADOPT=1 is set.
+	@$(DOTFILES_LINK) link_dir "$(CURDIR)" "$(TMUX_DIR)"
 	# Ensure TPM is present — updates happen via `make tmux.upgrade`
 	# (pulling TPM on every install added a needless network round-trip).
 	@mkdir -p $(HOME)/.tmux/plugins

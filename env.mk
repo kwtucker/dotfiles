@@ -3,7 +3,18 @@
 XDG_CONFIG_HOME ?= ${HOME}/.config
 XDG_CACHE_HOME  ?= ${HOME}/.cache
 XDG_DATA_HOME   ?= ${HOME}/.local/share
+XDG_STATE_HOME  ?= ${HOME}/.local/state
 ZSH_COMPLETIONS_DIR ?= ${XDG_DATA_HOME}/zsh/completions
+
+# Repository root and the shared link helper. This file lives at the repo root,
+# so the directory of the include is the root whether a Makefile includes it as
+# `env.mk` (root) or `../env.mk` (module).
+DOTFILES_ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+DOTFILES_LINK := $(DOTFILES_ROOT_DIR)/scripts/lib/link.sh
+
+# Module recipes run the helper as a child process. It reads DOTFILES_ADOPT from
+# the environment and must honour the state directory chosen for this Make run.
+export XDG_STATE_HOME
 
 # platform.mk must be included *after* the XDG vars above (FONT_DIR uses them)
 # platform.mk lives next to env.mk — resolve relative to THIS file so the

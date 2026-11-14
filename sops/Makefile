@@ -1,20 +1,19 @@
 include ../env.mk
 
 MODULE_NAME := sops
+AGE_DIR := $(XDG_CONFIG_HOME)/age
 
 .PHONY: install clean
 
 install: .ensure.xdg.sops
 	@echo "Installing $(MODULE_NAME)..."
-	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
-	@mkdir -p $(HOME)/.config/sops/age
-	@mkdir -p $(HOME)/.config/age
+	@$(DOTFILES_LINK) link_dir "$(CURDIR)" "$(XDG_CONFIG_HOME)/$(MODULE_NAME)"
+	@mkdir -p $(AGE_DIR)
 	@mkdir -p $(HOME)/.local/bin
-	@chmod 700 $(HOME)/.config/sops
-	@chmod 700 $(HOME)/.config/age
+	@chmod 700 $(AGE_DIR)
 	@if [ ! -x "$(HOME)/.local/bin/sops-age-key-from-wbs" ]; then \
 		echo "Installing sops-age-key helper..."; \
-		printf '%s\n' '#!/usr/bin/env bash' 'IDENTITY="$${WBS_IDENTITY:-$$HOME/.config/age/wbs-identity.age}"' 'exec age -d "$$IDENTITY"' > $(HOME)/.local/bin/sops-age-key-from-wbs; \
+		printf '%s\n' '#!/usr/bin/env bash' 'IDENTITY="$${WBS_IDENTITY:-$(AGE_DIR)/wbs-identity.age}"' 'exec age -d "$$IDENTITY"' > $(HOME)/.local/bin/sops-age-key-from-wbs; \
 		chmod +x $(HOME)/.local/bin/sops-age-key-from-wbs; \
 	else \
 		echo "✅ sops-age-key-from-wbs already installed"; \

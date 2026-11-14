@@ -7,7 +7,7 @@ MODULE_NAME := terraform
 install: .ensure.xdg.terraform
 	@echo "Installing $(MODULE_NAME) dotfiles..."
 	@mkdir -p $(XDG_CACHE_HOME)/$(MODULE_NAME)/plugin-cache
-	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+	@$(DOTFILES_LINK) link_dir "$(CURDIR)" "$(XDG_CONFIG_HOME)/$(MODULE_NAME)"
 	@echo "✅ $(MODULE_NAME) installed."
 
 # Terraform has no native zsh completion generator — use the maintained

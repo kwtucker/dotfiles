@@ -6,7 +6,7 @@ MODULE_NAME := alacritty
 
 install: .ensure.xdg.alacritty
 	@echo "Installing $(MODULE_NAME) dotfiles..."
-	@ln -sfn $(CURDIR) $(XDG_CONFIG_HOME)/$(MODULE_NAME)
+	@$(DOTFILES_LINK) link_dir "$(CURDIR)" "$(XDG_CONFIG_HOME)/$(MODULE_NAME)"
 	@echo "✅ $(MODULE_NAME) installed."
 
 clean: .remove.xdg.alacritty
