@@ -67,5 +67,7 @@ upgrade: .tpm.pin
 
 clean: .remove.xdg.tmux
 	@echo "Cleaning $(MODULE_NAME) data..."
-	@rm -rf $(TPM_DIR)
+	@if [ -d "$(TPM_DIR)/.git" ] && [ "$$(git -C "$(TPM_DIR)" remote get-url origin 2>/dev/null || true)" = "$(TPM_URL)" ]; then \
+		rm -rf "$(TPM_DIR)"; \
+	fi
 	@echo "✅ $(MODULE_NAME) cleaned."

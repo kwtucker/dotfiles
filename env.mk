@@ -5,6 +5,7 @@ XDG_CACHE_HOME  ?= ${HOME}/.cache
 XDG_DATA_HOME   ?= ${HOME}/.local/share
 XDG_STATE_HOME  ?= ${HOME}/.local/state
 ZSH_COMPLETIONS_DIR ?= ${XDG_DATA_HOME}/zsh/completions
+DOTFILES_STATE_DIR ?= ${XDG_STATE_HOME}/dotfiles
 
 # Repository root and the shared link helper. This file lives at the repo root,
 # so the directory of the include is the root whether a Makefile includes it as
@@ -22,8 +23,6 @@ export XDG_STATE_HOME
 # include works no matter which directory make is invoked from.
 include $(dir $(lastword $(MAKEFILE_LIST)))platform.mk
 
-XDG_DIRS := $(XDG_CONFIG_HOME) $(XDG_CACHE_HOME) $(XDG_DATA_HOME)
-
 .PHONY: .ensure.xdg .remove.xdg
 
 # Create base XDG dirs and module subdirs under cache/data only.
@@ -34,11 +33,30 @@ XDG_DIRS := $(XDG_CONFIG_HOME) $(XDG_CACHE_HOME) $(XDG_DATA_HOME)
 	@mkdir -p "$(XDG_CACHE_HOME)/$*"
 	@mkdir -p "$(XDG_DATA_HOME)/$*"
 
-# Remove module-specific XDG dirs only (does not remove base XDG dirs)
+# Remove only module paths this repository owns:
+#   config — a symlink that resolves inside this checkout (never a real file/dir)
+#   cache  — the module cache directory created by .ensure.xdg.%
+#   data   — only when empty; module clean targets remove their generated files
+#            (completions, tool data) themselves. Never recurse into user data.
 .remove.xdg.%:
-	@if [ -n "$*" ]; then \
-	    echo "Removing XDG dirs for $*"; \
-	    sh -c 'for dir in $(XDG_DIRS); do rm -rf "$$dir/$*"; done'; \
-	else \
-	    echo "Error: no module specified!"; exit 1; \
+	@if [ -z "$*" ]; then \
+	    echo "Error: no module specified!" >&2; exit 1; \
+	fi; \
+	echo "Removing owned XDG paths for $*"; \
+	cfg="$(XDG_CONFIG_HOME)/$*"; \
+	if [ -L "$$cfg" ]; then \
+	    case "$$(readlink "$$cfg")" in \
+	        "$(DOTFILES_ROOT_DIR)"/*) rm -f "$$cfg"; echo "Removed $$cfg." ;; \
+	        *) echo "Left $$cfg (link target is outside this checkout)." ;; \
+	    esac; \
+	elif [ -e "$$cfg" ]; then \
+	    echo "Left $$cfg (not a link owned by this checkout)."; \
+	fi; \
+	cache="$(XDG_CACHE_HOME)/$*"; \
+	if [ -d "$$cache" ] && [ ! -L "$$cache" ]; then \
+	    rm -rf "$$cache"; \
+	fi; \
+	data="$(XDG_DATA_HOME)/$*"; \
+	if [ -d "$$data" ] && [ ! -L "$$data" ]; then \
+	    rmdir "$$data/completions" "$$data" 2>/dev/null || true; \
 	fi

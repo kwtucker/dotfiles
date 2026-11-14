@@ -24,4 +24,5 @@ completions:
 
 clean: .remove.xdg.rust
 	@echo "Cleaning $(MODULE_NAME) data..."
+	@rm -f "$(ZSH_COMPLETIONS_DIR)/_rustup" "$(ZSH_COMPLETIONS_DIR)/_cargo"
 	@echo "✅ $(MODULE_NAME) cleaned."

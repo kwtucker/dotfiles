@@ -20,4 +20,5 @@ completions:
 
 clean: .remove.xdg.kubernetes
 	@echo "Cleaning $(MODULE_NAME) data..."
+	@rm -f "$(ZSH_COMPLETIONS_DIR)/_kubectl"
 	@echo "✅ $(MODULE_NAME) cleaned."

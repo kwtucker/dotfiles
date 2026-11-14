@@ -25,4 +25,5 @@ completions:
 
 clean: .remove.xdg.docker
 	@echo "Cleaning $(MODULE_NAME) data..."
+	@rm -f "$(ZSH_COMPLETIONS_DIR)/_docker"
 	@echo "✅ $(MODULE_NAME) cleaned."
