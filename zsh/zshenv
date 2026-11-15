@@ -1,6 +1,6 @@
-export XDG_CONFIG_HOME=$HOME/.config
-export XDG_CACHE_HOME=$HOME/.cache
-export XDG_DATA_HOME=$HOME/.local/share
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 # export XDG_RUNTIME_DIR=/run/user/$UID
 case "$(uname -s)" in
   Darwin)
@@ -14,4 +14,7 @@ export SHELL="/bin/zsh"
 export ZSH_THEME=""
 export ZDOTDIR=$XDG_CONFIG_HOME/zsh/
 export ZSH_CACHE_DIR=$XDG_CACHE_HOME/zsh/
-export ZSH_COMPLETIONS_DIR=$XDG_DATA_HOME/zsh/completions
+# Keep the completion path in this shell only. Exporting a derived path lets a
+# stale value steer `make` (and its clean targets) into a different home; Make
+# derives it from the XDG_DATA_HOME used for that run.
+ZSH_COMPLETIONS_DIR=$XDG_DATA_HOME/zsh/completions

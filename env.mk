@@ -4,7 +4,11 @@ XDG_CONFIG_HOME ?= ${HOME}/.config
 XDG_CACHE_HOME  ?= ${HOME}/.cache
 XDG_DATA_HOME   ?= ${HOME}/.local/share
 XDG_STATE_HOME  ?= ${HOME}/.local/state
-ZSH_COMPLETIONS_DIR ?= ${XDG_DATA_HOME}/zsh/completions
+# Derived from the XDG data directory used by this Make run. Do not inherit a
+# shell value: a stale export can point installs and cleanups at another home.
+# Override deliberately on the command line if needed:
+#   make install ZSH_COMPLETIONS_DIR=/path
+ZSH_COMPLETIONS_DIR := ${XDG_DATA_HOME}/zsh/completions
 DOTFILES_STATE_DIR ?= ${XDG_STATE_HOME}/dotfiles
 
 # Repository root and the shared link helper. This file lives at the repo root,

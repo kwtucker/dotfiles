@@ -407,6 +407,11 @@ file in a shared directory such as `~/.local/bin`. Fonts are copied rather than
 linked, so only the exact pinned filenames and version markers are removed.
 `make prune.links` is the separate pass for links that are no longer expected.
 
+Completion paths follow the `XDG_DATA_HOME` of the Make run. A
+`ZSH_COMPLETIONS_DIR` inherited from the shell is ignored so that a clean or
+install under a temporary home cannot reach another home; pass
+`ZSH_COMPLETIONS_DIR=/path` on the Make command line to override it.
+
 `copilot` is an optional module: install it with `make copilot`, or append it to
 `LOCAL_MODULES` in `modules.local.mk` to include it in `make all` on that machine.
 Additional optional modules can be listed in `OPTIONAL_MODULES` in the root
