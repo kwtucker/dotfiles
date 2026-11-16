@@ -85,7 +85,16 @@ mise_missing() {
     printf 'mise'
     return 0
   fi
-  mise ls --missing 2>/dev/null | grep -v '^[[:space:]]*$' | grep -v '^Tool' || true
+  # mise.toml is the version catalog, not the install set: profiles install only
+  # the active subset. Report missing entries only for tools the selected
+  # profile/modules own (plus base/shared/unclassified); an empty DOTFILES_TOOLS
+  # means the catalog could not be resolved, so fall back to every declaration.
+  if [ -n "${DOTFILES_TOOLS:-}" ]; then
+    mise ls --missing --no-header 2>/dev/null |
+      awk -v active=" $DOTFILES_TOOLS " 'index(active, " " $1 " ") { print $1 }' || true
+  else
+    mise ls --missing --no-header 2>/dev/null | awk 'NF { print $1 }' || true
+  fi
 }
 
 short_sha() {
@@ -245,7 +254,7 @@ cmd_status() {
   __missing_tools="$(mise_missing)"
 
   OVERRIDE_ITEMS=()
-  for __f in modules.local.mk mise.local.toml git/config.local zsh/local; do
+  for __f in modules.local.mk mise.local.toml profile.local git/config.local zsh/local; do
     if [ -e "$DOTFILES_ROOT/$__f" ]; then
       if [ -n "$(file_hash "$DOTFILES_ROOT/$__f")" ]; then
         OVERRIDE_ITEMS[${#OVERRIDE_ITEMS[@]}]="$__f ($(file_hash "$DOTFILES_ROOT/$__f"))"
@@ -328,6 +337,7 @@ cmd_status() {
     printf '}, '
 
     printf '"modules": {'
+    printf '"profile": "%s", ' "$(json_escape "$DOTFILES_ACTIVE_PROFILE")"
     printf '"enabled": %s, ' "$(json_words "$MODULES_ENABLED")"
     printf '"optional": %s' "$(json_words "$MODULES_OPTIONAL")"
     printf '}, '
@@ -342,6 +352,8 @@ cmd_status() {
     else
       printf '"mise": "missing", '
     fi
+    printf '"active_count": %s, ' "$(count_words "$DOTFILES_TOOLS")"
+    printf '"managed_count": %s, ' "$(count_words "$DOTFILES_MANAGED_TOOLS")"
     printf '"missing_count": %s' "$(count_nonempty "$__missing_tools")"
     printf '}, '
 
@@ -416,6 +428,7 @@ cmd_status() {
     fi
 
     section "Modules"
+    printf '  profile:  %s\n' "${DOTFILES_ACTIVE_PROFILE:-none}"
     printf '  enabled:  %s\n' "$MODULES_ENABLED"
     printf '  optional: %s%s\n' "${MODULES_OPTIONAL:-none}" "$([ -n "$MODULES_OPTIONAL" ] && printf ' (not enabled)')"
     if [ "${#OVERRIDE_ITEMS[@]}" -gt 0 ]; then
@@ -433,8 +446,10 @@ cmd_status() {
     else
       printf '  mise:     not installed\n'
     fi
+    printf '  active:   %s tool(s) for profile %s (%s managed)\n' \
+      "$(count_words "$DOTFILES_TOOLS")" "${DOTFILES_ACTIVE_PROFILE:-none}" "$(count_words "$DOTFILES_MANAGED_TOOLS")"
     if [ -n "$__missing_tools" ]; then
-      printf '  missing:  %s declared tool line(s)\n' "$(count_nonempty "$__missing_tools")"
+      printf '  missing:  %s active tool(s)\n' "$(count_nonempty "$__missing_tools")"
       printf '%s\n' "$__missing_tools" | head -n 3 | sed 's/^/            /'
       __missing_total="$(count_nonempty "$__missing_tools")"
       if [ "$__missing_total" -gt 3 ]; then
@@ -570,10 +585,14 @@ doctor_mise() {
       [ -n "$__line" ] && MISSING_TOOL_ITEMS[${#MISSING_TOOL_ITEMS[@]}]="$__line"
     done <<<"$__missing"
     record_result FAIL "mise.tools" \
-      "$(count_nonempty "$__missing") declared tool line(s) missing: $(summarize_items 3 "${MISSING_TOOL_ITEMS[@]}")" \
-      "mise install"
+      "$(count_nonempty "$__missing") active tool(s) missing: $(summarize_items 3 "${MISSING_TOOL_ITEMS[@]}")" \
+      "make tools.install"
   else
-    record_result PASS "mise.tools" "all declared tools are installed"
+    if [ -n "${DOTFILES_TOOLS:-}" ]; then
+      record_result PASS "mise.tools" "all $(count_words "$DOTFILES_TOOLS") active tools are installed"
+    else
+      record_result WARN "mise.tools" "active tool set could not be resolved" "make tools.check"
+    fi
   fi
 
   __mise_global="${MISE_CONFIG_DIR:-$XDG_CONFIG_HOME/mise}/config.toml"
@@ -706,7 +725,7 @@ doctor_repo() {
   fi
 
   OVERRIDE_ITEMS=()
-  for __f in modules.local.mk mise.local.toml git/config.local zsh/local; do
+  for __f in modules.local.mk mise.local.toml profile.local git/config.local zsh/local; do
     [ -e "$DOTFILES_ROOT/$__f" ] || continue
     __hash="$(file_hash "$DOTFILES_ROOT/$__f")"
     if [ -n "$__hash" ]; then
@@ -832,6 +851,8 @@ doctor_modules() {
     return 0
   fi
 
+  record_result PASS "modules.profile" "active profile: ${DOTFILES_ACTIVE_PROFILE:-unknown}"
+
   __count=0
   __bad=()
   for __module in $MODULES_ENABLED; do
@@ -884,14 +905,14 @@ doctor_secrets() {
   if have_cmd age; then
     record_result PASS "secrets.age" "$(command -v age)"
   else
-    record_result WARN "secrets.age" "age is not on PATH" "mise install"
+    record_result WARN "secrets.age" "age is not on PATH" "make tools.install"
   fi
 
   if [ "$__sops_on" -eq 1 ]; then
     if have_cmd sops; then
       record_result PASS "secrets.sops" "$(command -v sops)"
     else
-      record_result WARN "secrets.sops" "sops module is enabled but the binary is missing" "mise install"
+      record_result WARN "secrets.sops" "sops module is enabled but the binary is missing" "make tools.install"
     fi
 
     __helper="$HOME/.local/bin/sops-age-key-from-wbs"
@@ -1007,7 +1028,7 @@ doctor_artifacts() {
     if have_cmd copilot; then
       record_result PASS "artifacts.copilot" "$(command -v copilot)"
     else
-      record_result WARN "artifacts.copilot" "copilot CLI is not on PATH" "mise install"
+      record_result WARN "artifacts.copilot" "copilot CLI is not on PATH" "mise install aqua:github/copilot-cli"
     fi
   fi
 }

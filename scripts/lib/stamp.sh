@@ -2,9 +2,10 @@
 # stamp.sh — applied-state stamp helpers (v2 key=value, v1 raw HEAD).
 #
 # The stamp records the inputs that decide whether the fast path may skip the
-# module pass: commit, checkout location, XDG base directories, and the ignored
-# local override files. A stamp is only trusted when every recorded input still
-# matches; link health is verified separately by `scripts/state check-links`.
+# module pass: commit, checkout location, XDG base directories, the ignored local
+# override files, and the selected profile + resolved module/tool sets. A stamp is
+# only trusted when every recorded input still matches; link health is verified
+# separately by `scripts/state check-links`.
 #
 # v1 (historical): a single commit SHA on one line.
 # v2:
@@ -16,7 +17,20 @@
 #   xdg_state=<value>
 #   modules_local=<git hash-object | none>
 #   mise_local=<git hash-object | none>
+#   profile=<name>
+#   modules=<space-separated module names>
+#   tools=<space-separated backend-qualified mise tool names>
 #   applied_at=<UTC ISO 8601>
+#
+# `profile`, `modules`, and `tools` come from DOTFILES_ACTIVE_PROFILE,
+# DOTFILES_MODULES, and DOTFILES_TOOLS when a caller already resolved them
+# (install, scripts/state). Otherwise the helpers resolve the active selection
+# from `make .list.modules` / `make .list.tools` once and cache it, so a profile
+# switch invalidates the fast path even on a matching commit.
+#
+# The recorded tool list is what lets the installer remove tools owned by a
+# module or profile that is no longer selected. Base, shared, unclassified, and
+# locally declared tools are never in that removal set; see tools.mk.
 
 DOTFILES_ROOT="${DOTFILES_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)}"
 : "${XDG_CONFIG_HOME:=$HOME/.config}"
@@ -26,7 +40,7 @@ DOTFILES_ROOT="${DOTFILES_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && p
 : "${DOTFILES_STAMP:=$DOTFILES_STATE_DIR/last-applied}"
 
 # Keys compared by stamp_verify. applied_at is informational only.
-STAMP_KEYS="head root xdg_config xdg_data xdg_state modules_local mise_local"
+STAMP_KEYS="head root xdg_config xdg_data xdg_state modules_local mise_local profile modules tools"
 
 # Read one v2 key, or `head` from a legacy v1 stamp. Prints nothing on miss.
 read_stamp_key() {
@@ -54,6 +68,38 @@ stamp_git_hash() {
   fi
 }
 
+# Resolve the active profile and module list once. Callers that already queried
+# Make may export DOTFILES_ACTIVE_PROFILE / DOTFILES_MODULES; everything else
+# asks Make directly so the stamp always compares against the real selection.
+STAMP_META_LOADED=0
+STAMP_META_PROFILE="full"
+STAMP_META_MODULES=""
+STAMP_META_TOOLS=""
+
+stamp_load_meta() {
+  [ "$STAMP_META_LOADED" = "1" ] && return 0
+  STAMP_META_LOADED=1
+
+  if [ -n "${DOTFILES_ACTIVE_PROFILE:-}" ] || [ -n "${DOTFILES_MODULES:-}" ]; then
+    STAMP_META_PROFILE="${DOTFILES_ACTIVE_PROFILE:-full}"
+    STAMP_META_MODULES="${DOTFILES_MODULES:-}"
+  else
+    __stamp_meta="$(cd "$DOTFILES_ROOT" && make -s --no-print-directory .list.modules 2>/dev/null)" || return 0
+    STAMP_META_PROFILE="$(printf '%s\n' "$__stamp_meta" | awk -F '\t' '$1 == "profile" { print $2; exit }')"
+    STAMP_META_MODULES="$(printf '%s\n' "$__stamp_meta" | awk -F '\t' '$1 == "enabled" { printf "%s ", $2 }')"
+    STAMP_META_MODULES="${STAMP_META_MODULES% }"
+    [ -n "$STAMP_META_PROFILE" ] || STAMP_META_PROFILE="full"
+  fi
+
+  if [ -n "${DOTFILES_TOOLS:-}" ]; then
+    STAMP_META_TOOLS="$DOTFILES_TOOLS"
+  else
+    __stamp_tools="$(cd "$DOTFILES_ROOT" && make -s --no-print-directory .list.tools 2>/dev/null)" || return 0
+    STAMP_META_TOOLS="$(printf '%s\n' "$__stamp_tools" | awk -F '\t' '$1 == "active" { printf "%s ", $2 }')"
+    STAMP_META_TOOLS="${STAMP_META_TOOLS% }"
+  fi
+}
+
 # Current value of a stamp field.
 stamp_field() {
   case "$1" in
@@ -65,6 +111,18 @@ stamp_field() {
     xdg_state) printf '%s' "$XDG_STATE_HOME" ;;
     modules_local) stamp_git_hash "$DOTFILES_ROOT/modules.local.mk" ;;
     mise_local) stamp_git_hash "$DOTFILES_ROOT/mise.local.toml" ;;
+    profile)
+      stamp_load_meta
+      printf '%s' "$STAMP_META_PROFILE"
+      ;;
+    modules)
+      stamp_load_meta
+      printf '%s' "$STAMP_META_MODULES"
+      ;;
+    tools)
+      stamp_load_meta
+      printf '%s' "$STAMP_META_TOOLS"
+      ;;
     applied_at) date -u +%Y-%m-%dT%H:%M:%SZ ;;
     *) return 2 ;;
   esac

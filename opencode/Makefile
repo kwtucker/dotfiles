@@ -40,7 +40,11 @@ upgrade:
 
 clean: .remove.xdg.opencode
 	@echo "Cleaning $(MODULE_NAME) data..."
-	@MISE_YES=1 mise uninstall --yes $(OPENCODE_TOOL) || true
+	@if [ "$${DOTFILES_PROFILE_CLEANUP:-0}" = "1" ]; then \
+		echo "Keeping $(OPENCODE_TOOL) installed (shared mise tool)."; \
+	else \
+		MISE_YES=1 mise uninstall --yes $(OPENCODE_TOOL) || true; \
+	fi
 	@echo "✅ $(MODULE_NAME) cleaned."
 
 # Compatibility alias: shared skills now belong to the agents module.

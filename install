@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # install — works in all three contexts:
-#   1. Bare Linux server / Tailscale VPS (full install)
-#   2. DevPod --dotfiles flag (full install into fresh workspace)
-#   3. Machine with tools already present (update: pull + top-up + prune)
+#   1. Bare Linux server / Tailscale VPS (default full profile)
+#   2. DevPod --dotfiles flag (fresh workspace; profile from the environment)
+#   3. Machine with tools already present (update: pull + active tools + prune)
 set -euo pipefail
 
 BOLD='\033[1m'
@@ -41,10 +41,12 @@ fi
 
 # ── Detect context ─────────────────────────────────────────────────────────────
 # If mise + key tools are already on PATH this is an *existing* machine, so we
-# take the update path: pull latest, top up anything missing, prune stale tools.
-# Otherwise it's a fresh bootstrap (bare server, DevPod --dotfiles).
+# take the update path: pull latest, install the active tool set, prune stale
+# versions. Otherwise it's a fresh bootstrap (bare server, DevPod --dotfiles).
+# nvim is in every tracked profile and signals an existing dotfiles install;
+# Go is not, so it must not gate the update path.
 TOOLS_PRESENT=false
-if command -v mise &>/dev/null && command -v nvim &>/dev/null && command -v go &>/dev/null; then
+if command -v mise &>/dev/null && command -v nvim &>/dev/null; then
   TOOLS_PRESENT=true
 fi
 
@@ -74,37 +76,73 @@ mkdir -p "$XDG_CONFIG_HOME/mise"
 ln -sf "$DOTFILES_DIR/mise.toml" "$XDG_CONFIG_HOME/mise/config.toml"
 export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
-if [ "$TOOLS_PRESENT" = true ]; then
-  # Top up: install anything new another machine added to mise.toml. Idempotent
-  # and fast when everything is already present.
-  MISE_YES=1 mise install --yes
-  MISE_YES=1 mise trust "$DOTFILES_DIR/mise.toml" 2>/dev/null || true
-  mise reshim
-  ok "tools topped up"
-else
-  if ! command -v mise &>/dev/null; then
-    echo "  installing mise..."
-    # Pinned release + verified checksum; no `curl | sh`. See
-    # scripts/bootstrap-mise.sh and the README supply-chain notes.
-    "$DOTFILES_DIR/scripts/bootstrap-mise.sh"
-    export PATH="$HOME/.local/bin:$PATH"
-    ok "mise installed"
-  else
-    ok "mise already present"
-  fi
-
-  eval "$(mise activate bash)" 2>/dev/null || true
-  MISE_YES=1 mise install --yes
-
+if ! command -v mise &>/dev/null; then
+  echo "  installing mise..."
+  # Pinned release + verified checksum; no `curl | sh`. See
+  # scripts/bootstrap-mise.sh and the README supply-chain notes.
+  "$DOTFILES_DIR/scripts/bootstrap-mise.sh"
   export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
-
-  # Trust only the repository's global config. A missing exec bit on a tool
-  # binary is diagnosed by `make doctor` (mise.exec) and repaired with
-  # `mise install --force <tool>` — never by chmod-ing every mise file.
-  MISE_YES=1 mise trust "$DOTFILES_DIR/mise.toml" 2>/dev/null || true
-
-  ok "tools up to date"
+  ok "mise installed"
+else
+  ok "mise already present"
 fi
+
+# Trust only the repository's global config. A missing exec bit on a tool
+# binary is diagnosed by `make doctor` (mise.exec) and repaired with
+# `mise install --force <tool>` — never by chmod-ing every mise file.
+MISE_YES=1 mise trust "$DOTFILES_DIR/mise.toml" 2>/dev/null || true
+
+# Profile resolution runs through Make, so a bare host gets make from the catalog
+# before we ask which tools the profile selects.
+if ! command -v make &>/dev/null; then
+  echo "  installing make..."
+  MISE_YES=1 mise install --yes make
+  mise reshim
+  export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
+  ok "make installed"
+fi
+
+# ── Profile ───────────────────────────────────────────────────────────────────
+# Profiles choose which modules and mise tools this machine installs. Every
+# installed module is available in every terminal; there is no runtime profile
+# switching. Make owns the selection (PROFILE= > DOTFILES_PROFILE >
+# profile.local > full) and the tool ownership map lives in tools.mk.
+step "profile"
+PROFILE_META="$(make -s --no-print-directory -C "$DOTFILES_DIR" .list.modules)"
+TOOL_META="$(make -s --no-print-directory -C "$DOTFILES_DIR" .list.tools)"
+if [ -z "$PROFILE_META" ] || [ -z "$TOOL_META" ]; then
+  echo "error: cannot resolve the active profile (make .list.modules/.list.tools failed)" >&2
+  exit 1
+fi
+DOTFILES_ACTIVE_PROFILE="$(printf '%s\n' "$PROFILE_META" | awk -F '\t' '$1 == "profile" { print $2; exit }')"
+DOTFILES_MODULES="$(printf '%s\n' "$PROFILE_META" | awk -F '\t' '$1 == "enabled" { printf "%s ", $2 }')"
+DOTFILES_MODULES="${DOTFILES_MODULES% }"
+DOTFILES_TOOLS="$(printf '%s\n' "$TOOL_META" | awk -F '\t' '$1 == "active" { printf "%s ", $2 }')"
+DOTFILES_TOOLS="${DOTFILES_TOOLS% }"
+DOTFILES_MANAGED_TOOLS="$(printf '%s\n' "$TOOL_META" | awk -F '\t' '$1 == "managed" { printf "%s ", $2 }')"
+DOTFILES_MANAGED_TOOLS="${DOTFILES_MANAGED_TOOLS% }"
+[ -n "$DOTFILES_ACTIVE_PROFILE" ] || DOTFILES_ACTIVE_PROFILE="full"
+export DOTFILES_ACTIVE_PROFILE DOTFILES_MODULES DOTFILES_TOOLS DOTFILES_MANAGED_TOOLS
+echo "  profile: $DOTFILES_ACTIVE_PROFILE"
+echo "  modules: $DOTFILES_MODULES"
+
+# ── Tools ─────────────────────────────────────────────────────────────────────
+# mise.toml is the version catalog; the active profile decides what is installed.
+# Installing an explicit list (instead of a bare `mise install`) keeps tools owned
+# by dormant modules off the machine.
+step "tools"
+# An empty list would make `mise install` fall back to the whole catalog, so
+# treat it as a resolution failure instead.
+if [ -z "$DOTFILES_TOOLS" ]; then
+  echo "error: no active tools resolved for profile $DOTFILES_ACTIVE_PROFILE" >&2
+  exit 1
+fi
+TOOL_COUNT="$(printf '%s\n' "$DOTFILES_TOOLS" | wc -w | tr -d ' ')"
+# Deliberate word splitting: DOTFILES_TOOLS is a space-separated tool list.
+# shellcheck disable=SC2086
+MISE_YES=1 mise install --yes $DOTFILES_TOOLS
+mise reshim
+ok "$TOOL_COUNT tool(s) for profile $DOTFILES_ACTIVE_PROFILE"
 
 # ── Long-running processes ─────────────────────────────────────────────────────
 # Upgrading a tool swaps the binary on disk, but any process already running
@@ -144,16 +182,55 @@ fi
 
 # ── Dotfile modules ────────────────────────────────────────────────────────────
 # Fast path: skip the module pass only when the applied-state stamp (v2) still
-# matches every input — commit, checkout root, XDG bases, and the ignored local
-# override files — the worktree is clean, and the expected links are verified in
-# place. A stale link with a matching stamp must not be skipped. FORCE=1 always
-# applies. See scripts/lib/stamp.sh and `scripts/state status`.
+# matches every input — commit, checkout root, XDG bases, the ignored local
+# override files, and the selected profile/module/tool sets — the worktree is
+# clean, and the expected links are verified in place. A stale link with a
+# matching stamp must not be skipped. FORCE=1 always applies. See
+# scripts/lib/stamp.sh and `scripts/state status`.
 step "dotfile modules"
 DOTFILES_ROOT="$DOTFILES_DIR"
 DOTFILES_STATE_DIR="$XDG_STATE_HOME/dotfiles"
 export DOTFILES_ROOT DOTFILES_STATE_DIR
 # shellcheck source=scripts/lib/stamp.sh
 . "$DOTFILES_DIR/scripts/lib/stamp.sh"
+
+# Modules removed by a profile switch must lose their owned links and artifacts.
+# The previous list comes from the applied-state stamp. Stamps written before
+# profiles existed have no module list; those machines installed the historic
+# full set, so use that as the baseline rather than silently leaving links.
+OLD_MODULES="$(read_stamp_key modules 2>/dev/null || true)"
+if [ -z "$OLD_MODULES" ] && [ -n "$(read_stamp_key version 2>/dev/null || true)" ]; then
+  OLD_MODULES="$(make -s --no-print-directory -C "$DOTFILES_DIR" .list.modules PROFILE=full |
+    awk -F '\t' '$1 == "enabled" { printf "%s ", $2 }')"
+  OLD_MODULES="${OLD_MODULES% }"
+fi
+REMOVED_MODULES=""
+for __module in $OLD_MODULES; do
+  case " $DOTFILES_MODULES " in
+    *" $__module "*) ;;
+    *) REMOVED_MODULES="$REMOVED_MODULES $__module" ;;
+  esac
+done
+REMOVED_MODULES="${REMOVED_MODULES# }"
+
+# Tools owned by a module/profile the new selection drops. Only managed tools
+# (module-owned or profile-extra) are eligible: base, shared, unclassified, and
+# machine-local declarations are never removed by a profile switch. The previous
+# list comes from the stamp; a v2 stamp written before `tools` existed installed
+# the historic full set, so use that baseline. `DOTFILES_KEEP_TOOLS=1` is the
+# escape hatch for a machine that wants to keep everything.
+# shellcheck source=scripts/lib/tools.sh
+. "$DOTFILES_DIR/scripts/lib/tools.sh"
+
+LOCAL_TOOLS="$(local_mise_tools "${MISE_CONFIG_DIR:-$XDG_CONFIG_HOME/mise}/config.local.toml" "$DOTFILES_DIR/mise.local.toml")"
+
+OLD_TOOLS="$(read_stamp_key tools 2>/dev/null || true)"
+if [ -z "$OLD_TOOLS" ] && [ -n "$(read_stamp_key version 2>/dev/null || true)" ]; then
+  OLD_TOOLS="$(make -s --no-print-directory -C "$DOTFILES_DIR" .list.tools PROFILE=full |
+    awk -F '\t' '$1 == "active" { printf "%s ", $2 }')"
+  OLD_TOOLS="${OLD_TOOLS% }"
+fi
+REMOVED_TOOLS="$(profile_removed_tools "$OLD_TOOLS" "$DOTFILES_TOOLS" "$DOTFILES_MANAGED_TOOLS" "$LOCAL_TOOLS")"
 
 APPLY=1
 if [ "${FORCE:-0}" = "1" ]; then
@@ -203,9 +280,52 @@ else
 
   make -C "$DOTFILES_DIR" all
   ok "modules installed"
+
+  # Remove artifacts, links, and tools owned by modules/profiles the new
+  # selection drops. Runs after a successful install so a failed pass cannot
+  # leave the machine with fewer links than before.
+  CLEANUP_FAILED=0
+  if [ -n "$REMOVED_MODULES" ]; then
+    step "profile cleanup"
+    echo "  no longer selected: $REMOVED_MODULES"
+    for __module in $REMOVED_MODULES; do
+      if [ ! -f "$DOTFILES_DIR/$__module/Makefile" ]; then
+        skip "$__module (module directory is gone)"
+      elif ! grep -qE '^\.PHONY:.*clean|^clean:' "$DOTFILES_DIR/$__module/Makefile"; then
+        skip "$__module (no clean target)"
+      elif DOTFILES_PROFILE_CLEANUP=1 make -C "$DOTFILES_DIR/$__module" clean; then
+        ok "cleaned $__module"
+      else
+        echo -e "  ${YELLOW}↷${RESET} $__module clean failed — review its links manually" >&2
+        CLEANUP_FAILED=1
+      fi
+    done
+  fi
+
+  if [ -n "$REMOVED_TOOLS" ] && [ "${DOTFILES_KEEP_TOOLS:-0}" = "1" ]; then
+    echo -e "  ${YELLOW}↷${RESET} DOTFILES_KEEP_TOOLS=1 — keeping previous profile's tools: $REMOVED_TOOLS"
+  elif [ -n "$REMOVED_TOOLS" ]; then
+    step "tool cleanup"
+    echo "  no longer selected: $REMOVED_TOOLS"
+    for __tool in $REMOVED_TOOLS; do
+      # Full backend-qualified names are required here; short names do not
+      # resolve for `mise uninstall`.
+      if MISE_YES=1 mise uninstall --all --yes "$__tool" >/dev/null 2>&1; then
+        ok "removed $__tool"
+      else
+        echo -e "  ${YELLOW}↷${RESET} could not remove $__tool — review 'mise ls $__tool'" >&2
+        CLEANUP_FAILED=1
+      fi
+    done
+    mise reshim 2>/dev/null || true
+  fi
+
   # Record the applied inputs only after the pass succeeded, so an interrupted or
-  # failed pass is never mistaken for a verified state.
-  if stamp_write; then
+  # failed pass is never mistaken for a verified state. A failed profile cleanup
+  # also leaves the stamp stale so the next run retries it.
+  if [ "${CLEANUP_FAILED:-0}" = "1" ]; then
+    echo -e "  ${YELLOW}↷${RESET} applied-state stamp not written — profile cleanup failed, re-run ./install" >&2
+  elif stamp_write; then
     ok "applied state recorded"
   else
     echo -e "  ${YELLOW}↷${RESET} applied-state stamp not written — the next run will re-apply"

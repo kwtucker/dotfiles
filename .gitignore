@@ -7,6 +7,7 @@
 zsh/local
 mise.local.toml
 modules.local.mk
+profile.local
 
 # Secrets — defense-in-depth (the installed global gitignore also covers these).
 *.secret
