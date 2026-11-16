@@ -22,7 +22,7 @@ install: .ensure.xdg.whalebyte
 	@$(DOTFILES_LINK) link_file "$(CURDIR)/bin/wbs" "$(LOCAL_BIN)/wbs"
 	# Dependencies come from mise (age, jq); nvim is only needed to edit.
 	@if ! command -v age >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1; then \
-		echo "⚠️  wbs needs 'age' and 'jq' on PATH — run 'mise install' (or './install')"; \
+		echo "⚠️  wbs needs 'age' and 'jq' on PATH — run 'make tools.install' (or './install')"; \
 	fi
 	@echo "✅ $(MODULE_NAME) installed."
 

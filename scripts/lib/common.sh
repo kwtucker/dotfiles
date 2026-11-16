@@ -105,6 +105,14 @@ have_cmd() {
   command -v "$1" >/dev/null 2>&1
 }
 
+# Number of whitespace-separated words in a string.
+count_words() {
+  # Deliberate word splitting: the argument is a space-separated tool list.
+  # shellcheck disable=SC2086
+  set -- $1
+  printf '%s' "$#"
+}
+
 is_absolute() {
   case "$1" in
     /*) return 0 ;;
@@ -169,11 +177,33 @@ make_meta() {
 
 MODULES_ENABLED=""
 MODULES_OPTIONAL=""
+DOTFILES_MODULES=""
+DOTFILES_ACTIVE_PROFILE=""
+DOTFILES_TOOLS=""
+DOTFILES_MANAGED_TOOLS=""
 FONT_DIR=""
+
+# The active tool set for the selected profile, plus every tool a profile switch
+# may remove. `make .list.tools` derives both from mise.toml + tools.mk.
+load_tools() {
+  DOTFILES_TOOLS=""
+  DOTFILES_MANAGED_TOOLS=""
+  __meta="$(make_meta .list.tools)" || return 1
+  [ -n "$__meta" ] || return 1
+
+  DOTFILES_TOOLS="$(printf '%s\n' "$__meta" | awk -F '\t' '$1 == "active" { printf "%s ", $2 }')"
+  DOTFILES_TOOLS="${DOTFILES_TOOLS% }"
+  DOTFILES_MANAGED_TOOLS="$(printf '%s\n' "$__meta" | awk -F '\t' '$1 == "managed" { printf "%s ", $2 }')"
+  DOTFILES_MANAGED_TOOLS="${DOTFILES_MANAGED_TOOLS% }"
+  export DOTFILES_TOOLS
+  [ -n "$DOTFILES_TOOLS" ]
+}
 
 load_modules() {
   MODULES_ENABLED=""
   MODULES_OPTIONAL=""
+  DOTFILES_MODULES=""
+  DOTFILES_ACTIVE_PROFILE=""
   __meta="$(make_meta .list.modules)" || return 1
   [ -n "$__meta" ] || return 1
 
@@ -181,6 +211,12 @@ load_modules() {
   MODULES_ENABLED="${MODULES_ENABLED% }"
   MODULES_OPTIONAL="$(printf '%s\n' "$__meta" | awk -F '\t' '$1 == "optional" { printf "%s ", $2 }')"
   MODULES_OPTIONAL="${MODULES_OPTIONAL% }"
+  DOTFILES_MODULES="$MODULES_ENABLED"
+  DOTFILES_ACTIVE_PROFILE="$(printf '%s\n' "$__meta" | awk -F '\t' '$1 == "profile" { print $2; exit }')"
+  [ -n "$DOTFILES_ACTIVE_PROFILE" ] || DOTFILES_ACTIVE_PROFILE="full"
+  export DOTFILES_ACTIVE_PROFILE DOTFILES_MODULES
+  # Tool metadata is diagnostic; a missing catalog must not hide module state.
+  load_tools || true
   [ -n "$MODULES_ENABLED" ]
 }
 
