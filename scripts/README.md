@@ -14,16 +14,19 @@ must work without `jq`, `python`, or any non-POSIX tool beyond `git`, `curl`,
 | `lib/common.sh` | sourced | environment | nothing | n/a |
 | `lib/links.sh` | sourced | expected-link model, filesystem | nothing | n/a |
 | `lib/link.sh` | executable | source paths, destinations | symlinks, parent directories, adoption backups, stale owned links | 0 ok, 1 conflict, 2 usage/fatal |
-| `lib/stamp.sh` | sourced | git, XDG paths, local overrides | `${XDG_STATE_HOME}/dotfiles/last-applied` (atomic) | 0 verified/applied, 1 stale/failed |
+| `lib/stamp.sh` | sourced | git, XDG paths, local overrides, active profile + module/tool sets | `${XDG_STATE_HOME}/dotfiles/last-applied` (atomic) | 0 verified/applied, 1 stale/failed |
+| `lib/tools.sh` | sourced | previous/active/managed tool lists, local mise configs | nothing | n/a |
 | `lib/fetch.sh` | sourced | HTTPS URL + SHA-256 | destination + temporary file | 0 ok, 1 download/verify failure, 2 usage |
 | `fetch` | executable | same as `lib/fetch.sh` | same as `lib/fetch.sh` | 0 ok, 1 failure, 2 usage |
 | `bootstrap-mise.sh` | executable | pinned release + `SHASUMS256.txt` | `$HOME/.local/bin/mise` (755), temp dir | 0 installed/skipped, 1 failure, 2 usage |
 
-The top-level `install` is the orchestrator: it pulls the checkout, installs
-mise/tools, runs the link preflight, invokes the module Makefiles, and writes the
-stamp only after a successful pass. In Docker, Codespaces, and devcontainers it
-exports `DOTFILES_SKIP_FONTS=1` before the module pass; the `fonts` module leaves
-a marker in the state directory instead of downloading fonts.
+The top-level `install` is the orchestrator: it pulls the checkout, bootstrap-
+installs mise and `make`, asks Make for the active profile's module/tool sets,
+installs only those tools, runs the link preflight, invokes the module Makefiles,
+cleans modules and owned tools dropped by a profile switch, and writes the stamp
+only after a successful pass. In Docker, Codespaces, and devcontainers it exports
+`DOTFILES_SKIP_FONTS=1` before the module pass; the `fonts` module leaves a marker
+in the state directory instead of downloading fonts.
 
 ## Read-only tooling
 
@@ -55,12 +58,17 @@ Only these files may change the machine:
   files.
 - `lib/stamp.sh` — `stamp_write` records the applied inputs after a successful
   module pass. It is atomic; a failed or interrupted run leaves no fresh stamp.
+  The profile and resolved module/tool sets are recorded too, so changing any of
+  them invalidates the fast path and `./install` can clean modules and managed
+  tools that are no longer selected.
 - `lib/fetch.sh` / `fetch` — download to a temporary file, verify size and
   SHA-256, then rename into place. Partial or mismatched files are removed.
 - `bootstrap-mise.sh` — verifies the release archive against the release's
   checksum file before writing the binary.
 
-`lib/common.sh` and `lib/links.sh` are read-only helpers sourced by the above.
+`lib/common.sh`, `lib/links.sh`, and `lib/tools.sh` are read-only helpers sourced
+by the above. `lib/tools.sh` only compares tool lists and parses local mise
+configs; `install` performs the actual uninstalls.
 
 ## Environment knobs
 
@@ -71,6 +79,10 @@ Only these files may change the machine:
 | `DOTFILES_ADOPT` | `lib/link.sh` | `1` adopts conflicting destinations with a backup |
 | `DOTFILES_BACKUP_ROOT`, `DOTFILES_BACKUP_ID` | `lib/link.sh` | Override the backup parent or run directory name |
 | `DOTFILES_SKIP_FONTS` | `install`, `fonts` | `1` skips the font download and records `${XDG_STATE_HOME}/dotfiles/fonts-skipped`; `0` overrides container detection |
+| `PROFILE` | root `Makefile`, `./install` | Profile name; highest selection precedence |
+| `DOTFILES_PROFILE` | root `Makefile`, `./install` | Profile name used when `PROFILE` is unset |
+| `DOTFILES_PROFILE_CLEANUP` | `./install`, module clean targets | `1` marks cleanup for a profile switch; modules keep shared mise tools installed |
+| `DOTFILES_KEEP_TOOLS` | `./install` | `1` keeps tools owned by the previous profile instead of uninstalling them |
 | `FETCH_MAX_BYTES` | `lib/fetch.sh` | Reject downloads larger than this (default 256 MiB) |
 | `MISE_BOOTSTRAP_VERSION`, `MISE_BOOTSTRAP_DEST` | `bootstrap-mise.sh` | Override the pinned mise release or install path |
 | `FORCE` | `install` | `1` bypasses the applied-state fast path |

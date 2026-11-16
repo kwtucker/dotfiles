@@ -12,8 +12,8 @@
   directory outside the checkout and remove them afterward.
 - Never commit credentials, session data, machine-specific permissions, or tokens.
   Respect ignored local overrides such as `modules.local.mk`, `mise.local.toml`,
-  `zsh/local`, and `git/config.local`. Prefer HOME/XDG-based paths over personal
-  absolute paths in reusable configuration.
+  `profile.local`, `zsh/local`, and `git/config.local`. Prefer HOME/XDG-based paths
+  over personal absolute paths in reusable configuration.
 
 ## Repository map
 
@@ -23,19 +23,29 @@
   and its nested `.platforms` table are not duplicate declarations.
 - Root `Makefile`: module orchestration; `env.mk` and `platform.mk`: shared XDG
   paths and platform differences. Each module has its own `Makefile` and config.
-  Register default modules in `MODULES`, opt-in modules in `OPTIONAL_MODULES`.
-  `LOCAL_MODULES` adds machine-specific choices. Preserve parallel-install ordering.
-- `install`: bootstrap/update entry point. It can pull Git changes, install/prune
-  tools, relink modules, and recycle tmux; it is not a harmless validation command.
+  `profiles.mk` defines tracked install-time module sets; `PROFILE`, then
+  `DOTFILES_PROFILE`, then ignored `profile.local` select one, defaulting to
+  `full`. Register default modules in the profile sets, opt-in modules in
+  `OPTIONAL_MODULES`. `LOCAL_MODULES` remains additive and machine-specific.
+  Preserve parallel-install ordering. `tools.mk` maps each `mise.toml` entry to
+  the module that needs it plus `PROFILE_TOOLS_<profile>` extras; tools with no
+  owner are shared and never auto-removed. Keep backend-qualified names exactly
+  as the catalog declares them.
+- `install`: bootstrap/update entry point. It can pull Git changes, install the
+  active profile's tools, prune, relink modules, recycle tmux, and clean modules
+  and owned tools dropped by a profile switch; it is not a harmless validation
+  command. `DOTFILES_KEEP_TOOLS=1` skips tool removal.
 - `scripts/`: state and deployment helpers. `scripts/state` backs `make doctor`
   and `make status`; keep it write-free, offline by default, and dependent only
   on bash, git, and standard POSIX tools. `scripts/lib/link.sh` is the
   conflict-safe link helper the module Makefiles call; only it may mutate the
   home directory, and only through the documented adopt/backup path.
   `scripts/lib/stamp.sh` owns the v2 applied-state stamp that gates the install
-  fast path; write it only after a successful module pass. `scripts/fetch`
-  verifies pinned downloads, and `scripts/bootstrap-mise.sh` installs the pinned
-  mise release from verified release checksums.
+  fast path; write it only after a successful module pass, including profile
+  cleanup. `scripts/lib/tools.sh` holds the pure profile-cleanup comparison used
+  by `install`; it must not write. `scripts/fetch` verifies pinned downloads, and
+  `scripts/bootstrap-mise.sh` installs the pinned mise release from verified
+  release checksums.
 - `image/`: a separate, deliberately slim Linux workspace image/tool manifest.
   Do not automatically mirror every laptop tool or agent into it.
 - `agents/`: single source for shared engineering instructions and portable skills,
@@ -60,6 +70,12 @@
   `~/.copilot` state directory into Git or delete it during cleanup.
 - Some existing install/clean targets are destructive. Do not copy broad deletion
   patterns into new modules or run them against a real home merely to validate code.
+- A new tracked module needs a profile in `profiles.mk` and an explicit
+  `TOOLS_<module>` declaration in `tools.mk` (empty is valid); `OPTIONAL_MODULES`
+  stays for client-specific extras. Profile-switch cleanup runs a removed
+  module's `clean` target, so keep `clean` limited to owned links/artifacts and do
+  not uninstall shared mise tools when `DOTFILES_PROFILE_CLEANUP=1`. Run
+  `make tools.check` after touching `mise.toml`, `tools.mk`, or `profiles.mk`.
 
 ## Validation and reporting
 
@@ -68,8 +84,11 @@
   this repository is configuration, not a Go application.
 - For installer checks, isolate HOME, XDG paths, and `COPILOT_HOME` in temporary
   directories. Inspect recipes first: even `make -n` may execute recursive recipes.
-- Do not run `./install`, `make all`, update/upgrade/prune, or destructive clean
-  targets as routine checks. These change the machine and may access the network.
+  Exercise profile tool cleanup through `scripts/lib/tools.sh` with fixture lists
+  and a fake `mise`; do not uninstall real tools to validate it.
+- Do not run `./install`, `make all`, `make tools.install`, update/upgrade/prune,
+  or destructive clean targets as routine checks. These change the machine and
+  may access the network. `make tools.list` and `make tools.check` are read-only.
 - Run `git diff --check`. Report exactly what was checked, actual results, and
   anything unverified. Distinguish configuration/discovery checks from live model
   quality evaluations. Leave no temporary validation artifacts in the repository.
