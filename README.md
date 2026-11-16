@@ -1,28 +1,20 @@
 # .Files
 
 > Modular, portable, XDG-compliant dotfiles for Zsh, Neovim, tmux, Git, and developer tools.
-> Works on any Linux environment — local machines and remote servers.
 
-## Environments
+One checkout per machine, applied with `./install`. Configuration is split into
+independent Make modules; CLI tools and runtimes are pinned in
+[`mise.toml`](./mise.toml) and installed by mise. No root access and no Nix/asdf
+— everything lives under your home directory, so other users on a shared host are
+unaffected.
 
-These dotfiles are designed to work identically across all of the following:
+Works on local Linux machines, bare SSH servers, thin clients, and headless
+containers. Docker, Codespaces, and devcontainers skip the font download
+automatically; see [Headless installs](#headless-installs).
 
-**Local Linux machine** — full install with mise managing all tools.
+## Quick start
 
-**Bare remote servers (SSH)** — no Docker required. One command installs mise and bootstraps the full environment from scratch.
-
-**Shared company servers** — mise installs everything into `~/.local` with no root access required. Other users on the same machine are unaffected.
-
-**Chromebook or any thin client** — SSH in from a browser-based terminal or any SSH client. The computer you're working from doesn't matter.
-
-**Headless containers and cloud workspaces** — Docker, Codespaces, and
-devcontainers install everything except the local font files, which no terminal
-on the remote host would render. See [Headless and container
-installs](#headless-and-container-installs).
-
-## Quick Start
-
-### Local machine or bare server
+### New machine
 
 ```bash
 git clone git@github.com:kwtucker/dotfiles.git ~/.dotfiles
@@ -30,102 +22,232 @@ cd ~/.dotfiles
 ./install
 ```
 
-### Updating an existing machine
+`./install` bootstraps mise from a verified release archive, installs the active
+profile's tools, links every selected module, and prunes superseded tool versions.
+Re-running it is always safe.
 
-`./install` is idempotent. Run it again — or `make update`, which wraps it — on
-a machine that is already set up and it becomes an **update**: it pulls the
-latest dotfiles (`git pull --ff-only`), installs any tools or modules another
-machine added, re-links all configs, and prunes superseded tool versions.
+### Existing machine
 
 ```bash
 cd ~/.dotfiles
 ./install          # or: make update  (or: make install)
 ```
 
-When the applied-state stamp still matches — same commit, checkout path, XDG base
-directories, and ignored local overrides (`modules.local.mk`, `mise.local.toml`) —
-and `scripts/state check-links --quiet` confirms every expected link, the module
-pass is skipped and reported as verified (tools are still topped up). A missing or
-drifted link, an edited override, a moved checkout, or an uncommitted change falls
-through to a full pass. Force one with `FORCE=1 ./install`.
+On an existing install it pulls with `--ff-only`, ensures the active tool set,
+relinks modules, cleans what a profile switch dropped, and prunes.
 
-The stamp lives at
-`${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/last-applied` and holds v2
-`key=value` lines: `version`, `head`, `root`, `xdg_config`, `xdg_data`,
-`xdg_state`, `modules_local`, `mise_local`, and `applied_at`. It is written
-atomically only after a successful module pass, so a failed or interrupted run is
-never mistaken for a verified state. A v1 stamp (a bare commit line) or an
-unreadable stamp is treated as stale and the next run applies.
+The module pass is skipped when the applied-state stamp still matches the commit,
+checkout path, XDG bases, ignored overrides, and selected profile/module/tool
+sets, the worktree is clean, and `scripts/state check-links --quiet` verifies
+every expected link. The active tool set is still ensured in that fast path.
+`FORCE=1 ./install`
+always re-applies. The stamp lives at
+`${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/last-applied` (atomic v2
+`key=value`); a failed or interrupted run never writes it, so the next run
+retries.
 
-### Headless and container installs
+### Headless installs
 
-`./install` detects Docker (`/.dockerenv`), GitHub Codespaces (`CODESPACES`), and
-devcontainers (`REMOTE_CONTAINERS`). In those environments it exports
-`DOTFILES_SKIP_FONTS=1`, so the `fonts` module skips both downloads and records
-the omission in `${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/fonts-skipped`
-for `make doctor` and `make status`.
+Docker (`/.dockerenv`), Codespaces (`CODESPACES`), and devcontainers
+(`REMOTE_CONTAINERS`) export `DOTFILES_SKIP_FONTS=1`; the `fonts` module records
+the omission in `${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/fonts-skipped`.
+Override with `DOTFILES_SKIP_FONTS=0 ./install` when the container hosts a
+terminal, or `DOTFILES_SKIP_FONTS=1 make fonts` to skip elsewhere. Only font files
+are skipped.
 
-Override the detection when the fonts are genuinely useful (for example a
-container that hosts a terminal):
+## Profiles
+
+A profile is an install-time choice of modules and tools. It is not a shell mode:
+every installed module is available in every terminal.
+
+| Profile | Includes |
+|---|---|
+| `minimal` | `bin zsh tmux git tig fzf nvim agents` |
+| `dev` | `minimal` + `golang bat ripgrep rust docker opencode` |
+| `infra` | `dev` + `kubernetes helm terraform psql sops whalebyte` |
+| `workstation` | `dev` + `alacritty fonts` |
+| `full` | `infra` + `workstation` (default); `copilot` stays opt-in |
+
+Selection precedence, highest first:
+
+1. `PROFILE=<name>` on the command line
+2. `DOTFILES_PROFILE` in the environment
+3. `profile.local` in the checkout (ignored, one profile name)
+4. `full`
 
 ```bash
-DOTFILES_SKIP_FONTS=0 ./install   # download fonts anyway
-DOTFILES_SKIP_FONTS=1 make fonts  # explicit skip on any machine
-make fonts                        # install fonts and clear the skip marker
+make profile.list                # profiles and the active one
+make profile.show                # profile, modules, and tool count
+make profile.set PROFILE=infra   # write profile.local
+./install                        # apply it
+make profile.clear               # remove profile.local (back to default)
 ```
 
-The skip covers only the local font files; every other module installs normally.
+Switching profiles is applied by `./install`, not `make all`. The stamp records
+the previous profile, modules, and tools; after the new selection installs, each
+dropped module runs its `clean` target and mise tools owned by the previous
+modules/profile are uninstalled. Base tools (`make`, `shellcheck`, `shfmt`),
+shared/unclassified catalog entries, and tools declared in a machine-local mise
+config are never removed. Switching back reinstalls what the profile needs;
+`DOTFILES_KEEP_TOOLS=1 ./install` keeps the old tools instead.
 
-## Checking installation state
+`make all` only relinks the current selection and warns about missing active
+tools. Use `make tools.install` to install them, `make prune.links` for stale
+links, and `make <module>.clean` for one module.
 
-`make status` and `make doctor` are read-only: they do not create directories,
-change links, or write the applied-state stamp. They work offline; only
+### Tool ownership
+
+[`mise.toml`](./mise.toml) is the single version catalog;
+[`tools.mk`](./tools.mk) maps each catalog entry to the module that needs it, plus
+profile-scoped extras (the demo/video tools in `workstation`/`full`, and
+`libqrencode`/`graphviz` in `full`). An unowned entry is treated as shared:
+installed on every profile, never auto-removed, and reported by `make tools.check`
+so the omission is visible. A new module needs an explicit `TOOLS_<module>`
+declaration (empty is valid).
+
+```bash
+make tools.list                  # active tools for the selected profile
+make tools.install               # install just those tools
+make tools.check                 # validate ownership against mise.toml (offline)
+```
+
+### Versions and lockfile
+
+CLI tools and LSP servers are pinned to exact versions, so an upgrade is a
+deliberate, reviewable commit. Language runtimes (`go`, `node`, `python`, `make`)
+keep a minor range so patch releases flow. Bump a tool with `make outdated` →
+edit [`mise.toml`](./mise.toml) → commit → `./install` (or `make tools.install`).
+`make upgrade.tools` stays within the pinned ranges and never rewrites them.
+GNU Make is pinned the same way: macOS ships Make 3.81 without `--output-sync`,
+so the pinned 4.x keeps the parallel module pass identical across platforms.
+
+[`mise.lock`](./mise.lock) records the exact resolved version, URL, and checksum
+per platform (`linux-x64`, `linux-arm64`, `macos-x64`, `macos-arm64`). Refreshing
+pins or ranges updates it — commit both together. To refresh every platform after
+a bump, run `mise lock --global -p linux-x64,linux-arm64,macos-x64,macos-arm64`
+(set `GITHUB_TOKEN` if rate-limited). Tools without upstream checksums
+(Docker CLI, ttyd on some platforms) simply have none recorded; strict locked mode
+applies only where the lockfile has one.
+
+Range-based upgrades are held for mise's default 24-hour `minimum_release_age`;
+exact pins and versions already in `mise.lock` are exempt. One caveat: `rust` is a
+rustup-managed `stable` channel and is not reproducible from `mise.toml` — pin it
+with a `rust-toolchain.toml` if that matters.
+
+Long-running processes keep old binaries until restarted. `./install` recycles the
+tmux server when its version changes (skipped from inside tmux); restart Neovim
+and LSP clients yourself after their binaries change. Per-project overrides work
+as usual: drop a `mise.toml` in any project and mise switches on `cd`.
+
+## Modules
+
+Each module is an independent directory with a `Makefile` that symlinks its config
+into the XDG directories (`~/.config`, `~/.local/share`, …). Tool binaries are
+never installed by modules; they come from `mise.toml`, so the same pins work on
+Linux and macOS (Apple Silicon). Destination conflicts are refused, not replaced
+— see [Conflicts and recovery](#conflicts-and-recovery).
+
+| Module | Configures |
+|---|---|
+| `bin/` | Personal scripts |
+| `zsh/` | Zsh env, path, aliases, antigen plugins |
+| `tmux/` | tmux config, TPM plugins |
+| `git/` | Git config, aliases, delta pager |
+| `tig/` | Tig Git browser |
+| `fzf/` | fzf config and shell integration |
+| `nvim/` | Neovim / LazyVim |
+| `alacritty/` | Alacritty terminal |
+| `fonts/` | Powerline + JetBrains Mono Nerd Font |
+| `golang/` | Go env; gofumpt, goimports, govulncheck |
+| `kubernetes/` | kubectl aliases and completions |
+| `helm/` | Helm config and completions |
+| `terraform/` | Terraform config and vendored completion |
+| `docker/` | Docker aliases (`rd-docker` targets Rancher's client) |
+| `bat/` | bat config |
+| `ripgrep/` | ripgrep config |
+| `psql/` | psql config |
+| `rust/` | Rust toolchain and stylua |
+| `sops/` | sops config and `sops-age-key-from-wbs` helper |
+| `whalebyte/` | whalebyte config and the `wbs` vault CLI |
+| `agents/` | Shared AI instructions and skills |
+| `opencode/` | OpenCode config, commands, plugins |
+| `copilot/` | Optional Copilot CLI config and MCP servers |
+
+See [`nvim/README.md`](./nvim/README.md) for editor setup and maintenance.
+
+### AI agents
+
+OpenCode and Copilot share [engineering instructions](./agents/instructions/engineering.md)
+and [skills](./agents/skills/) from `agents/`; client-specific settings stay in
+`opencode/` and `copilot/`.
+
+```bash
+make agents                  # shared instructions and skills
+make opencode                # shared files + OpenCode config
+make copilot                 # shared files + Copilot config (optional)
+make -C agents sync-skills   # refresh the commit skill; review the diff
+```
+
+Use the root targets so shared files install first. Copilot links into
+`${COPILOT_HOME:-$HOME/.copilot}` without replacing personal instructions or
+session data. See [`agents/EVALUATION.md`](./agents/EVALUATION.md) for discovery
+and quality checks.
+
+- **Go:** the [`go-development` skill](./agents/skills/go-development/SKILL.md)
+  is shared by both clients; `gopls mcp` provides saved-file context.
+- **Terse replies:** the opt-in [`caveman` skill](./agents/skills/caveman/SKILL.md)
+  changes chat style only.
+- **Copilot Desktop:** reuses CLI skills and MCP servers but manages its own
+  preferences; check **Customize → Skills/MCP** and ensure `gopls` is on its PATH.
+
+### Rancher Desktop
+
+Rancher ships its own `kubectl`, `helm`, and `docker` in `~/.rd/bin`. mise shims
+come first on `PATH`, so plain `kubectl` is the generic client. Use `rd-kubectl`,
+`rd-helm`, and `rd-docker` to target Rancher's cluster.
+
+### Kubernetes debugging
+
+Ephemeral troubleshooting containers live in
+[kwtucker/k8s-debug](https://github.com/kwtucker/k8s-debug). It consumes this
+repo's `nvim/` config at a pinned commit and sets `K8S_DEBUG=1`, which makes
+`nvim/lua/plugins/mason.lua` skip Mason installs.
+
+## Checking state
+
+`make status` and `make doctor` are read-only and offline by default; only
 `doctor --online` makes network requests.
 
 ```bash
-make status                 # repository + applied + filesystem overview
-make doctor                 # PASS/WARN/FAIL with a fix for each problem
-make doctor ARGS=--online   # also check mise updates and origin reachability
-make status ARGS=--json     # machine-readable status
-make prune.links            # list stale links into this checkout (dry run)
+make status                    # repository + applied + filesystem overview
+make status ARGS=--json        # machine-readable
+make status ARGS=--exit-code   # fail on drift (links, stamp, active tools)
+make doctor                    # PASS/WARN/FAIL with a fix for each problem
+make doctor ARGS=--online      # also check mise updates and origin reachability
+scripts/state check-links      # fast expected-link verification
+make prune.links               # list stale links into this checkout (dry run)
 make prune.links ARGS=--force  # remove them
-scripts/state check-links   # fast expected-link verification
 ```
 
-`make status` separates three domains: the git checkout, the last applied state
-(stamp and link health), and the filesystem. It reports drift but exits `0` by
-default; add `ARGS=--exit-code` to fail when links, the stamp, or declared tools
-have drifted. Local edits and untracked files are reported but do not by
-themselves count as drift.
+`scripts/state doctor` exits `0` with warnings, `1` on failure, `2` on usage
+error. Through `make`, GNU Make reports a failed recipe as its own status (`2`);
+call `scripts/state doctor` directly to distinguish the two.
+`scripts/state check-links` exits `0` only when every expected link resolves into
+this checkout; `--preflight` lists destinations a default install would refuse,
+and `--strict` also fails on links into this checkout that are no longer expected.
 
-`scripts/state doctor` exits `0` with warnings, `1` on any failure, and `2` on a
-usage error. It checks the platform, base tools, mise/tools/trust, repository and
-stamp, XDG paths, expected links, module sources, secrets permissions, and
-installed artifacts. Every warning and failure prints a remediation command.
-When run through `make`, GNU Make reports any failed recipe with its own status
-(`2`), so call `scripts/state doctor` directly if you need to distinguish a
-failure from a usage error.
+`make prune.links` touches only symlinks that still resolve inside this checkout
+and re-checks ownership immediately before unlinking.
 
-`scripts/state check-links` exits `0` only when every expected link is present
-and resolves to this checkout. `--preflight` reports only destinations a default
-install would refuse to replace; `--strict` also fails on links that point into
-this checkout but are no longer expected.
+## Conflicts and recovery
 
-`make prune.links` lists symlinks that point into this checkout but are no
-longer in the expected set (for example after removing a module from
-`modules.local.mk`). It is a dry run; `make prune.links ARGS=--force` removes
-them. Only symlinks whose target still resolves inside this checkout are
-touched, and `scripts/lib/link.sh` re-checks ownership immediately before each
-unlink.
+### Conflicts and adoption
 
-### Conflicts, adoption, and backups
+Installs never delete existing configuration. A real file, real directory, or
+symlink pointing outside this checkout is refused by name, and `./install` runs
+that preflight for every module before changing anything.
 
-Installs never delete an existing configuration. If an expected destination is a
-real file, a real directory, or a symlink that points outside this checkout, the
-module refuses and names the path. `./install` runs the same preflight for every
-module before changing anything, so a conflict aborts the whole pass.
-
-Move the path aside and re-run, or opt into automatic adoption:
+Move the path aside, or opt into adoption:
 
 ```bash
 DOTFILES_ADOPT=1 ./install          # full update
@@ -133,19 +255,11 @@ DOTFILES_ADOPT=1 FORCE=1 ./install  # when the stamp says "already applied"
 DOTFILES_ADOPT=1 make bat           # one module
 ```
 
-Adoption moves the existing path into
-
-```
-${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/backups/<UTC timestamp>/
-```
-
-keeping its path relative to `$HOME` (paths outside `$HOME` go under
-`external/`). Each run appends `adopt<TAB>dest<TAB>backup` to `manifest.tsv` in
-that directory. Links that point into this checkout are repaired in place without
-a backup. Sockets, pipes, and device nodes are always refused.
-
-To restore one adopted path, remove the link this repo installed and move the
-backup back into place:
+Adoption moves the existing path to
+`${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/backups/<UTC timestamp>/`, keeping
+its `$HOME`-relative path (external paths go under `external/`), and appends
+`adopt<TAB>dest<TAB>backup` to `manifest.tsv`. Links into this checkout are
+repaired in place without a backup. Sockets, pipes, and device nodes are refused.
 
 ```bash
 backup=~/.local/state/dotfiles/backups/<timestamp>
@@ -153,266 +267,109 @@ rm ~/.config/bat
 mv "$backup/.config/bat" ~/.config/bat
 ```
 
-Re-running the module afterwards will treat that path as a conflict again, which
-is the intended guard: choose adoption or move it aside deliberately.
+Re-running the module treats the path as a conflict again by design; `make status`
+lists backup runs.
 
-`make status` lists backup runs so you can find the right timestamp.
+### Rollback
 
-### Recovery and rollback
-
-Adoption backups cover individual conflicting paths, not whole-home snapshots.
-For a configuration rollback:
+Adoption backups cover individual paths, not whole-home snapshots.
 
 ```bash
 cd ~/.dotfiles
 git switch --detach <known-good-rev>   # or: git switch main to return
-mise install                           # only if mise.toml/mise.lock changed
-FORCE=1 ./install                      # ignore the applied stamp, relink everything
+make tools.install                     # only if mise.toml/mise.lock changed
+FORCE=1 ./install                      # ignore the stamp, relink everything
 ```
 
-`FORCE=1` matters when the stamp still describes the current commit and would
-otherwise take the fast path. A full pass re-checks every destination, so a path
-that became foreign since the last install still aborts before anything changes.
+Then restart long-running processes: new shell, detached `tmux kill-server`, and
+Neovim/LSP clients. `make doctor` reports leftovers (stale links, missing tools,
+stale stamp).
 
-After a rollback, restart long-running processes: open a new shell, recycle tmux
-(`tmux kill-server` once detached), and restart Neovim and any LSP clients so
-they load the older binaries and configs. `make doctor` reports leftovers such as
-stale links, missing tools, or a stamp that no longer matches.
+## Machine-local overrides
 
-## How it works
-
-### Tools — mise
-
-All CLI tools and language runtimes are declared in [`mise.toml`](./mise.toml) and managed by [mise](https://mise.jdx.dev). This replaces Nix, asdf, nvm, and any other version managers with a single file.
-
-OpenCode and Copilot CLI are declared here too. The Copilot Desktop app is
-installed separately; its MCP servers and skills can reuse the CLI configuration.
-
-```toml
-[tools]
-go        = "1.26"       # minor range — patch releases flow
-node      = "24"
-kubectl   = "1.35.3"     # exact pin — bumps are deliberate
-helm      = "4.1.3"
-terraform = "1.14.8"
-rust      = "stable"
-tmux      = "3.7c"
-"aqua:docker/cli"    = "29.9.0"
-"aqua:neovim/neovim" = "0.12.6"
-# ...and more
-```
-
-GNU Make is managed here too: macOS ships Make 3.81, which lacks `--output-sync`,
-so `mise.toml` pins a modern GNU Make (4.x) and the parallel module pass runs the
-same way on Linux and macOS.
-
-**Versioning policy.** CLI tools and LSP servers are pinned to exact versions,
-so upgrading one is a deliberate, reviewable commit; language runtimes (`go`,
-`node`, `python`, `make`) keep their minor range so patch releases flow. To bump
-a tool: `make outdated` to preview → edit the pin here → commit/push → on a live
-machine run `./install` (or `mise install`). `make upgrade.tools` will not move
-exact pins, and `make prune.tools` cleans up superseded versions.
-
-`mise.lock` records the exact resolved version, download URL, and checksum for
-every tool on `linux-x64`, `linux-arm64`, `macos-x64`, and `macos-arm64`.
-`mise install` refreshes it when pins or ranges change, so commit it with the
-change. To refresh every platform after a pin bump, run
-`mise lock --global -p linux-x64,linux-arm64,macos-x64,macos-arm64` (set
-`GITHUB_TOKEN` if GitHub rate-limits you). CI installs the linters with
-`MISE_LOCKED=1` to exercise the recorded checksums. A few tools (Docker CLI,
-ttyd) publish no checksums, so strict locked mode is used only where the
-lockfile has one.
-
-New versions requested by a range (`go`, `node`, `python`, `make`, `rust`) are
-held back for mise's default 24 hours (`minimum_release_age`). Exact pins and
-versions already recorded in `mise.lock` are exempt, so installs of the
-committed set do not wait.
-
-Long-running processes keep the old binary until they restart, so `./install`
-recycles the tmux server automatically when its version changes (skipped when run
-from inside tmux). Editors are not touched — restart Neovim after changing its
-version, or restart affected LSP clients after changing a server binary.
-
-One exception worth knowing: `rust` is a rustup-managed `stable` channel
-(`~/.local/share/mise/installs/rust/stable` → `~/.cargo/bin`), so it is *not*
-reproducible from this file — pin it with rustup (a `rust-toolchain.toml`) if
-that matters.
-
-Per-project overrides are supported — drop a `mise.toml` in any project directory and mise will switch tool versions automatically when you `cd` into it.
-
-### Pinned downloads
-
-Everything installed outside mise is fetched by `scripts/fetch`, which rejects
-non-HTTPS URLs, empty or oversized responses, and SHA-256 mismatches before the
-file is moved into place. Pins live next to the URL in tracked files — edit the
-version/commit and digest together:
-
-| Artifact | Pin |
-|---|---|
-| mise bootstrap | `MISE_BOOTSTRAP_VERSION` in `scripts/bootstrap-mise.sh`; the release archive is verified against the release's `SHASUMS256.txt` |
-| `wt` | `WT_VERSION` + `WT_SHA256` in `git/Makefile` |
-| antigen | `ANTIGEN_VERSION` + `ANTIGEN_SHA256` in `zsh/Makefile` (vendored at `zsh/antigen.zsh`) |
-| `fzf-tmux` | `FZF_TMUX_VERSION` + `FZF_TMUX_SHA256` in `fzf/Makefile` |
-| TPM | `TPM_VERSION` + `TPM_COMMIT` in `tmux/Makefile` |
-| fonts | `INCONSOLATA_COMMIT`/`INCONSOLATA_SHA256` and `JETBRAINS_VERSION`/`JETBRAINS_SHA256` in `fonts/Makefile` |
-
-A pin bump is always two edits: the version/commit and the matching SHA-256.
-Then run the module's `upgrade` target (or `./install` / `make fonts`) so
-`scripts/fetch` verifies the new artifact, confirm the result with `make doctor`,
-and commit the pin, digest, and any vendored file together. Never push a bump
-whose download has not succeeded on a clean machine.
-
-`make tmux.upgrade`, the `prefix + r` binding, and TPM's own update commands act
-on the configured plugins only. TPM is installed and pinned by the tmux module
-and is deliberately not listed as a plugin, so it is never pulled off its tag.
-Change TPM only through `TPM_VERSION`/`TPM_COMMIT`.
-
-Terraform's zsh completion is vendored under `terraform/completions/` instead of
-being fetched. Fresh machines bootstrap mise with
-`scripts/bootstrap-mise.sh`; it never pipes a remote script into a shell, and it
-fails instead of silently falling back when the checksum cannot be fetched. The
-module upgrade targets (`make git.upgrade`, `make zsh.upgrade`,
-`make tmux.upgrade`) fetch the pinned artifact and fail on a digest mismatch.
-
-### Dotfiles — Make modules
-
-Configuration is split into independent modules, each in its own directory with a `Makefile`. The root `Makefile` coordinates them all.
-
-| Module | What it configures |
-|---|---|
-| `zsh/` | Zsh config, env, path, aliases, antigen plugins |
-| `nvim/` | Neovim / LazyVim config |
-| `tmux/` | tmux config, TPM plugins |
-| `git/` | Git config, aliases, delta pager |
-| `tig/` | Tig Git browser config (binary: mise) |
-| `fzf/` | fzf config and shell integration |
-| `alacritty/` | Alacritty terminal config |
-| `golang/` | Go environment variables; `gofumpt`, `goimports`, `staticcheck`, `govulncheck` (binary: mise) |
-| `kubernetes/` | kubectl aliases + completions (binary: mise) |
-| `helm/` | Helm config + completions (binary: mise) |
-| `terraform/` | Terraform config (binary: mise) |
-| `docker/` | Docker aliases — `rd-docker` for Rancher's client (binary: mise `docker-cli`) |
-| `bat/` | bat (better cat) config |
-| `ripgrep/` | ripgrep config |
-| `psql/` | psql config |
-| `fonts/` | Powerline + Nerd Font (JetBrains Mono) |
-| `rust/` | Rust toolchain + stylua (managed by mise) |
-| `bin/` | Personal scripts |
-| `agents/` | Shared AI instructions and skills |
-| `opencode/` | OpenCode config, commands, and plugins (binary: mise) |
-| `copilot/` | Optional Copilot CLI config and MCP servers (binary: mise) |
-
-Each module symlinks its config files into the appropriate XDG directory (`~/.config`, `~/.local/share`, etc). Modules are independent — install only what you need. Tool binaries are *not* installed by modules; everything comes from `mise.toml`, so Kubectl, Helm, Docker, and Rust work identically on Linux and macOS (Apple Silicon). A destination that is already a real file, directory, or foreign symlink is refused rather than replaced; see [Conflicts, adoption, and backups](#conflicts-adoption-and-backups).
-
-See [`nvim/README.md`](./nvim/README.md) for editor setup and maintenance.
-
-### AI agent configuration
-
-OpenCode and Copilot share [engineering instructions](./agents/instructions/engineering.md)
-and [skills](./agents/skills/) from `agents/`. Client-specific settings and MCP
-definitions stay in `opencode/` and `copilot/`; project guidance stays in each repo.
-
-```bash
-make agents                # Install shared instructions and skills
-make opencode              # Install shared files and OpenCode config
-make copilot               # Install shared files and Copilot config (optional)
-make -C agents sync-skills  # Refresh the commit skill; review the diff
-```
-
-Use the root targets so shared files install before either client. Copilot config
-links into `${COPILOT_HOME:-$HOME/.copilot}` without replacing personal instructions
-or session data. Conflicting files must be merged and moved aside first; clean
-targets for `agents` and `copilot` remove only links owned by this checkout.
-
-- **Go:** the [`go-development` skill](./agents/skills/go-development/SKILL.md)
-  provides the shared workflow; both clients use mise-managed `gopls mcp` for
-  saved-file context and diagnostics.
-- **Terse replies:** the opt-in [`caveman` skill](./agents/skills/caveman/SKILL.md)
-  changes chat style only. See its [usage notes](./agents/skills/caveman/UPSTREAM.md)
-  for activation and updates.
-- **Copilot Desktop:** reuses CLI skills and MCP servers, but manages its own app
-  preferences. Check discovery in **Customize → Skills/MCP** and ensure `gopls`
-  is on the app's PATH.
-
-Existing local skills are left untouched; review overlapping Go or commit skills
-before migrating. See [`agents/EVALUATION.md`](./agents/EVALUATION.md) for discovery
-and quality checks, and [`AGENTS.md`](./AGENTS.md) for repository guidance.
-
-### Rancher Desktop
-
-Rancher Desktop ships its own `kubectl`, `helm`, and `docker` in `~/.rd/bin`. Generic versions are still managed by mise so they work on any machine (bare servers, containers). mise shims come first on PATH, so plain `kubectl` is the generic client — use the `rd-*` aliases to target Rancher's cluster:
-
-```bash
-rd-kubectl
-rd-helm
-rd-docker
-```
-
-### Local overrides
-
-Some files are intentionally not tracked in git. Create these locally as needed:
+These files are intentionally untracked:
 
 | File | Purpose |
 |---|---|
+| `profile.local` | This machine's profile (see [Profiles](#profiles)) |
 | `modules.local.mk` | Add extra modules: `LOCAL_MODULES = terraform` |
-| `mise.local.toml` | Project-local mise overrides for this checkout only |
-| `git/config.local` | Per-machine git identity + auth per environment (copy from `git/config.local.example`) |
+| `mise.local.toml` | Project-local mise overrides/tools for this checkout only |
+| `~/.config/mise/config.local.toml` | Machine-wide mise tools not in the catalog (not created by `./install`) |
+| `git/config.local` | Per-machine git identity/auth (copy from `git/config.local.example`) |
 | `zsh/local` | Local env vars, tokens, secrets |
 
-`mise.local.toml` is scoped to the checkout, like any project-local mise file.
-It does not modify the global `~/.config/mise/config.toml` link, so tools started
-outside `~/.dotfiles` keep the pin from `mise.toml`. Use it for temporary
-experiments in this repository; make lasting machine-wide changes in `mise.toml`
-and commit them. The applied-state stamp hashes `modules.local.mk` and
-`mise.local.toml`, so editing either triggers a full module pass on the next
-`./install`.
+`mise.local.toml` is scoped to the checkout and does not replace the global
+`~/.config/mise/config.toml` link, so tools outside `~/.dotfiles` keep the
+`mise.toml` pins. Use it for experiments; make lasting changes in `mise.toml` and
+commit them. The stamp hashes `modules.local.mk` and `mise.local.toml`, so editing
+either triggers a full pass on the next `./install`.
 
-## Kubernetes debugging
+Tools declared in either local mise file are protected from profile cleanup, so
+one-machine additions survive switching to a smaller profile. Use
+backend-qualified names (`aqua:jqlang/jq`) where possible; short names also match.
 
-Ephemeral Kubernetes troubleshooting containers live in
-[kwtucker/k8s-debug](https://github.com/kwtucker/k8s-debug). It consumes this
-repo's `nvim/` config at a pinned commit and sets `K8S_DEBUG=1`, which makes
-`nvim/lua/plugins/mason.lua` skip Mason installs entirely.
+## Supply chain
 
-## Makefile commands
+Everything installed outside mise is fetched by `scripts/fetch`, which rejects
+non-HTTPS URLs, empty or oversized responses, and SHA-256 mismatches before moving
+a file into place. Pins and digests live together in tracked files:
+
+| Artifact | Pin |
+|---|---|
+| mise bootstrap | `MISE_BOOTSTRAP_VERSION` in `scripts/bootstrap-mise.sh`; archive verified against `SHASUMS256.txt` |
+| `wt` | `WT_VERSION` + `WT_SHA256` in `git/Makefile` |
+| antigen | `ANTIGEN_VERSION` + `ANTIGEN_SHA256` in `zsh/Makefile` (vendored) |
+| `fzf-tmux` | `FZF_TMUX_VERSION` + `FZF_TMUX_SHA256` in `fzf/Makefile` |
+| TPM | `TPM_VERSION` + `TPM_COMMIT` in `tmux/Makefile` |
+| fonts | `INCONSOLATA_*` and `JETBRAINS_*` version/checksum pairs in `fonts/Makefile` |
+
+A pin bump is always two edits: the version/commit and the matching digest. Then
+run the module's `upgrade` target (or `./install` / `make fonts`), confirm with
+`make doctor`, and commit the pin, digest, and any vendored file together. Never
+push a bump whose download has not succeeded on a clean machine.
+
+TPM is installed and pinned by the tmux module and deliberately not listed as a
+plugin, so `make tmux.upgrade`, `prefix + r`, and TPM's own commands never pull it
+off its tag; change it only through `TPM_VERSION`/`TPM_COMMIT`. Terraform's zsh
+completion is vendored under `terraform/completions/`. Bootstrap never pipes a
+remote script into a shell and fails instead of falling back when a checksum
+cannot be fetched.
+
+## Command reference
 
 | Target | Description |
 |---|---|
 | `make install` / `make update` | Install or update this machine (runs `./install`) |
-| `make all` | Relink all modules in parallel (no pull, top-up, or prune) |
-| `make status` | Show repository, applied, and filesystem state (read-only) |
-| `make doctor` | Diagnose install state with PASS/WARN/FAIL (read-only, offline) |
-| `make prune.links` | List stale links into this checkout (dry run; `ARGS=--force` removes) |
-| `make clean.all` | Remove owned links, completions, and helper binaries |
-| `make [module]` | Install a specific module, e.g. `make nvim` |
-| `make [module].clean` | Clean a specific module, e.g. `make nvim.clean` |
-| `make outdated` | Preview outdated tools for `mise.toml` (no changes) |
-| `make upgrade.tools` | Upgrade mise tools within pinned ranges, refresh `mise.lock` + completions |
-| `make prune.tools` | Remove superseded mise tool versions (keeps referenced ones) |
-| `make upgrade.plugins` | Upgrade plugins with an `upgrade` target (`nvim`, `tmux`, `zsh`, `opencode`); skips the rest |
-| `make upgrade.all` | `upgrade.tools` + `upgrade.plugins` (tools first) |
-| `make [module].upgrade` | Upgrade a specific module's plugins, e.g. `make nvim.upgrade` |
-| `make help` | List all available targets |
+| `make all` | Relink the selected profile's modules in parallel |
+| `make profile.list` | List profiles and mark the active one |
+| `make profile.show` | Show profile, modules, and tool count |
+| `make profile.set` | Save this machine's profile (`PROFILE=<name>`) |
+| `make profile.clear` | Remove `profile.local` and fall back to `full` |
+| `make tools.list` / `make tools.install` | Show / install the active profile's tools |
+| `make tools.check` | Validate tool ownership against `mise.toml` (offline) |
+| `make status` / `make doctor` | Read-only state and diagnostics |
+| `make prune.links` | Remove stale links into this checkout (dry run; `ARGS=--force`) |
+| `make clean.all` | Remove owned links, completions, and helper binaries for the selected profile |
+| `make [module]` / `make [module].clean` | Install / clean one module |
+| `make outdated` | Preview outdated tools (no changes) |
+| `make upgrade.tools` | Upgrade within pinned ranges; refresh `mise.lock` and completions |
+| `make prune.tools` | Remove superseded mise tool versions |
+| `make upgrade.plugins` | Upgrade modules with an `upgrade` target (`nvim`, `tmux`, `zsh`, `opencode`) |
+| `make upgrade.all` | `upgrade.tools` + `upgrade.plugins` |
+| `make [module].upgrade` | Upgrade one module's plugins |
+| `make help` | List all targets |
 
-Upgrades are split by design: `upgrade.tools` never rewrites version pins
-(`mise upgrade` stays within the ranges in `mise.toml`; bumps stay manual via
-`make outdated` → edit → commit). It refreshes `mise.lock`, so commit that
-alongside the pin change.
+`make clean.all` removes only paths this repository owns: module links, generated
+completions, `~/.zshenv`, `wt`, `fzf-tmux`, fetched fonts, the module cache, and
+empty module data directories. It never follows a tracked file, removes a real
+config directory, or deletes unrelated files in shared directories such as
+`~/.local/bin`. Fonts are copied, so only exact pinned filenames and version
+markers are removed.
 
-`make clean.all` (or `make <module>.clean`) removes only paths this repository
-owns: module links, generated completion files, `~/.zshenv`, `wt`, `fzf-tmux`,
-fonts it fetched, its module cache, and empty module data directories. It never
-follows a tracked file, removes a real config directory, or deletes an unrelated
-file in a shared directory such as `~/.local/bin`. Fonts are copied rather than
-linked, so only the exact pinned filenames and version markers are removed.
-`make prune.links` is the separate pass for links that are no longer expected.
+Completion paths follow the `XDG_DATA_HOME` of the Make run; an inherited
+`ZSH_COMPLETIONS_DIR` is ignored so a temporary-home install cannot reach another
+home. Pass `ZSH_COMPLETIONS_DIR=/path` on the Make command line to override.
 
-Completion paths follow the `XDG_DATA_HOME` of the Make run. A
-`ZSH_COMPLETIONS_DIR` inherited from the shell is ignored so that a clean or
-install under a temporary home cannot reach another home; pass
-`ZSH_COMPLETIONS_DIR=/path` on the Make command line to override it.
-
-`copilot` is an optional module: install it with `make copilot`, or append it to
-`LOCAL_MODULES` in `modules.local.mk` to include it in `make all` on that machine.
-Additional optional modules can be listed in `OPTIONAL_MODULES` in the root
-`Makefile`.
+`copilot` is optional: install with `make copilot`, or add it to `LOCAL_MODULES` in
+`modules.local.mk` to include it in `make all`. Additional opt-in modules go in
+`OPTIONAL_MODULES` in the root `Makefile`.
