@@ -75,7 +75,8 @@ shfmt = "3.14.1"
 "github:golangci/golangci-lint" = "2.14.0"
 "aqua:terraform-docs/terraform-docs" = "0.24.0"
 "aqua:charmbracelet/vhs" = "0.12.1"
-"aqua:tsl0922/ttyd" = "1.7.7"
+# Conda provides macOS builds; upstream/Aqua only distribute Linux and Windows.
+"conda:ttyd" = "1.7.7"
 "conda:ffmpeg" = "9.0.2"
 
 # ── AI agents ────────────────────────────────────────────────────────────────

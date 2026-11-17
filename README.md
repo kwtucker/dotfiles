@@ -126,7 +126,7 @@ per platform (`linux-x64`, `linux-arm64`, `macos-x64`, `macos-arm64`). Refreshin
 pins or ranges updates it — commit both together. To refresh every platform after
 a bump, run `mise lock --global -p linux-x64,linux-arm64,macos-x64,macos-arm64`
 (set `GITHUB_TOKEN` if rate-limited). Tools without upstream checksums
-(Docker CLI, ttyd on some platforms) simply have none recorded; strict locked mode
+(for example, Docker CLI) simply have none recorded; strict locked mode
 applies only where the lockfile has one.
 
 Range-based upgrades are held for mise's default 24-hour `minimum_release_age`;
@@ -193,10 +193,11 @@ Use the root targets so shared files install first. Copilot links into
 session data. See [`agents/EVALUATION.md`](./agents/EVALUATION.md) for discovery
 and quality checks.
 
-Machine-local MCP endpoints stay out of git. Create an ignored
-`copilot/mcp-config.local.json` (mode `600`, token inline) and `make copilot`
-links it as `mcp-config.json` in place of the tracked gopls-only baseline; this
-covers both the CLI and Desktop. OpenCode needs no repo change: an `opencode.json`
+The tracked `copilot/mcp-config.json` contains global MCP servers such as gopls.
+Keep project-specific servers in a repo-local `.mcp.json`; exclude personal
+configuration through that checkout's `.git/info/exclude`. See
+[Copilot MCP configuration](#copilot-mcp-configuration) for credential guidance.
+OpenCode needs no repo change: an `opencode.json`
 in a project parent directory merges over `~/.config/opencode/opencode.json`.
 
 - **Go:** the [`go-development` skill](./agents/skills/go-development/SKILL.md)
@@ -302,8 +303,8 @@ These files are intentionally untracked:
 | `mise.local.toml` | Project-local mise overrides/tools for this checkout only |
 | `~/.config/mise/config.local.toml` | Machine-wide mise tools not in the catalog (not created by `./install`) |
 | `git/config.local` | Per-machine git identity/auth (copy from `git/config.local.example`) |
-| `copilot/mcp-config.local.json` | Machine-local Copilot MCP servers/token, linked instead of the tracked `mcp-config.json` |
 | `zsh/local` | Local env vars, tokens, secrets |
+| `copilot/mcp-config.local.json` | Legacy personal MCP config; ignored for credential safety, but no longer installed |
 
 `mise.local.toml` is scoped to the checkout and does not replace the global
 `~/.config/mise/config.toml` link, so tools outside `~/.dotfiles` keep the
@@ -314,6 +315,22 @@ either triggers a full pass on the next `./install`.
 Tools declared in either local mise file are protected from profile cleanup, so
 one-machine additions survive switching to a smaller profile. Use
 backend-qualified names (`aqua:jqlang/jq`) where possible; short names also match.
+
+### Copilot MCP configuration
+
+`make copilot` links the tracked `copilot/mcp-config.json` directly into
+`${COPILOT_HOME:-$HOME/.copilot}`. There is no generated file or local merge step.
+The shared link helper repairs legacy links into this checkout and refuses
+unrelated configuration unless adoption is explicitly enabled.
+
+For project-specific servers, use that project's `.mcp.json`. Keep personal
+configuration untracked by adding `/.mcp.json` to its `.git/info/exclude` (unless
+the file is already tracked). Reference credentials through supported environment
+variables rather than literal tokens. Each client must have access to those
+variables: a token exported in a terminal is inherited by CLI processes launched
+there, not automatically by an already-running Desktop app or one opened from
+the Dock. The legacy `copilot/mcp-config.local.json` remains ignored for safety,
+but is not read or installed.
 
 ## Supply chain
 

@@ -2,5 +2,6 @@
   "autoUpdate": false,
   "defaultMode": "plan",
   "includeCoAuthoredBy": false,
-  "disabledSkills": []
+  "disabledSkills": [],
+  "enabledPlugins": {}
 }

@@ -81,7 +81,7 @@ TOOLS_copilot := aqua:github/copilot-cli
 PROFILE_TOOLS_minimal :=
 PROFILE_TOOLS_dev :=
 PROFILE_TOOLS_infra :=
-PROFILE_TOOLS_workstation := aqua:charmbracelet/vhs aqua:tsl0922/ttyd conda:ffmpeg
+PROFILE_TOOLS_workstation := aqua:charmbracelet/vhs conda:ttyd conda:ffmpeg
 PROFILE_TOOLS_full := $(PROFILE_TOOLS_workstation) conda:libqrencode conda:graphviz
 
 # ── Derived sets ──────────────────────────────────────────────────────────────
