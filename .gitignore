@@ -39,5 +39,5 @@ opencode/node_modules
 opencode/service.json
 
 copilot/settings.json.lock
-# Machine-local MCP endpoint and token; linked as mcp-config.json by make copilot.
+# Legacy machine-local MCP configuration; may contain credentials.
 copilot/mcp-config.local.json
