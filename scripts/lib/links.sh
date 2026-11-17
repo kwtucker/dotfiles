@@ -48,7 +48,6 @@ build_expected_links() {
           skills/conventional-commits \
           skills/go-development \
           skills/caveman \
-          skills/temporary-ssh-key \
           instructions/engineering.md; do
           add_link "$HOME/.agents/$__path" "$DOTFILES_ROOT/agents/$__path"
         done
