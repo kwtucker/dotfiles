@@ -193,6 +193,12 @@ Use the root targets so shared files install first. Copilot links into
 session data. See [`agents/EVALUATION.md`](./agents/EVALUATION.md) for discovery
 and quality checks.
 
+Machine-local MCP endpoints stay out of git. Create an ignored
+`copilot/mcp-config.local.json` (mode `600`, token inline) and `make copilot`
+links it as `mcp-config.json` in place of the tracked gopls-only baseline; this
+covers both the CLI and Desktop. OpenCode needs no repo change: an `opencode.json`
+in a project parent directory merges over `~/.config/opencode/opencode.json`.
+
 - **Go:** the [`go-development` skill](./agents/skills/go-development/SKILL.md)
   is shared by both clients; `gopls mcp` provides saved-file context.
 - **Terse replies:** the opt-in [`caveman` skill](./agents/skills/caveman/SKILL.md)
@@ -296,6 +302,7 @@ These files are intentionally untracked:
 | `mise.local.toml` | Project-local mise overrides/tools for this checkout only |
 | `~/.config/mise/config.local.toml` | Machine-wide mise tools not in the catalog (not created by `./install`) |
 | `git/config.local` | Per-machine git identity/auth (copy from `git/config.local.example`) |
+| `copilot/mcp-config.local.json` | Machine-local Copilot MCP servers/token, linked instead of the tracked `mcp-config.json` |
 | `zsh/local` | Local env vars, tokens, secrets |
 
 `mise.local.toml` is scoped to the checkout and does not replace the global
