@@ -53,9 +53,15 @@ build_expected_links() {
         done
         ;;
       copilot)
-        for __file in settings.json mcp-config.json instructions/engineering.instructions.md; do
+        for __file in settings.json instructions/engineering.instructions.md; do
           add_link "$COPILOT_HOME/$__file" "$DOTFILES_ROOT/copilot/$__file"
         done
+        # The module links an ignored machine-local MCP config when present.
+        __mcp="$DOTFILES_ROOT/copilot/mcp-config.json"
+        if [ -f "$DOTFILES_ROOT/copilot/mcp-config.local.json" ]; then
+          __mcp="$DOTFILES_ROOT/copilot/mcp-config.local.json"
+        fi
+        add_link "$COPILOT_HOME/mcp-config.json" "$__mcp"
         ;;
       *)
         add_link "$XDG_CONFIG_HOME/$__module" "$DOTFILES_ROOT/$__module"
