@@ -8,7 +8,7 @@ SHELL := /bin/bash
 NUM_CPUS := $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
 OUTPUT_SYNC := $(shell $(MAKE) --version 2>/dev/null | head -1 | grep -qE 'GNU Make ([4-9]|1[0-9])\.' && echo --output-sync=recurse)
 JOBS := $(if $(filter -j% --jobs%,$(MAKEFLAGS)),,-j$(NUM_CPUS))
-MAKEFLAGS += $(JOBS) $(OUTPUT_SYNC)
+MAKEFLAGS += $(JOBS) $(OUTPUT_SYNC) --no-print-directory
 
 # If the file doesn't exist it will not error.
 -include modules.local.mk
@@ -150,7 +150,8 @@ UPGRADE := $(addsuffix .upgrade,$(TARGETS))
 COMPLETION_MODULES := kubernetes helm fzf ripgrep docker golang rust terraform zsh git
 
 $(TARGETS):
-	$(MAKE) -C $@ install
+	@echo "▶ $@"
+	@$(MAKE) -C $@ install
 	@if grep -qE '^\.PHONY:.*completions|^completions:' $@/Makefile 2>/dev/null; then \
 		mkdir -p $(ZSH_COMPLETIONS_DIR); \
 		$(MAKE) -C $@ completions; \
@@ -162,7 +163,8 @@ $(TARGETS):
 opencode copilot: agents
 
 $(CLEAN):
-	$(MAKE) -C $(basename $@) clean
+	@echo "▶ $(basename $@) (clean)"
+	@$(MAKE) -C $(basename $@) clean
 
 # Per-module plugin upgrade: delegates to `<module>/Makefile#upgrade` when it
 # exists, otherwise skips (same UX as the completions hook above). Honors
@@ -171,6 +173,7 @@ $(CLEAN):
 # implicit rule search for .PHONY targets, so a pattern rule would never fire.
 $(UPGRADE):
 	@if grep -qE '^\.PHONY:.*upgrade|^upgrade:' $(basename $@)/Makefile 2>/dev/null; then \
+		echo "▶ $(basename $@) (upgrade)"; \
 		$(MAKE) -C $(basename $@) upgrade; \
 	else \
 		echo "==> Skipping $(basename $@) (no upgrade target)"; \

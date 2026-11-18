@@ -278,7 +278,7 @@ else
       ;;
   esac
 
-  make -C "$DOTFILES_DIR" all
+  make --no-print-directory -C "$DOTFILES_DIR" all
   ok "modules installed"
 
   # Remove artifacts, links, and tools owned by modules/profiles the new
@@ -293,7 +293,7 @@ else
         skip "$__module (module directory is gone)"
       elif ! grep -qE '^\.PHONY:.*clean|^clean:' "$DOTFILES_DIR/$__module/Makefile"; then
         skip "$__module (no clean target)"
-      elif DOTFILES_PROFILE_CLEANUP=1 make -C "$DOTFILES_DIR/$__module" clean; then
+      elif DOTFILES_PROFILE_CLEANUP=1 make --no-print-directory -C "$DOTFILES_DIR/$__module" clean; then
         ok "cleaned $__module"
       else
         echo -e "  ${YELLOW}↷${RESET} $__module clean failed — review its links manually" >&2
