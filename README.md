@@ -233,7 +233,7 @@ make doctor                    # PASS/WARN/FAIL with a fix for each problem
 make doctor ARGS=--online      # also check mise updates and origin reachability
 scripts/state check-links      # fast expected-link verification
 make prune.links               # list stale links into this checkout (dry run)
-make prune.links ARGS=--force  # remove them
+make prune.links.apply         # remove them
 ```
 
 `scripts/state doctor` exits `0` with warnings, `1` on failure, `2` on usage
@@ -243,8 +243,10 @@ call `scripts/state doctor` directly to distinguish the two.
 this checkout; `--preflight` lists destinations a default install would refuse,
 and `--strict` also fails on links into this checkout that are no longer expected.
 
-`make prune.links` touches only symlinks that still resolve inside this checkout
-and re-checks ownership immediately before unlinking.
+`make prune.links` and `make prune.links.apply` touch only symlinks that still
+resolve inside this checkout and re-check ownership immediately before unlinking.
+Passing `--force` directly to `make` is a make option, not a script argument; use
+the `.apply` target (or `prune.links ARGS=--force`) instead.
 
 ## Conflicts and recovery
 
