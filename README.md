@@ -61,7 +61,7 @@ Point DevPod at this repo with an explicit install script; `--ide none` keeps th
 workspace terminal-only:
 
 ```bash
-devpod up github.com/microsoft/vscode-remote-try-go \
+devpod up <project-repo> \
   --dotfiles https://github.com/kwtucker/dotfiles \
   --dotfiles-script install \
   --ide none
