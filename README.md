@@ -8,9 +8,9 @@ independent Make modules; CLI tools and runtimes are pinned in
 — everything lives under your home directory, so other users on a shared host are
 unaffected.
 
-Works on local Linux machines, bare SSH servers, thin clients, and headless
-containers. Docker, Codespaces, and devcontainers skip the font download
-automatically; see [Headless installs](#headless-installs).
+Works on local Linux machines, bare SSH servers, thin clients, DevPod workspaces,
+and headless containers. Docker, Codespaces, and devcontainers skip the font
+download automatically; see [Headless installs](#headless-installs).
 
 ## Quick start
 
@@ -54,6 +54,60 @@ the omission in `${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/fonts-skipped`.
 Override with `DOTFILES_SKIP_FONTS=0 ./install` when the container hosts a
 terminal, or `DOTFILES_SKIP_FONTS=1 make fonts` to skip elsewhere. Only font files
 are skipped.
+
+### DevPod and devcontainers
+
+Point DevPod at this repo with an explicit install script; `--ide none` keeps the
+workspace terminal-only:
+
+```bash
+devpod up github.com/microsoft/vscode-remote-try-go \
+  --dotfiles https://github.com/kwtucker/dotfiles \
+  --dotfiles-script install \
+  --ide none
+```
+
+Current DevPod versions auto-detect a root-level `install`, but pinning
+`--dotfiles-script` keeps the command stable across versions. To vary
+install-time settings, pass them to the script (check `devpod up --help` for this
+flag on your version):
+
+```bash
+devpod up <project-repo> --dotfiles https://github.com/kwtucker/dotfiles \
+  --dotfiles-script install --ide none \
+  --dotfiles-script-env DOTFILES_PROFILE=dev DOTFILES_SKIP_FONTS=1
+```
+
+`DOTFILES_PROFILE` takes precedence over `profile.local`, which is preferable in
+ephemeral workspaces because rebuilds discard home-directory changes. DevPod
+forwards git credentials for private repos. Apply the same dotfiles to every new
+workspace with context options:
+
+```bash
+devpod context set-options \
+  -o DOTFILES_URL=https://github.com/kwtucker/dotfiles \
+  -o DOTFILES_SCRIPT=install
+```
+
+For plain devcontainers, clone and run the installer from the project's
+`devcontainer.json`:
+
+```jsonc
+{
+  "containerEnv": {
+    "DOTFILES_PROFILE": "dev",
+    "DOTFILES_SKIP_FONTS": "1"
+  },
+  "postCreateCommand": "[ -d ~/.dotfiles ] || git clone https://github.com/kwtucker/dotfiles.git ~/.dotfiles; ~/.dotfiles/install"
+}
+```
+
+Use `postCreateCommand` rather than `onCreateCommand` when setup needs
+user-scoped credentials, and keep tokens out of the file — use `${localEnv:...}`
+or forwarded git credentials. Docker, Codespaces, and `REMOTE_CONTAINERS`
+containers already skip fonts (see [Headless installs](#headless-installs)); set
+`DOTFILES_SKIP_FONTS=1` explicitly for SSH-backed DevPod workspaces. Check the
+result with `make profile.show` and `make doctor`.
 
 ## Profiles
 
@@ -374,7 +428,7 @@ cannot be fetched.
 | `make tools.list` / `make tools.install` | Show / install the active profile's tools |
 | `make tools.check` | Validate tool ownership against `mise.toml` (offline) |
 | `make status` / `make doctor` | Read-only state and diagnostics |
-| `make prune.links` | Remove stale links into this checkout (dry run; `ARGS=--force`) |
+| `make prune.links` / `make prune.links.apply` | List / remove stale links into this checkout |
 | `make clean.all` | Remove owned links, completions, and helper binaries for the selected profile |
 | `make [module]` / `make [module].clean` | Install / clean one module |
 | `make outdated` | Preview outdated tools (no changes) |
