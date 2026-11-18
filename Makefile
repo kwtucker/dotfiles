@@ -206,8 +206,11 @@ doctor: ## Diagnose install state (read-only; offline unless ARGS=--online)
 status: ## Show repository, applied, and filesystem state (read-only)
 	@scripts/state status $(ARGS)
 
-prune.links: ## Remove stale links into this checkout (dry run; ARGS=--force)
+prune.links: ## List stale links into this checkout (dry run)
 	@scripts/prune-links $(ARGS)
+
+prune.links.apply: ## Remove stale links into this checkout
+	@scripts/prune-links --force
 
 lint: ## Lint shell scripts (bash -n, shellcheck, shfmt)
 	@fail=0; \
@@ -252,7 +255,7 @@ upgrade.plugins: $(UPGRADE) ## Upgrade editor/shell plugins (nvim, tmux, zsh, op
 
 upgrade.all: upgrade.tools upgrade.plugins ## Upgrade tools + plugins
 
-.PHONY: $(TARGETS) $(CLEAN) $(UPGRADE) install update all clean.all outdated doctor status prune.links lint fmt upgrade.tools prune.tools upgrade.plugins upgrade.all profile.list profile.show profile.set profile.clear tools.list tools.install tools.check
+.PHONY: $(TARGETS) $(CLEAN) $(UPGRADE) install update all clean.all outdated doctor status prune.links prune.links.apply lint fmt upgrade.tools prune.tools upgrade.plugins upgrade.all profile.list profile.show profile.set profile.clear tools.list tools.install tools.check
 
 help: ## Show this help message
 	@echo "Available targets:"; \
@@ -276,7 +279,8 @@ help: ## Show this help message
 	echo "  make outdated       # Preview outdated tools (no changes)"; \
 	echo "  make doctor         # Diagnose install state (read-only)"; \
 	echo "  make status         # Show repo, applied, and filesystem state"; \
-	echo "  make prune.links    # Remove stale links (dry run; ARGS=--force)"; \
+	echo "  make prune.links    # List stale links (dry run)"; \
+	echo "  make prune.links.apply # Remove stale links into this checkout"; \
 	echo "  make lint           # Check shell scripts (bash -n, shellcheck, shfmt)"; \
 	echo "  make fmt            # Format shell scripts with shfmt"; \
 	echo "  make upgrade.tools  # Upgrade mise tools within pinned ranges"; \
