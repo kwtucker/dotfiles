@@ -42,6 +42,16 @@
 # [core]
 #     sshCommand = "ssh -i ~/.ssh/id_work -o IdentitiesOnly=yes"
 
+# ── 2b. GitHub identity (remote-URL routed) ────────────────────────────────
+# The shared `config` routes github.com remotes (HTTPS and SSH) to an
+# untracked, gitignored identity file at ~/.config/git/config.github.
+# It overrides the [user] block above for GitHub repos; everything else
+# keeps the default. Create that file with just the GitHub identity:
+# [user]
+#     name = Your Name
+#     email = you@github.example
+# Keep remote.*.url out of included files — Git disallows it here.
+
 # ── 3. SSH key selection (access, per environment) ─────────────────────────
 # Machine-wide key (simplest when there is one key per machine):
 # [core]

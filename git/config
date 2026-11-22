@@ -54,3 +54,8 @@
 [url "git@github.com:"]
   pushInsteadOf = https://github.com/
 
+# GitHub — both HTTPS and SSH remotes
+[includeIf "hasconfig:remote.*.url:https://github.com/**"]
+    path = ~/.config/git/config.github
+[includeIf "hasconfig:remote.*.url:git@github.com:*/**"]
+    path = ~/.config/git/config.github

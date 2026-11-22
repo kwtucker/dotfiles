@@ -17,6 +17,7 @@ nvim/autoload
 
 git/config.local
 git/config.env-*
+git/config.github
 
 Brewfile.lock.json
 Brewfile.linux.lock.json
