@@ -66,6 +66,7 @@ shfmt = "3.14.1"
 
 # ── Personal tools ────────────────────────────────────────────────────────────
 "github:kwtucker/temp-ssh-key" = "0.3.1"
+"github:kwtucker/vpn" = "0.1.4"
 
 # ── LSP servers ───────────────────────────────────────────────────────────────
 "aqua:artempyanykh/marksman" = "2026-02-08"

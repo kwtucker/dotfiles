@@ -5,6 +5,16 @@ passphrase-protected secrets vault) and installs the `wbs` secrets CLI. It is
 enabled per-machine via `modules.local.mk` (`LOCAL_MODULES = whalebyte`) and is
 intentionally **not** part of the public module set.
 
+## Personal CLIs
+
+Two personal Go CLIs are pinned in `mise.toml` and installed on every profile:
+
+- `temp-ssh-key` — disposable SSH keys for untrusted machines.
+- `vpn` — connects to exactly one of Mullvad or Tailscale at a time; also
+  registered as `wb vpn` in the `wb` aggregator.
+
+Their source lives in `~/.whalebyte/code/` and is not managed by this module.
+
 ## Secrets vault (`wbs`)
 
 `wbs` stores secrets as JSON in a single [age](https://github.com/FiloSottile/age)

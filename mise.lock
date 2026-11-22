@@ -3622,6 +3622,35 @@ url = "https://github.com/kwtucker/temp-ssh-key/releases/download/v0.3.1/temp-ss
 url_api = "https://api.github.com/repos/kwtucker/temp-ssh-key/releases/assets/735282094"
 provenance = "github-attestations"
 
+[[tools."github:kwtucker/vpn"]]
+version = "0.1.4"
+backend = "github:kwtucker/vpn"
+specifiers = ["0.1.4"]
+
+[tools."github:kwtucker/vpn"."platforms.linux-arm64"]
+checksum = "sha256:621735435140e38baffe1101048fa7e479377a6a99613ec4ffee4a2306764a51"
+url = "https://github.com/kwtucker/vpn/releases/download/v0.1.4/vpn_0.1.4_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/kwtucker/vpn/releases/assets/780024757"
+provenance = "github-attestations"
+
+[tools."github:kwtucker/vpn"."platforms.linux-x64"]
+checksum = "sha256:f1fca4f1714a7050488d2f0bd49c0111e01e4dfb2fc946471da20f323e33263e"
+url = "https://github.com/kwtucker/vpn/releases/download/v0.1.4/vpn_0.1.4_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/kwtucker/vpn/releases/assets/780024760"
+provenance = "github-attestations"
+
+[tools."github:kwtucker/vpn"."platforms.macos-arm64"]
+checksum = "sha256:f389651444af9e44be6acf41afa67c93bb485f9fdb0835fc86e527eaa96e39b7"
+url = "https://github.com/kwtucker/vpn/releases/download/v0.1.4/vpn_0.1.4_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/kwtucker/vpn/releases/assets/780024758"
+provenance = "github-attestations"
+
+[tools."github:kwtucker/vpn"."platforms.macos-x64"]
+checksum = "sha256:2f27ddb1066246bb0124e42b04eb986b2475bb9d1a64a8245d3d20bd5b98f165"
+url = "https://github.com/kwtucker/vpn/releases/download/v0.1.4/vpn_0.1.4_darwin_amd64.tar.gz"
+url_api = "https://api.github.com/repos/kwtucker/vpn/releases/assets/780024764"
+provenance = "github-attestations"
+
 [[tools.go]]
 version = "1.27.4"
 backend = "core:go"

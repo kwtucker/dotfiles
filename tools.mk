@@ -24,7 +24,7 @@ BASE_TOOLS := make shellcheck shfmt
 # Catalog tools with no module or profile owner. They install everywhere and are
 # never uninstalled by profile cleanup. Unclassified tools are also treated as
 # shared (with a warning from `make tools.check`).
-SHARED_TOOLS := github:kwtucker/temp-ssh-key
+SHARED_TOOLS := github:kwtucker/temp-ssh-key github:kwtucker/vpn
 
 # ── Module ownership ──────────────────────────────────────────────────────────
 # Define every tracked module explicitly, including modules that own no tools, so
