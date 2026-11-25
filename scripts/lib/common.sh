@@ -176,7 +176,7 @@ make_meta() {
 }
 
 MODULES_ENABLED=""
-MODULES_OPTIONAL=""
+MODULES_AVAILABLE=""
 DOTFILES_MODULES=""
 DOTFILES_ACTIVE_PROFILE=""
 DOTFILES_TOOLS=""
@@ -201,7 +201,7 @@ load_tools() {
 
 load_modules() {
   MODULES_ENABLED=""
-  MODULES_OPTIONAL=""
+  MODULES_AVAILABLE=""
   DOTFILES_MODULES=""
   DOTFILES_ACTIVE_PROFILE=""
   __meta="$(make_meta .list.modules)" || return 1
@@ -209,8 +209,8 @@ load_modules() {
 
   MODULES_ENABLED="$(printf '%s\n' "$__meta" | awk -F '\t' '$1 == "enabled" { printf "%s ", $2 }')"
   MODULES_ENABLED="${MODULES_ENABLED% }"
-  MODULES_OPTIONAL="$(printf '%s\n' "$__meta" | awk -F '\t' '$1 == "optional" { printf "%s ", $2 }')"
-  MODULES_OPTIONAL="${MODULES_OPTIONAL% }"
+  MODULES_AVAILABLE="$(printf '%s\n' "$__meta" | awk -F '\t' '$1 == "available" { printf "%s ", $2 }')"
+  MODULES_AVAILABLE="${MODULES_AVAILABLE% }"
   DOTFILES_MODULES="$MODULES_ENABLED"
   DOTFILES_ACTIVE_PROFILE="$(printf '%s\n' "$__meta" | awk -F '\t' '$1 == "profile" { print $2; exit }')"
   [ -n "$DOTFILES_ACTIVE_PROFILE" ] || DOTFILES_ACTIVE_PROFILE="full"

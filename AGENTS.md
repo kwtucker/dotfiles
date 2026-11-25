@@ -25,8 +25,9 @@
   paths and platform differences. Each module has its own `Makefile` and config.
   `profiles.mk` defines tracked install-time module sets; `PROFILE`, then
   `DOTFILES_PROFILE`, then ignored `profile.local` select one, defaulting to
-  `full`. Register default modules in the profile sets, opt-in modules in
-  `OPTIONAL_MODULES`. `LOCAL_MODULES` remains additive and machine-specific.
+  `full`. Register default modules in the profile sets; every `*/Makefile` is
+  available for `make <module>`. `LOCAL_MODULES` remains additive and
+  machine-specific.
   Preserve parallel-install ordering. `tools.mk` maps each `mise.toml` entry to
   the module that needs it plus `PROFILE_TOOLS_<profile>` extras; tools with no
   owner are shared and never auto-removed. Keep backend-qualified names exactly
@@ -70,12 +71,13 @@
   `~/.copilot` state directory into Git or delete it during cleanup.
 - Some existing install/clean targets are destructive. Do not copy broad deletion
   patterns into new modules or run them against a real home merely to validate code.
-- A new tracked module needs a profile in `profiles.mk` and an explicit
-  `TOOLS_<module>` declaration in `tools.mk` (empty is valid); `OPTIONAL_MODULES`
-  stays for client-specific extras. Profile-switch cleanup runs a removed
-  module's `clean` target, so keep `clean` limited to owned links/artifacts and do
-  not uninstall shared mise tools when `DOTFILES_PROFILE_CLEANUP=1`. Run
-  `make tools.check` after touching `mise.toml`, `tools.mk`, or `profiles.mk`.
+- A new tracked module needs a directory with a `Makefile`, an explicit
+  `TOOLS_<module>` declaration in `tools.mk` (empty is valid), and a profile
+  entry only if it should install by default. Profile-switch cleanup runs a
+  removed module's `clean` target, so keep `clean` limited to owned
+  links/artifacts and do not uninstall shared mise tools when
+  `DOTFILES_PROFILE_CLEANUP=1`. Run `make tools.check` after touching
+  `mise.toml`, `tools.mk`, or `profiles.mk`.
 
 ## Validation and reporting
 

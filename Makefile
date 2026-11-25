@@ -46,13 +46,13 @@ endif
 # LOCAL_MODULES stays additive; drop duplicates while preserving profile order.
 MODULES := $(strip $(PROFILE_MODULES) $(filter-out $(PROFILE_MODULES),$(LOCAL_MODULES)))
 
-# Optional modules — installed on demand (`make <module>`), not part of `make all`.
-OPTIONAL_MODULES = copilot
-
-TARGETS := $(MODULES) $(filter-out $(MODULES),$(OPTIONAL_MODULES))
+# Every module directory is available on demand; only active modules (profile
+# plus LOCAL_MODULES) are installed by `make all` and `./install`.
+ALL_MODULES := $(sort $(patsubst %/Makefile,%,$(wildcard */Makefile)))
+TARGETS := $(sort $(ALL_MODULES) $(MODULES))
 
 # Tracked mise tool ownership per module and profile. Must be included after
-# MODULES, OPTIONAL_MODULES, and ACTIVE_PROFILE are resolved.
+# MODULES, ALL_MODULES, and ACTIVE_PROFILE are resolved.
 include tools.mk
 
 # Shell sources checked by `make lint`. `install` has no .sh suffix.
@@ -69,7 +69,7 @@ SHFMT_FLAGS := -i 2 -ci
 .list.modules:
 	@printf 'profile\t%s\n' "$(ACTIVE_PROFILE)"
 	@for m in $(MODULES); do printf 'enabled\t%s\n' "$$m"; done
-	@for m in $(filter-out $(MODULES),$(OPTIONAL_MODULES)); do printf 'optional\t%s\n' "$$m"; done
+	@for m in $(filter-out $(MODULES),$(ALL_MODULES)); do printf 'available\t%s\n' "$$m"; done
 
 .list.tools:
 	@printf 'profile\t%s\n' "$(ACTIVE_PROFILE)"
@@ -168,7 +168,7 @@ $(CLEAN):
 
 # Per-module plugin upgrade: delegates to `<module>/Makefile#upgrade` when it
 # exists, otherwise skips (same UX as the completions hook above). Honors
-# LOCAL_MODULES / OPTIONAL_MODULES via $(TARGETS).
+# LOCAL_MODULES and every available module via $(TARGETS).
 # NOTE: explicit list (not a %.upgrade pattern rule) — GNU make skips
 # implicit rule search for .PHONY targets, so a pattern rule would never fire.
 $(UPGRADE):

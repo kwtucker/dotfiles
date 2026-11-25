@@ -339,7 +339,7 @@ cmd_status() {
     printf '"modules": {'
     printf '"profile": "%s", ' "$(json_escape "$DOTFILES_ACTIVE_PROFILE")"
     printf '"enabled": %s, ' "$(json_words "$MODULES_ENABLED")"
-    printf '"optional": %s' "$(json_words "$MODULES_OPTIONAL")"
+    printf '"available": %s' "$(json_words "$MODULES_AVAILABLE")"
     printf '}, '
 
     printf '"overrides": '
@@ -430,7 +430,7 @@ cmd_status() {
     section "Modules"
     printf '  profile:  %s\n' "${DOTFILES_ACTIVE_PROFILE:-none}"
     printf '  enabled:  %s\n' "$MODULES_ENABLED"
-    printf '  optional: %s%s\n' "${MODULES_OPTIONAL:-none}" "$([ -n "$MODULES_OPTIONAL" ] && printf ' (not enabled)')"
+    printf '  available: %s%s\n' "${MODULES_AVAILABLE:-none}" "$([ -n "$MODULES_AVAILABLE" ] && printf ' (not enabled)')"
     if [ "${#OVERRIDE_ITEMS[@]}" -gt 0 ]; then
       printf '  overrides: %s\n' "${OVERRIDE_ITEMS[*]}"
     else
@@ -870,22 +870,10 @@ doctor_modules() {
       "check modules.local.mk and git status"
   fi
 
-  if [ -z "$MODULES_OPTIONAL" ]; then
-    record_result PASS "modules.optional" "none declared"
+  if [ -z "$MODULES_AVAILABLE" ]; then
+    record_result PASS "modules.available" "none (all modules enabled)"
   else
-    __missing_optional=()
-    for __module in $MODULES_OPTIONAL; do
-      if [ ! -d "$DOTFILES_ROOT/$__module" ] || [ ! -f "$DOTFILES_ROOT/$__module/Makefile" ]; then
-        __missing_optional[${#__missing_optional[@]}]="$__module"
-      fi
-    done
-    if [ "${#__missing_optional[@]}" -eq 0 ]; then
-      record_result PASS "modules.optional" "$MODULES_OPTIONAL available but not enabled"
-    else
-      record_result WARN "modules.optional" \
-        "optional module source missing: $(summarize_items 5 "${__missing_optional[@]}")" \
-        "remove it from OPTIONAL_MODULES or restore its directory"
-    fi
+    record_result PASS "modules.available" "$MODULES_AVAILABLE available but not enabled"
   fi
 }
 

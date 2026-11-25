@@ -71,9 +71,10 @@ TOOLS_agents :=
 TOOLS_opencode := http:opencode
 TOOLS_sops := aqua:getsops/sops aqua:FiloSottile/age
 TOOLS_whalebyte := aqua:FiloSottile/age aqua:jqlang/jq
-# Optional modules are not part of `make all` but declare their tools here so an
-# explicit `make tools.install MODULES=copilot` includes them.
+# Modules outside the active profile still declare their tools here so an
+# explicit `make tools.install MODULES=<module>` includes them.
 TOOLS_copilot := aqua:github/copilot-cli
+TOOLS_cosmic :=
 
 # ── Profile extras ────────────────────────────────────────────────────────────
 # Install-scoped tools that do not belong to a configuration module. They are
@@ -112,7 +113,7 @@ MISE_TOOL_KEYS := $(shell awk '\
 		print line; \
 	}' "$(DOTFILES_ROOT_DIR)/mise.toml" | LC_ALL=C sort -u)
 
-TRACKED_MODULES := $(sort $(foreach p,$(PROFILE_NAMES),$(PROFILE_MODULES_$(p))) $(OPTIONAL_MODULES))
+TRACKED_MODULES := $(ALL_MODULES)
 ALL_MODULE_TOOLS := $(sort $(foreach m,$(TRACKED_MODULES) $(LOCAL_MODULES),$(TOOLS_$(m))))
 ALL_PROFILE_TOOLS := $(sort $(foreach p,$(PROFILE_NAMES),$(PROFILE_TOOLS_$(p))))
 MANAGED_TOOLS := $(sort $(ALL_MODULE_TOOLS) $(ALL_PROFILE_TOOLS))
