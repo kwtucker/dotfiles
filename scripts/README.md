@@ -1,109 +1,78 @@
-# scripts
+# Deployment and state helpers
 
-Shell helpers behind `make doctor`, `make status`, verified downloads, and
-module linking. They target **bash 3.2** (macOS) and modern bash on Linux, and
-must work without `jq`, `python`, or any non-POSIX tool beyond `git`, `curl`,
-`awk`, and standard file utilities.
+Bash helpers for offline inspection, link deployment, verified downloads, GPG
+configuration, and applied-state stamps. They target Bash 3.2 on macOS and modern
+Bash on Linux; read-only state tooling avoids jq/Python dependencies.
 
-## Contract map
+## How-to inspect or maintain the system
 
-| File | Kind | Reads | Writes | Exit codes |
-| --- | --- | --- | --- | --- |
-| `state` | executable | git, Make metadata, XDG/mise paths, links, artifacts | **nothing** | `check-links` 0/1/2; `status` 0 (1 with `--exit-code`); `doctor` 0/1/2 |
-| `prune-links` | executable | expected-link model, filesystem | stale symlinks (only with `--force`) | 0 clean/pruned, 1 failed, 2 usage |
-| `lib/common.sh` | sourced | environment | nothing | n/a |
-| `lib/links.sh` | sourced | expected-link model, filesystem | nothing | n/a |
-| `lib/link.sh` | executable | source paths, destinations | symlinks, parent directories, adoption backups, stale owned links | 0 ok, 1 conflict, 2 usage/fatal |
-| `lib/stamp.sh` | sourced | git, XDG paths, local overrides, active profile + module/tool sets | `${XDG_STATE_HOME}/dotfiles/last-applied` (atomic) | 0 verified/applied, 1 stale/failed |
-| `lib/tools.sh` | sourced | previous/active/managed tool lists, local mise configs | nothing | n/a |
-| `lib/fetch.sh` | sourced | HTTPS URL + SHA-256 | destination + temporary file | 0 ok, 1 download/verify failure, 2 usage |
-| `fetch` | executable | same as `lib/fetch.sh` | same as `lib/fetch.sh` | 0 ok, 1 failure, 2 usage |
-| `bootstrap-mise.sh` | executable | pinned release + `SHASUMS256.txt` | `$HOME/.local/bin/mise` (755), temp dir | 0 installed/skipped, 1 failure, 2 usage |
+- [Update an installation](../docs/how-to/update-dotfiles.md)
+- [Recover conflicting configuration](../docs/how-to/recover-configuration.md)
+- [Add a module safely](../docs/how-to/add-module.md)
 
-The top-level `install` is the orchestrator: it pulls the checkout, bootstrap-
-installs mise and `make`, asks Make for the active profile's module/tool sets,
-installs only those tools, runs the link preflight, invokes the module Makefiles,
-cleans modules and owned tools dropped by a profile switch, and writes the stamp
-only after a successful pass. In Docker, Codespaces, and devcontainers it exports
-`DOTFILES_SKIP_FONTS=1` before the module pass; the `fonts` module leaves a marker
-in the state directory instead of downloading fonts.
-
-## Read-only tooling
-
-`scripts/state` is the only entrypoint shared by `make status` and `make doctor`:
+For read-only inspection from the checkout root:
 
 ```sh
+scripts/state check-links --preflight
+scripts/state status --json
+scripts/state doctor
+```
+
+`doctor --online` additionally queries remote information. Do not run installers
+or cleanup to check whether documentation examples are accurate. For shell
+changes, `make lint` checks syntax/ShellCheck/formatting; `make fmt` rewrites
+files. Keep fixtures in temporary directories outside this checkout and remove
+them afterward; no persistent test suite belongs here.
+
+## Reference
+
+| File | Contract / writes | Exit behavior |
+| --- | --- | --- |
+| `state` | Read-only Make/Git/filesystem evidence; offline unless requested | `check-links`/`doctor`: 0 success, 1 failure, 2 usage; status normally 0, drift 1 with `--exit-code` |
+| `prune-links` | Preview stale links; `--force` delegates owned unlinking | 0 success, 1 failure, 2 usage |
+| `lib/common.sh` | Shared environment/metadata helpers; no intended writes | Sourced |
+| `lib/links.sh` | Expected links and verification; no writes | Sourced |
+| `lib/link.sh` | Symlinks, missing parents, adoption backups, owned unlinking | 0 success, 1 conflict, 2 usage/fatal |
+| `lib/stamp.sh` | Verify/write `$XDG_STATE_HOME/dotfiles/last-applied` atomically | Verification/write return success/failure |
+| `lib/tools.sh` | Pure profile comparison/local declaration parsing | Sourced; does not uninstall tools |
+| `lib/gpg.sh` | Generate ignored agent config; delegate home link changes | Install/clean; missing shim is a reported skip, conflicts fail |
+| `lib/fetch.sh`, `fetch` | HTTPS download, size/digest checks, temporary file and rename | 0 success, 1 download/verification failure, 2 usage/dependency errors |
+| `bootstrap-mise.sh` | Verify release archive/checksums and install user-local mise | 0 installed/skipped; failures nonzero |
+
+State CLI forms:
+
+```text
 scripts/state check-links [--quiet] [--preflight] [--strict]
 scripts/state status [--exit-code] [--json]
 scripts/state doctor [--online] [--json] [--verbose]
 ```
 
-- It never creates directories, changes links, or writes the stamp.
-- It is offline by default; only `doctor --online` touches the network.
-- `check-links --preflight` reports just the destinations a default install would
-  refuse, so `./install` can abort before any module mutates the home directory.
-- `doctor` prints a remediation command for every warning and failure.
+Verified download form:
 
-## Write boundaries
-
-Only these files may change the machine:
-
-- `lib/link.sh` — creates/repairs symlinks and, with `DOTFILES_ADOPT=1`, moves
-  conflicting paths under `${XDG_STATE_HOME}/dotfiles/backups/<timestamp>/` and
-  appends to `manifest.tsv`. Its `prune_link` command removes a symlink only
-  after confirming its target still resolves inside the checkout. It never
-  deletes a real destination.
-- `prune-links` — lists stale links into this checkout by default; `--force`
-  asks `lib/link.sh` to unlink each one. It never touches foreign links or real
-  files.
-- `lib/stamp.sh` — `stamp_write` records the applied inputs after a successful
-  module pass. It is atomic; a failed or interrupted run leaves no fresh stamp.
-  The profile and resolved module/tool sets are recorded too, so changing any of
-  them invalidates the fast path and `./install` can clean modules and managed
-  tools that are no longer selected.
-- `lib/fetch.sh` / `fetch` — download to a temporary file, verify size and
-  SHA-256, then rename into place. Partial or mismatched files are removed.
-- `bootstrap-mise.sh` — verifies the release archive against the release's
-  checksum file before writing the binary.
-
-`lib/common.sh`, `lib/links.sh`, and `lib/tools.sh` are read-only helpers sourced
-by the above. `lib/tools.sh` only compares tool lists and parses local mise
-configs; `install` performs the actual uninstalls.
-
-## Environment knobs
-
-| Variable | Used by | Meaning |
-| --- | --- | --- |
-| `DOTFILES_ROOT` | most scripts | Checkout root; defaults to the repository containing the script |
-| `XDG_CONFIG_HOME`, `XDG_CACHE_HOME`, `XDG_DATA_HOME`, `XDG_STATE_HOME` | most scripts | Default to `$HOME/.config`, `$HOME/.cache`, `$HOME/.local/share`, `$HOME/.local/state` |
-| `DOTFILES_ADOPT` | `lib/link.sh` | `1` adopts conflicting destinations with a backup |
-| `DOTFILES_BACKUP_ROOT`, `DOTFILES_BACKUP_ID` | `lib/link.sh` | Override the backup parent or run directory name |
-| `DOTFILES_SKIP_FONTS` | `install`, `fonts` | `1` skips the font download and records `${XDG_STATE_HOME}/dotfiles/fonts-skipped`; `0` overrides container detection |
-| `PROFILE` | root `Makefile`, `./install` | Profile name; highest selection precedence |
-| `DOTFILES_PROFILE` | root `Makefile`, `./install` | Profile name used when `PROFILE` is unset |
-| `DOTFILES_PROFILE_CLEANUP` | `./install`, module clean targets | `1` marks cleanup for a profile switch; modules keep shared mise tools installed |
-| `DOTFILES_KEEP_TOOLS` | `./install` | `1` keeps tools owned by the previous profile instead of uninstalling them |
-| `FETCH_MAX_BYTES` | `lib/fetch.sh` | Reject downloads larger than this (default 256 MiB) |
-| `MISE_BOOTSTRAP_VERSION`, `MISE_BOOTSTRAP_DEST` | `bootstrap-mise.sh` | Override the pinned mise release or install path |
-| `FORCE` | `install` | `1` bypasses the applied-state fast path |
-
-## Reviewing shell changes
-
-Run the same checks CI uses:
-
-```sh
-make lint   # bash -n, shellcheck -x, shfmt -d
-make fmt    # rewrite with shfmt (-i 2 -ci)
+```text
+scripts/fetch HTTPS_URL DESTINATION SHA256 [MODE]
 ```
 
-Conventions:
+Adoption stores HOME-relative paths beneath the backup run directory and records
+`adopt<TAB>destination<TAB>backup` in `manifest.tsv`. Source files/directories
+must exist; special destination files are refused. See the
+[environment reference](../docs/reference/environment.md) for path/backup knobs.
 
-- Quote expansions and pass paths explicitly; no `eval` when indirect expansion
-  or a `case` will do.
-- Keep writes inside the boundaries above.
-- Keep functions single-purpose and use `local`/prefixed globals deliberately.
-- Add `# shellcheck source=...` next to `.` includes so ShellCheck follows them.
-- New persistent tests are not allowed in this repository; validation fixtures
-  belong under `/tmp/opencode` and must be removed.
-- Bump a download pin and its SHA-256 together; see the “Pinned downloads”
-  section of the root `README.md`.
+## Explanation: inspection is not application
+
+`install` orchestrates tools, module links, cleanup, and stamps. The state helper
+only reports evidence. Expected-link preflight is useful but does not cover
+every write, missing future generated config, or application runtime behavior.
+The global mise force-link and module-specific download/cache operations are
+outside the shared link helper's adoption contract.
+
+GPG output is generated locally from a tracked template so different computers
+resolve their own Pinentry paths. Keys stay in the real GPG home; linking the
+entire mutable home would expose private state and undermine ownership-safe
+cleanup. See the [Git reference](../git/reference.md#gpg-paths).
+
+Stamps record successful application, not whole-home snapshots. Verified
+downloads establish artifact integrity against the recorded digest, not the
+safety of arbitrary downloaded code. Read the
+[safety explanation](../docs/explanation/safety-and-reproducibility.md) for
+current boundaries and implementation limitations.

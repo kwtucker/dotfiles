@@ -1,35 +1,37 @@
-# COSMIC module
+# COSMIC themes
 
-COSMIC Terminal and COSMIC Desktop theme sources. This module is not in any
-install profile: apply it only on machines with COSMIC Terminal.
+Opt-in COSMIC Terminal color scheme and COSMIC Desktop theme sources. No
+tracked profile includes this module; it does not install COSMIC itself.
 
-```bash
-make cosmic
-# or add `cosmic` to modules.local.mk for ./install / make all
-```
+## How-to install and import
 
-## What is linked
+On a machine with COSMIC installed, run `make cosmic` from the dotfiles root,
+or add `cosmic` to ignored `LOCAL_MODULES` for future installs. Existing foreign
+destinations are refused. Review a conflict before explicitly adopting it with
+`DOTFILES_ADOPT=1 make cosmic`.
 
-- `color_schemes_dark` →
-  `$XDG_CONFIG_HOME/cosmic/com.system76.CosmicTerm/v1/color_schemes_dark`
-- `themes/` → `$XDG_CONFIG_HOME/cosmic/dotfiles-themes`
+In COSMIC Settings → Desktop → Appearance, import the desired Frappé `.ron`
+variant from `$XDG_CONFIG_HOME/cosmic/dotfiles-themes/`. Desktop theme selection
+is a separate UI step; creating links does not activate it automatically.
 
-The first link is the terminal color scheme COSMIC Terminal reads. If a scheme is
-already imported there, move it aside or use `DOTFILES_ADOPT=1 make cosmic` to
-back it up. COSMIC can rewrite this file when schemes are imported or removed in
-the UI; if that happens, re-copy the desired scheme into this module and commit
-the change.
+## Reference
 
-The second link is a stable import location for the source `.ron` themes. The
-active desktop theme itself is deliberately not managed: COSMIC Settings expands
-an imported theme into version-specific config bundles under
-`$XDG_CONFIG_HOME/cosmic/com.system76.CosmicThemeBundle.*`. Import the desired
-Frappé variant once from `$XDG_CONFIG_HOME/cosmic/dotfiles-themes/` in
-COSMIC Settings → Desktop → Appearance.
+| Source | Installed path under `$XDG_CONFIG_HOME/cosmic` |
+| --- | --- |
+| `color_schemes_dark` | `com.system76.CosmicTerm/v1/color_schemes_dark` |
+| `themes/` | `dotfiles-themes` |
 
-## Sources
+`make cosmic.clean` asks the link helper to remove these checkout-owned links.
+It does not delete COSMIC's config tree, active theme bundles, or imported data.
 
-Vendored from <https://github.com/catppuccin/cosmic-desktop> at commit
-`95e81098042dd2102f0b258f6990f886c5759692`, trimmed to the Frappé terminal
-scheme and the two Frappé desktop variants already in use (`flamingo+round` and
-`sky+round`). Upstream is MIT licensed; see [`LICENSE`](./LICENSE).
+Sources are vendored from [catppuccin/cosmic-desktop](https://github.com/catppuccin/cosmic-desktop)
+at commit `95e81098042dd2102f0b258f6990f886c5759692`, limited to the Frappé
+terminal scheme and flamingo/sky round desktop variants. See [LICENSE](LICENSE).
+
+## Explanation
+
+COSMIC owns its mutable configuration tree. The module links source assets,
+not the whole tree or version-specific `com.system76.CosmicThemeBundle.*`
+output. COSMIC can rewrite the scheme file when using its import/remove UI;
+inspect the link and Git diff afterward rather than assuming the tracked
+source remains unchanged.

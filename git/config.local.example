@@ -1,46 +1,41 @@
 # config.local.example — machine-local git config (untracked, gitignored).
 # Set up a new machine:
 #   cp config.local.example config.local
-# then keep ONE environment block below and delete the rest.
+# then set the default identity and enable only the optional blocks you need.
 #
-# Environments, not just "work vs personal": give every machine you own
-# (personal desktop, work laptop, client contract box, macOS, Linux,
-# containers) the block that matches what that machine is for.
+# Every computer can have a default identity, regardless of its owner or purpose.
+# Use additional identities for specific directories, accounts, or hosts when
+# needed. The same pattern applies on macOS, Linux, and in containers.
 #
 # The shared `config` includes this file first, so everything here
 # overrides the shared defaults.
 
-# ── 1. Identity: keep ONE environment, delete the rest ────────────────────
-# Personal machine:
+# ── 1. Default identity ──────────────────────────────────────────────────
+# Use this identity unless a more specific repository/directory override applies:
 [user]
     name = Your Name
-    email = you@personal.example
+    email = you@example.com
 
-# Work machine:
+# Alternative default identity (replace the block above, do not enable both):
 # [user]
 #     name = Your Name
-#     email = you@work.example
+#     email = you@secondary.example
 
-# Client / contract machine (one block per client):
-# [user]
-#     name = Your Name
-#     email = you@client.example
-
-# ── 2. Mixed machine: per-directory environments (optional) ────────────────
-# One machine hosting several environments: map directories to env files.
+# ── 2. Per-directory identities (optional) ────────────────────────────────
+# Map project directories to additional identity files.
 # The [user] block above remains the default for everything else.
 # Env files live next to this one and are gitignored via `git/config.env-*`.
-# [includeIf "gitdir:~/work/"]
-#     path = ~/.config/git/config.env-work
-# [includeIf "gitdir:~/clients/acme/"]
-#     path = ~/.config/git/config.env-acme
+# [includeIf "gitdir:~/projects/secondary/"]
+#     path = ~/.config/git/config.env-secondary
+# [includeIf "gitdir:~/projects/another/"]
+#     path = ~/.config/git/config.env-another
 #
-# ...with e.g. ~/.config/git/config.env-work containing:
+# ...with e.g. ~/.config/git/config.env-secondary containing:
 # [user]
 #     name = Your Name
-#     email = you@work.example
+#     email = you@secondary.example
 # [core]
-#     sshCommand = "ssh -i ~/.ssh/id_work -o IdentitiesOnly=yes"
+#     sshCommand = "ssh -i ~/.ssh/id_secondary -o IdentitiesOnly=yes"
 
 # ── 2b. GitHub identity (remote-URL routed) ────────────────────────────────
 # The shared `config` routes github.com remotes (HTTPS and SSH) to an
@@ -52,24 +47,24 @@
 #     email = you@github.example
 # Keep remote.*.url out of included files — Git disallows it here.
 
-# ── 3. SSH key selection (access, per environment) ─────────────────────────
+# ── 3. SSH key selection (access, per identity) ────────────────────────────
 # Machine-wide key (simplest when there is one key per machine):
 # [core]
-#     sshCommand = "ssh -i ~/.ssh/id_work -o IdentitiesOnly=yes"
+#     sshCommand = "ssh -i ~/.ssh/id_default -o IdentitiesOnly=yes"
 # Per-env keys belong in the env file from section 2.
 # For per-host keys prefer ~/.ssh/config Host blocks instead.
 
-# ── 4. Host rewrites per environment (access, incl. enterprise) ────────────
-# Second GitHub account via a ~/.ssh/config `Host github.com-work` alias:
-# [url "git@github.com-work:"]
+# ── 4. Host rewrites (access, per account or host) ─────────────────────────
+# Additional GitHub account via a ~/.ssh/config `Host github.com-secondary` alias:
+# [url "git@github.com-secondary:"]
 #     insteadOf = https://github.com/
 # GitHub Enterprise (self-hosted):
-# [url "git@ghe.work.example:"]
-#     insteadOf = https://ghe.work.example/
+# [url "git@git.example.com:"]
+#     insteadOf = https://git.example.com/
 # Enterprise with a non-standard SSH port via ~/.ssh/config Host block,
 # then point git at the alias:
 # [url "git@ghe-alias:"]
-#     insteadOf = https://ghe.work.example/
+#     insteadOf = https://git.example.com/
 # Prefer HTTPS + credential manager over the shared SSH rewrite:
 # [url "https://github.com/"]
 #     insteadOf = git@github.com:
@@ -80,9 +75,9 @@
 #     helper = /usr/local/share/gcm-core/git-credential-manager                          # Git Credential Manager
 #     helper = osxkeychain                                                               # macOS
 
-# ── 6. Commit signing (optional, often required at work/enterprise) ────────
+# ── 6. Commit signing (optional; follow account/project policy) ───────────
 # [user]
-#     signingkey = ~/.ssh/id_work.pub
+#     signingkey = ~/.ssh/id_default.pub
 # [gpg]
 #     format = ssh
 # [commit]

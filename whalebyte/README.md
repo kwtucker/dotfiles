@@ -1,170 +1,32 @@
-# whalebyte
+# Whalebyte workspace and vault
 
-Personal, **local-only** module. It manages `~/.whalebyte` (code, notes, and a
-passphrase-protected secrets vault) and installs the `wbs` secrets CLI. It is
-enabled per-machine via `modules.local.mk` (`LOCAL_MODULES = whalebyte`) and is
-intentionally **not** part of the public module set.
+Personal workspace directories and the `wbs` encrypted JSON secrets CLI.
+The module is included in `infra` and `full`; its actual data and secrets remain
+local under `~/.whalebyte`, not in this public checkout.
 
-## Personal CLIs
+- [Create, use, back up, or migrate a vault](how-to.md)
+- [Look up commands, paths, and overrides](reference.md)
+- [Understand encryption and security limits](explanation.md)
 
-Two personal Go CLIs are pinned in `mise.toml` and installed on every profile:
+## How-to install the module
 
-- `temp-ssh-key` — disposable SSH keys for untrusted machines.
-- `vpn` — connects to exactly one of Mullvad or Tailscale at a time; also
-  registered as `wb vpn` in the `wb` aggregator.
+Provision the selected tools and run `make whalebyte` from the dotfiles root.
+It links config and `~/.local/bin/wbs`, creates private workspace/age
+directories, and ensures a plaintext `.env` file exists. It does not initialize
+or overwrite the encrypted vault. Other profiles can add it through ignored
+`LOCAL_MODULES`.
 
-Their source lives in `~/.whalebyte/code/` and is not managed by this module.
+`age`, `age-keygen`, and jq are required for vault operations; the configured
+editor is needed for editing. `make whalebyte.clean` removes the config/helper
+links and module cache, but leaves the workspace, identity, and vault intact.
 
-## Secrets vault (`wbs`)
+## Explanation: personal tools versus personal data
 
-`wbs` stores secrets as JSON in a single [age](https://github.com/FiloSottile/age)
-file (`--passphrase`, scrypt) at `~/.whalebyte/.secret`. The vault is only an
-opaque encrypted blob on disk; plaintext exists only in a `0700` temp directory
-beside the vault while a command runs, and is removed on exit — including on
-error or interruption.
+The `temp-ssh-key` and `vpn` CLIs are shared mise tools installed by every
+profile. Their source projects are not managed by this module. The `wb`
+aggregator registration is likewise separate from the vault's interface.
 
-```
-~/.whalebyte/
-├── .env          # plaintext, shell-sourced (see below)
-├── .secret       # age-encrypted JSON vault  (0600)
-├── code/
-└── ...
-```
-
-### Dependencies
-
-`age` and `jq` come from `mise.toml` (`mise install`, or `./install`). Neovim is
-needed only to edit. `wbs` fails with a clear message if a dependency is missing.
-
-### Setup (first time)
-
-```sh
-# 1. Enable the module locally (once per machine).
-echo 'LOCAL_MODULES = whalebyte' >> modules.local.mk   # if not already present
-make whalebyte                                          # links the module + installs ~/.local/bin/wbs
-# 2. Create the vault and choose a passphrase.
-wbs init
-wbs                                                     # add secrets in Neovim, save, quit
-```
-
-`wbs init` refuses to touch an existing vault. `make whalebyte` never creates or
-overwrites `.secret`.
-
-### Commands
-
-| Command | Purpose |
-| --- | --- |
-| `wbs` / `wbs edit` | Decrypt, edit in Neovim, validate, re-encrypt |
-| `wbs init` | Create a new empty vault (fails if one exists) |
-| `wbs get KEY` | Decrypt and print one value to stdout |
-| `wbs export KEY` | Zsh function: decrypt and export one value into the current shell without printing it |
-| `wbs list` | Decrypt and print key names, sorted (no values) |
-| `wbs validate` | Decrypt and validate the JSON, report the key count |
-| `wbs help` | Usage |
-
-`WHALEBYTE` overrides the vault directory; `WBS_EDITOR` overrides the editor.
-
-### Consuming secrets
-
-Nothing is auto-exported at shell startup. Pull values on demand:
-
-```sh
-wbs export API_KEY
-OTHER_SECRET="$(wbs get OTHER_SECRET)" some-command
-```
-
-`wbs export` is provided by `whalebyte/function.zsh`, which the module links
-into `${XDG_CONFIG_HOME:-$HOME/.config}/whalebyte/` and `.zshrc` sources with
-the rest of the module's `*.zsh` files. The standalone `bin/wbs` cannot change
-its parent shell, so only this wrapper can export a value. In an existing
-terminal that predates the module, load the function once:
-
-```sh
-source "${XDG_CONFIG_HOME:-$HOME/.config}/whalebyte/function.zsh"
-wbs export API_KEY
-```
-
-Each export prompts once to unlock the vault. The value is not printed or
-evaluated as shell code. If retrieval fails, the command returns an error
-without changing the existing variable. All other `wbs` commands pass through
-to the executable unchanged.
-
-The exported value stays in the current shell and is inherited by subsequently
-launched commands, including tests and Copilot CLI, until `unset EXAMPLE` or the
-shell exits. Other terminals and already-running applications do not receive it;
-child processes that inherited it retain their copy until they exit. This keeps
-the secret encrypted on disk, but exposes it in process memory and the
-environment while it is in use.
-
-### How it works
-
-1. Decrypt `.secret` into `$WHALEBYTE/.wbs.XXXXXX/plain.json` (`0600`).
-2. Open Neovim with swap/backup/undo/shada disabled — `-n -i NONE` plus a
-   post-load `set nobackup nowritebackup noundofile noswapfile` that overrides
-   `undofile = true` in the shared nvim config.
-3. Validate the edited JSON with `jq -e .`.
-4. Encrypt to a temp file, `chmod 600`, then atomically `mv` it over the vault.
-5. Remove the temp directory via an `EXIT`/`INT`/`TERM` trap.
-
-Any failure — wrong passphrase, invalid JSON, editor error, Ctrl-C — aborts
-before step 4, so the last valid vault is always intact.
-
-### Recovery
-
-- **Vault lost, passphrase known:** restore a backup of `.secret` (the encrypted
-  file is safe to keep in normal backups/cloud storage).
-- **Passphrase lost:** the data is **unrecoverable**. There is no recovery key,
-  no keyfile, and nothing stored in the repository. Back up the passphrase.
-- **Vault corrupt / wrong format:** `wbs validate` reports it; nothing is
-  overwritten until a decrypt → edit → validate → encrypt cycle succeeds.
-
-### Troubleshooting
-
-| Symptom | Cause / fix |
-| --- | --- |
-| `missing dependency 'age'` | `mise install` (or `./install`) so `~/.local/share/mise/shims` is on PATH |
-| `incorrect passphrase` | Wrong passphrase; the vault is unchanged |
-| `vault is not valid JSON` | The vault (or your edit) isn't JSON — `wbs` refuses to encrypt invalid content |
-| Edited content rejected | Fix the JSON; answer `y` to re-open or `n` to abort (vault unchanged) |
-| `wbs: command not found` | Run `make whalebyte` to link `~/.local/bin/wbs`; ensure `~/.local/bin` is on PATH |
-| Left the passphrase blank at init | age generates a random passphrase and prints it **once** — save it or the vault is unrecoverable |
-
-### `.env` (not encrypted)
-
-`~/.whalebyte/.env` remains plaintext and is sourced by `.zshrc`. It is a
-separate, non-secret convenience channel; the encrypted vault replaces only the
-old `.secret` file.
-
-### Security limitations
-
-- Secrets are protected **at rest**. While a command runs, plaintext exists in
-  memory and in a private temp file; anyone with privileged access to the machine
-  (root, monitoring/EDR agents) can observe it. Secrets that must stay hidden
-  from the device owner should not live on the device at all.
-- `wbs get KEY` prints a secret to stdout — don't redirect it into logs, shell
-  history, or the repository.
-- Deleting a plaintext file is not a secure erase (SSD wear-levelling, APFS
-  snapshots, Time Machine, backups).
-
-### Migrating from a plaintext `.secret`
-
-The old `.secret` was shell assignments (`export KEY="value"`). To move it in:
-
-```sh
-cp ~/.whalebyte/.secret ~/.whalebyte/.secret.bak   # keep a backup until verified
-wbs init
-wbs                                                # add the keys as JSON, e.g. {"KEY":"value"}
-wbs get KEY                                        # verify
-rm ~/.whalebyte/.secret.bak                        # then remove the plaintext copy
-```
-
-The vault stores a JSON object of string keys → values, e.g.:
-
-```json
-{
-  "EXAMPLE_ID": "replace-me",
-  "EXAMPLE_SECRET": "replace-me"
-}
-```
-
-See `vault.example.json` for the shape.
+The current vault is encrypted to an age X25519 recipient. Its private identity
+is itself passphrase-encrypted. This differs from the older passphrase-only
+vault format, which has a deliberate migration command. Backing up the vault
+alone is insufficient; the matching identity and passphrase are also required.

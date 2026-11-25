@@ -1,12 +1,16 @@
 # Evaluate the Go agent setup
 
+This is a how-to guide for maintainers, linked from the
+[agents README](README.md). It is not a tutorial or proof that the default
+configuration improves every model's output.
+
 Instruction discovery can be checked; consistently better generated code still
 needs evaluation on representative tasks. Do not equate installation checks with
 LLM quality evaluation, or a model's self-assessment with independent verification.
 Keep any validation scripts, test fixtures, and scratch modules temporary and
 outside this dotfiles checkout; remove them afterward. Do not add a test suite here.
 
-## Discovery smoke check
+## How-to check discovery
 
 - Install with `make copilot` (or `make agents` for shared guidance only).
 - Start a fresh Copilot CLI session and inspect `/instructions` and `/skills list`.
@@ -19,7 +23,7 @@ outside this dotfiles checkout; remove them afterward. Do not add a test suite h
   documented; verify instruction behavior in the installed app rather than assuming
   every CLI preference or instruction source applies to Desktop.
 
-## Representative task evaluation
+## How-to evaluate representative tasks
 
 Use a disposable checkout or a scratch Go module, never a production environment.
 Obtain permission before running model sessions or tools that incur cost. Keep task
