@@ -17,9 +17,6 @@ shape = "Block"
 [debug]
 render_timer = false
 
-[env]
-TERM = "xterm-256color"
-
 [font]
 size = 15.0
 
@@ -38,56 +35,6 @@ style = "Italic"
 [font.normal]
 family = "JetBrainsMono Nerd Font"
 style = "Regular"
-
-[[keyboard.bindings]]
-chars = "\u0000c"
-key = "T"
-mods = "Command"
-
-[[keyboard.bindings]]
-chars = "\u0000-"
-key = "S"
-mods = "Command"
-
-[[keyboard.bindings]]
-chars = "\u0000\\"
-key = "S"
-mods = "Command|Shift"
-
-[[keyboard.bindings]]
-chars = "\u0000h"
-key = "H"
-mods = "Command"
-
-[[keyboard.bindings]]
-chars = "\u0000j"
-key = "J"
-mods = "Command"
-
-[[keyboard.bindings]]
-chars = "\u0000k"
-key = "K"
-mods = "Command"
-
-[[keyboard.bindings]]
-chars = "\u0000l"
-key = "L"
-mods = "Command"
-
-[[keyboard.bindings]]
-chars = "\u0000x"
-key = "X"
-mods = "Command"
-
-[[keyboard.bindings]]
-chars = "\u0000z"
-key = "Z"
-mods = "Command"
-
-[[keyboard.bindings]]
-chars = "\u0000,"
-key = "Comma"
-mods = "Command"
 
 [[keyboard.bindings]]
 action = "SpawnNewInstance"
@@ -158,12 +105,6 @@ multiplier = 10
 [selection]
 save_to_clipboard = true
 semantic_escape_chars = ",│`|:\"' ()[]{}<>"
-
-[terminal]
-shell = {
-  args = ["-i", "-c", "tm; exec zsh"],
-  program = "/bin/zsh",
-}
 
 [window]
 decorations = "full"
