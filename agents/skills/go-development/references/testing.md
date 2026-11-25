@@ -13,7 +13,10 @@ Avoid importing a new assertion/mocking framework just for the current task.
   for unrelated scenarios. Include inputs, expected results, and expected errors.
 - Check meaningful error identity/type with `errors.Is`/`errors.As`. Compare exact
   error text only when that text is part of the contract. Failure messages should
-  identify inputs, actual results, and expected results.
+  identify inputs, actual results, and expected results, in Go's conventional
+  order: `Func(input) = got, want want`.
+- Call `t.Helper()` first in assertion helpers so failures report the caller's
+  line.
 - Allocate mutable fixtures per case. Use `t.TempDir`, `t.Cleanup`, `httptest`, and
   small fakes at real boundaries. Make cleanup and restoration reliable on failure.
 - Do not add `t.Parallel` mechanically: shared process state, environment variables,
