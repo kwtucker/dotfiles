@@ -62,4 +62,10 @@ done
 # sops config (env/paths) loaded via sops module if present
 [ -f ${XDG_CONFIG_HOME}/sops/env.zsh ] && source ${XDG_CONFIG_HOME}/sops/env.zsh
 
+# Automatically attach to main tmux session
+if [[ -o interactive && -z "$TMUX" ]] && command -v tmux >/dev/null 2>&1; then
+  tmux has-session -t '=main' 2>/dev/null || tmux new-session -d -s main
+  tmux attach-session -t '=main'
+fi
+
 unset config_files
