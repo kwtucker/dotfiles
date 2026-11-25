@@ -72,6 +72,13 @@ build_expected_links() {
 
     # Module-specific home-level links.
     case "$__module" in
+      git)
+        # GPG setup is optional until the mise tools and generated config exist.
+        if [ -f "$DOTFILES_ROOT/git/gpg-agent.generated.conf" ]; then
+          add_link "${GNUPGHOME:-$HOME/.gnupg}/gpg-agent.conf" \
+            "$DOTFILES_ROOT/git/gpg-agent.generated.conf"
+        fi
+        ;;
       zsh)
         add_link "$HOME/.zshenv" "$DOTFILES_ROOT/zsh/zshenv"
         ;;

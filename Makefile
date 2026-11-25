@@ -56,7 +56,7 @@ TARGETS := $(sort $(ALL_MODULES) $(MODULES))
 include tools.mk
 
 # Shell sources checked by `make lint`. `install` has no .sh suffix.
-SHELL_SCRIPTS := install scripts/state scripts/fetch scripts/prune-links scripts/bootstrap-mise.sh $(wildcard scripts/lib/*.sh)
+SHELL_SCRIPTS := install scripts/state scripts/fetch scripts/prune-links scripts/bootstrap-mise.sh $(wildcard scripts/lib/*.sh) bin/gpg-key
 SHELLCHECK ?= $(shell mise which shellcheck 2>/dev/null || command -v shellcheck 2>/dev/null)
 SHFMT ?= $(shell mise which shfmt 2>/dev/null || command -v shfmt 2>/dev/null)
 SHFMT_FLAGS := -i 2 -ci

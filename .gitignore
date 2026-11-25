@@ -18,6 +18,8 @@ nvim/autoload
 git/config.local
 git/config.env-*
 git/config.github
+git/gpg-agent.local.conf
+git/gpg-agent.generated.conf*
 
 Brewfile.lock.json
 Brewfile.linux.lock.json

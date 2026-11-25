@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# Small, platform-neutral helpers for GPG commit-signing keys.
+set -euo pipefail
+
+die() {
+  printf 'gpg-key: %s\n' "$*" >&2
+  exit 1
+}
+
+usage() {
+  cat <<'EOF'
+Usage: gpg-key generate
+       gpg-key list
+       gpg-key copy KEY_ID_OR_FINGERPRINT
+
+generate  Ask for name/email and create an Ed25519 signing key, valid for 1 year.
+list      Show signing-key IDs, fingerprints, and identities.
+copy      Export exactly one public key in ASCII armor and copy it to the
+          clipboard (pbcopy, wl-copy, or xclip), or print it if none is available.
+
+Passphrases are handled by GPG/Pinentry, never by this script.
+Uploading keys and enabling commit signing are separate steps.
+EOF
+}
+
+generate() {
+  [ -t 0 ] || die 'generation requires an interactive terminal'
+  local name email answer
+  printf 'Name: '
+  read -r name || die 'name entry cancelled'
+  printf 'Email (verified with your signing platform): '
+  read -r email || die 'email entry cancelled'
+  [ -n "$name" ] && [ -n "$email" ] || die 'name and email must not be empty'
+  case "$name$email" in
+    *'<'* | *'>'*) die 'enter name and email without angle brackets' ;;
+  esac
+  GPG_TTY="$(tty)"
+  export GPG_TTY
+  printf 'Ed25519 signing-only key for %s <%s>, valid for 1 year.\n' "$name" "$email"
+  printf 'Create this key? [y/N]: '
+  read -r answer || die 'confirmation cancelled'
+  case "$answer" in
+    y | Y | yes | YES) ;;
+    *)
+      printf 'Cancelled; no key generated.\n'
+      return
+      ;;
+  esac
+  gpg --quick-generate-key "$name <$email>" ed25519 sign 1y
+  printf '\nUse gpg-key list to find the key ID, then gpg-key copy KEY_ID.\n'
+}
+
+copy_key() {
+  local selector="$1" fingerprints public_key
+  case "$selector" in
+    '' | *[![:xdigit:]]*) die 'use a hexadecimal key ID or fingerprint from gpg-key list' ;;
+  esac
+  fingerprints="$(gpg --batch --with-colons --fingerprint --list-keys -- "$selector" |
+    awk -F: '$1 == "pub" { primary = 1; next } primary && $1 == "fpr" { print $10; primary = 0 }')" ||
+    die 'could not find the public key'
+  [ -n "$fingerprints" ] || die 'no matching public key'
+  case "$fingerprints" in
+    *$'\n'*) die 'key ID is ambiguous; use a full fingerprint from gpg-key list' ;;
+  esac
+  public_key="$(gpg --batch --armor --export "$fingerprints")" || die 'public-key export failed'
+  case "$public_key" in
+    '-----BEGIN PGP PUBLIC KEY BLOCK-----'*) ;;
+    *) die 'GPG did not return an armored public key' ;;
+  esac
+
+  if command -v pbcopy >/dev/null 2>&1; then
+    printf '%s\n' "$public_key" | pbcopy || die 'pbcopy failed'
+  elif [ -n "${WAYLAND_DISPLAY:-}" ] && command -v wl-copy >/dev/null 2>&1; then
+    printf '%s\n' "$public_key" | wl-copy || die 'wl-copy failed'
+  elif [ -n "${DISPLAY:-}" ] && command -v xclip >/dev/null 2>&1; then
+    printf '%s\n' "$public_key" | xclip -selection clipboard || die 'xclip failed'
+  else
+    printf 'gpg-key: no clipboard tool available; printing public key instead.\n' >&2
+    printf '%s\n' "$public_key"
+    return
+  fi
+  printf 'gpg-key: public key %s copied to clipboard.\n' "$fingerprints" >&2
+}
+
+case "${1:-}" in
+  -h | --help | help | '')
+    usage
+    exit 0
+    ;;
+  generate | list)
+    [ "$#" -eq 1 ] || die 'unexpected arguments; see gpg-key --help'
+    ;;
+  copy)
+    [ "$#" -eq 2 ] || die 'copy requires exactly one key ID or fingerprint'
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac
+command -v gpg >/dev/null 2>&1 || die 'GPG is missing; install conda:gnupg through mise'
+
+case "$1" in
+  generate) generate ;;
+  list) gpg --list-secret-keys --keyid-format=long --with-fingerprint ;;
+  copy) copy_key "$2" ;;
+esac

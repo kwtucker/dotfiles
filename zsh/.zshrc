@@ -13,6 +13,11 @@ if command -v mise >/dev/null 2>&1; then
   eval "$(mise activate zsh)"
 fi
 
+# Pinentry needs the current terminal for GPG passphrase prompts.
+if [[ -o interactive && -t 0 ]]; then
+  export GPG_TTY="$(tty)"
+fi
+
 # Load env files first (PATH, exports, env vars)
 typeset config_files
 config_files=($XDG_CONFIG_HOME/*/*.zsh)

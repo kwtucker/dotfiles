@@ -24,7 +24,7 @@ install:
 			continue; \
 		fi; \
 		found=1; \
-		$(DOTFILES_LINK) link_file "$$script" "$(BIN_DIR)/$$name"; \
+		$(DOTFILES_LINK) link_file "$$script" "$(BIN_DIR)/$$name" || exit $$?; \
 	done; \
 	if [ "$$found" -eq 0 ]; then \
 		echo "No executable scripts in $(SCRIPT_DIR); nothing to link."; \

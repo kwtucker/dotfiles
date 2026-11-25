@@ -11,10 +11,11 @@ WT_VERSION ?= v0.2.2
 WT_URL ?= https://codeberg.org/tuck/wt/raw/tag/$(WT_VERSION)/wt.sh
 WT_SHA256 ?= abb08d38ffa8f8507abba3e0db68970356749bd3ec9123b4de65e0720ef0dbac
 WT_BIN ?= $(HOME)/.local/bin/wt
+GPG_HOME := $(if $(GNUPGHOME),$(GNUPGHOME),$(HOME)/.gnupg)
 
-.PHONY: install clean upgrade completions
+.PHONY: install clean upgrade completions gpg-install gpg-clean
 
-install: .ensure.xdg.git
+install: .ensure.xdg.git gpg-install
 	@echo "Installing $(MODULE_NAME) dotfiles..."
 	@$(DOTFILES_LINK) link_dir "$(CURDIR)" "$(XDG_CONFIG_HOME)/$(MODULE_NAME)"
 	@if [ ! -f "$(XDG_CONFIG_HOME)/$(MODULE_NAME)/config.local" ]; then \
@@ -30,6 +31,12 @@ install: .ensure.xdg.git
 	fi
 	@echo "✅ $(MODULE_NAME) installed."
 
+gpg-install:
+	@HOME="$(HOME)" GNUPGHOME="$(GPG_HOME)" bash "$(DOTFILES_ROOT_DIR)/scripts/lib/gpg.sh" install
+
+gpg-clean:
+	@HOME="$(HOME)" GNUPGHOME="$(GPG_HOME)" bash "$(DOTFILES_ROOT_DIR)/scripts/lib/gpg.sh" clean
+
 upgrade:
 	@echo "Upgrading $(MODULE_NAME) tools..."
 	@mkdir -p $(HOME)/.local/bin
@@ -43,7 +50,7 @@ completions:
 	@cp $(CURDIR)/completions/_wt $(ZSH_COMPLETIONS_DIR)/_wt
 	@echo "✅ wt completions installed."
 
-clean: .remove.xdg.git
+clean: .remove.xdg.git gpg-clean
 	@echo "Cleaning $(MODULE_NAME) data..."
 	@rm -f "$(WT_BIN)" "$(ZSH_COMPLETIONS_DIR)/_wt"
 	@echo "✅ $(MODULE_NAME) cleaned."
