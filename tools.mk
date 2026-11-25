@@ -35,7 +35,7 @@ TOOLS_zsh := aqua:starship/starship
 TOOLS_alacritty :=
 TOOLS_fzf := github:junegunn/fzf aqua:sharkdp/fd aqua:sharkdp/bat
 TOOLS_tmux := tmux
-TOOLS_git := aqua:jesseduffield/lazygit aqua:cli/cli
+TOOLS_git := aqua:jesseduffield/lazygit aqua:cli/cli conda:gnupg conda:pinentry
 TOOLS_tig := conda:tig
 TOOLS_golang := \
 	go \

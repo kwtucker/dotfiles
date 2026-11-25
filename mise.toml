@@ -47,6 +47,9 @@ shfmt = "3.14.1"
 # Register the bundled renderers so the conda installation supports PNG output.
 "conda:graphviz" = { version = "14.1.2", postinstall = "dot -c" }
 "aqua:cli/cli" = "2.102.0"
+# GnuPG and terminal passphrase prompts for Git commit signing.
+"conda:gnupg" = "2.5.24"
+"conda:pinentry" = "1.3.3"
 "aqua:starship/starship" = "1.26.0"
 "aqua:docker/cli" = "29.9.0"
 "cargo:stylua" = "2.5.2"
