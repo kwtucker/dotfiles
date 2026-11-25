@@ -60,6 +60,11 @@ for file in ${${config_files:#*/env.zsh}:#*/completion.zsh}; do
   source "$file"
 done
 
+# Fresh login shells may not find Starship until path.zsh adds the mise shims.
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi
+
 # Local overrides
 [ -f ${XDG_CONFIG_HOME}/zsh/local ] && source ${XDG_CONFIG_HOME}/zsh/local
 # ${WHALEBYTE}/.secret is an age-encrypted vault (see `wbs`) — never sourced.

@@ -52,8 +52,33 @@ present in this checkout. External image projects must pin their own inputs.
 | `<leader>gd` / `:CodeDiff` | Live diff review |
 | LSP `gd` in Markdown | Marksman link/heading navigation when the server is available |
 
-Gitsigns' standard hunk mappings remain provided by LazyVim. VS Code uses
-LazyVim compatibility plus `lua/config/vscode.lua`, not a separate plugin stack.
+Gitsigns' standard hunk mappings remain provided by LazyVim in terminal Neovim.
+
+### VS Code
+
+VSCode Neovim uses the same `init.lua` through the installed config link. Leave
+`vscode-neovim.neovimClean` off and the custom init path and `NVIM_APPNAME` settings
+unset for the default config location. If the extension cannot find `nvim`, set
+the platform-specific `vscode-neovim.neovimExecutablePaths` setting in VS Code
+User Settings to the full executable path.
+
+When `vim.g.vscode` is set, the config loads shared editing options and
+`lua/config/vscode.lua` without starting LazyVim. VS Code handles the UI,
+completion, formatting, and language features. The custom mappings are
+`<leader>w` (save), `<Esc>` (clear search), `<leader>e` (toggle the primary
+sidebar, like `Cmd+B` on macOS), `<leader>ff` (Quick Open), `<leader>/` or
+`<leader>fg` (Find in Files), `gd` (definition), and `gr` (references).
+Use `<leader>-` to split below and `<leader><Bar>` (`Space`, `|`) to split right.
+In Normal mode, `Ctrl+h` moves to the left editor split or, from the leftmost
+split, to the visible left sidebar (the file tree when Explorer is active).
+`Ctrl+j/k/l` focuses the editor split below, above, or to the right.
+While the Explorer file tree has focus, VS Code handles `Ctrl+l` directly to
+return to the active editor. Use the binding in `vscode-keybindings.json` in
+**Preferences: Open Keyboard Shortcuts (JSON)** for your VS Code profile.
+If you already have bindings, merge the entry into the existing array.
+
+Run **Neovim: Restart Extension** after changing the config. In a VS Code editor,
+run `:echo $MYVIMRC` to check the loaded init and try `<leader>ff` (Space, `f`, `f`).
 
 ## Maintenance commands
 

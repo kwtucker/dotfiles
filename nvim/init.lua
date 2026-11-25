@@ -1,5 +1,11 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
+if vim.g.vscode then
+  require("config.editing")
+  require("config.vscode").setup()
+  return
+end
+
 -- bootstrap lazy.nvim, LazyVim and your plugins
 require("config.lazy")
