@@ -1,13 +1,9 @@
-local function default_adapter()
-  return vim.fn.has("mac") == 1 and "copilot_acp" or "opencode"
-end
-
 local function chat_adapter()
   local configured = vim.env.CODECOMPANION_ADAPTER
   if configured == "copilot_acp" or configured == "opencode" then
     return configured
   end
-  return default_adapter()
+  return "opencode"
 end
 
 local function add_buffer_context()

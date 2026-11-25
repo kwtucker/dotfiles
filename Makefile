@@ -162,6 +162,9 @@ $(TARGETS):
 # Install shared skills once, before either client (including parallel installs).
 opencode copilot: agents
 
+# Provision/configure the default ACP backend before the editor, even on demand.
+nvim: opencode
+
 $(CLEAN):
 	@echo "▶ $(basename $@) (clean)"
 	@$(MAKE) -C $(basename $@) clean

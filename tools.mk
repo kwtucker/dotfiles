@@ -55,8 +55,10 @@ TOOLS_terraform := \
 TOOLS_docker := aqua:docker/cli
 TOOLS_bat := aqua:sharkdp/bat
 TOOLS_ripgrep := aqua:BurntSushi/ripgrep
+# The default ACP backend is also owned here for editor-only tool provisioning.
 TOOLS_nvim := \
 	aqua:neovim/neovim \
+	http:opencode \
 	node \
 	python \
 	uv \

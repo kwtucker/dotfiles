@@ -8,8 +8,8 @@
 # PROFILE selection precedence is documented in the root Makefile:
 #   PROFILE=<name> > DOTFILES_PROFILE > profile.local > full
 
-MINIMAL_MODULES := bin zsh tmux git tig fzf nvim agents
-DEV_MODULES := $(MINIMAL_MODULES) golang bat ripgrep rust docker opencode
+MINIMAL_MODULES := bin zsh tmux git tig fzf nvim agents opencode
+DEV_MODULES := $(MINIMAL_MODULES) golang bat ripgrep rust docker
 INFRA_MODULES := $(DEV_MODULES) kubernetes helm terraform psql sops whalebyte
 WORKSTATION_MODULES := $(DEV_MODULES) alacritty fonts
 FULL_MODULES := \
@@ -18,7 +18,7 @@ FULL_MODULES := \
 
 PROFILE_NAMES := minimal dev infra workstation full
 
-PROFILE_DESCRIPTION_minimal := Shell, git, tmux, tig, fzf, editor, agents
+PROFILE_DESCRIPTION_minimal := Shell, git, tmux, tig, fzf, editor, agents, OpenCode
 PROFILE_DESCRIPTION_dev := Minimal plus common language and development tools
 PROFILE_DESCRIPTION_infra := Dev plus Kubernetes, Terraform, Docker, psql, secrets
 PROFILE_DESCRIPTION_workstation := Dev plus Alacritty and Nerd Fonts
