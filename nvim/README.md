@@ -2,8 +2,9 @@
 
 LazyVim with Blink/native snippets, Catppuccin Frappé, Neo-tree, and fzf-lua.
 Telescope remains for the Terraform extensions, not general navigation. Git work
-uses LazyGit, agents/the terminal, tig, and inline Gitsigns; there is no Neogit,
-Fugitive, Ollama integration, debugger, or test-runner plugin.
+uses LazyGit, CodeDiff, agents/the terminal, tig, and inline Gitsigns;
+CodeCompanion provides the only in-editor AI chat. There is no Neogit, Fugitive,
+Ollama integration, debugger, or test-runner plugin.
 
 ## Installation and maintenance
 
@@ -54,6 +55,46 @@ Neovim executable for these targets. Do not run maintenance inside an editing se
 - Laptop and image Neovim, gopls, golangci-lint, and fzf pins are aligned; other
   image tools remain independently pinned to keep this change focused.
 
+## AI chat
+
+CodeCompanion uses ACP agents, selected by OS when the plugin loads:
+
+| Host | Default chat adapter | Built-in agent command |
+| --- | --- | --- |
+| macOS | `copilot_acp` | `copilot --acp --stdio` |
+| Linux | `opencode` | `opencode acp` |
+
+Override the default with `CODECOMPANION_ADAPTER=opencode` or
+`CODECOMPANION_ADAPTER=copilot_acp` in the shell, or set it in ignored
+`zsh/local`. For a single chat, use `:CodeCompanionChat adapter=<name>`. The
+chat also supports `ga` to change adapter.
+
+Authentication happens outside Neovim. For `copilot_acp`, run `copilot login`
+(or `/login` inside `copilot`); Copilot CLI needs an active Copilot plan. For
+`opencode`, run `make opencode` from the dotfiles root to link the shared
+config, then `opencode auth login` for the provider you use. OpenCode ACP uses
+the project directory's config, models, agents, instructions, and MCP servers,
+and starts a private session rather than the shared service.
+
+For smoke testing, start Neovim from a project directory and run
+`:checkhealth codecompanion`, then `<leader>aa` to open the chat. A missing CLI
+produces an error naming the executable that must be installed.
+
+| Mapping | Action |
+| --- | --- |
+| `<leader>aa` | Toggle/show/hide the last chat |
+| `<leader>ac` | Add `#{buffer}` context from the current buffer |
+| Visual `<leader>as` | Add the selection to the chat |
+| `<CR>` / `<C-s>` | Send the prompt from the chat |
+| `<C-c>` | Close the chat buffer |
+| `?` | Show all chat-buffer mappings |
+
+`:CodeCompanionChat <prompt>` opens a chat and sends the prompt. Save a file
+before adding it as context: ACP agents read buffers from disk. Inline, CLI,
+and background interactions are intentionally not configured; they would need
+a separate HTTP adapter and a new billing path. CodeCompanion's own tools are
+not offered to ACP agents because those agents use their own tools.
+
 ## Intentional preferences
 
 - Saving is explicit (`autowrite = false`). YAML and Markdown do not autoformat.
@@ -64,6 +105,10 @@ Neovim executable for these targets. Do not run maintenance inside an editing se
 - `<leader>gb` selects branches with fzf-lua; `<leader>gB` shows Gitsigns line blame.
   LazyVim's Gitsigns hunk mappings remain available. `<leader>gg` opens LazyGit at
   the project root; `<leader>gG` opens it in the current working directory.
+  `<leader>gd` (or `:CodeDiff`) opens CodeDiff for live Git diff review, taking
+  over the fzf-lua git-diff binding; LazyGit stays on `<leader>gg`/`gG`.
+  Moving through the explorer with `j`/`k` updates the diff under the cursor
+  while focus stays in the file list.
 - VS Code uses LazyVim's built-in compatibility extra, followed by our small set
   of editor-command mappings. It does not initialize a separate plugin stack.
 

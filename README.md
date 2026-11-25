@@ -120,7 +120,7 @@ every installed module is available in every terminal.
 | `dev` | `minimal` + `golang bat ripgrep rust docker opencode` |
 | `infra` | `dev` + `kubernetes helm terraform psql sops whalebyte` |
 | `workstation` | `dev` + `alacritty fonts` |
-| `full` | `infra` + `workstation` (default); `copilot` stays opt-in |
+| `full` | `infra` + `workstation` (default); `copilot` and `cosmic` stay opt-in |
 
 Selection precedence, highest first:
 
@@ -211,6 +211,7 @@ Linux and macOS (Apple Silicon). Destination conflicts are refused, not replaced
 | `fzf/` | fzf config and shell integration |
 | `nvim/` | Neovim / LazyVim |
 | `alacritty/` | Alacritty terminal |
+| `cosmic/` | COSMIC Terminal scheme and desktop theme sources |
 | `fonts/` | Powerline + JetBrains Mono Nerd Font |
 | `golang/` | Go env; gofumpt, goimports, govulncheck |
 | `kubernetes/` | kubectl aliases and completions |
@@ -229,11 +230,29 @@ Linux and macOS (Apple Silicon). Destination conflicts are refused, not replaced
 
 See [`nvim/README.md`](./nvim/README.md) for editor setup and maintenance.
 
+### Terminal modules
+
+`alacritty/` remains part of the `workstation` and `full` profiles. `cosmic/`
+is opt-in because it only applies to machines using COSMIC Terminal and COSMIC
+Desktop:
+
+```bash
+make cosmic
+```
+
+COSMIC Desktop owns its config tree, so the `cosmic` module links only the
+COSMIC Terminal color-scheme file and a stable `dotfiles-themes/` directory.
+Import the desired Frappé desktop theme from that directory once in COSMIC
+Settings; COSMIC's generated theme bundles and active theme selection stay
+under COSMIC's control. See [`cosmic/README.md`](./cosmic/README.md) for the
+link layout and conflict handling.
+
 ### AI agents
 
 OpenCode and Copilot share [engineering instructions](./agents/instructions/engineering.md)
 and [skills](./agents/skills/) from `agents/`; client-specific settings stay in
-`opencode/` and `copilot/`.
+`opencode/` and `copilot/`. Neovim uses CodeCompanion's ACP chat with
+`copilot_acp` on macOS and `opencode` on Linux; see [`nvim/README.md`](./nvim/README.md#ai-chat).
 
 ```bash
 make agents                  # shared instructions and skills
@@ -450,6 +469,7 @@ Completion paths follow the `XDG_DATA_HOME` of the Make run; an inherited
 `ZSH_COMPLETIONS_DIR` is ignored so a temporary-home install cannot reach another
 home. Pass `ZSH_COMPLETIONS_DIR=/path` on the Make command line to override.
 
-`copilot` is optional: install with `make copilot`, or add it to `LOCAL_MODULES` in
-`modules.local.mk` to include it in `make all`. Additional opt-in modules go in
-`OPTIONAL_MODULES` in the root `Makefile`.
+Modules outside the active profile remain available: install one with
+`make <module>`, or add it to `LOCAL_MODULES` in `modules.local.mk` to include
+it in `make all`. Any module directory with a `Makefile` is discovered
+automatically; no separate optional-module list is needed.
