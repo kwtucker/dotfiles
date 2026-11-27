@@ -76,7 +76,6 @@ TOOLS_whalebyte := aqua:FiloSottile/age aqua:jqlang/jq
 # Modules outside the active profile still declare their tools here so an
 # explicit `make tools.install MODULES=<module>` includes them.
 TOOLS_copilot := aqua:github/copilot-cli
-TOOLS_cosmic :=
 
 # ── Profile extras ────────────────────────────────────────────────────────────
 # Install-scoped tools that do not belong to a configuration module. They are

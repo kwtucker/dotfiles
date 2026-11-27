@@ -52,14 +52,6 @@ build_expected_links() {
           add_link "$HOME/.agents/$__path" "$DOTFILES_ROOT/agents/$__path"
         done
         ;;
-      cosmic)
-        # COSMIC owns ~/.config/cosmic, so only the theme-scheme file and a
-        # stable source-themes directory are linked inside its config tree.
-        __cosmic_dir="$XDG_CONFIG_HOME/cosmic"
-        add_link "$__cosmic_dir/com.system76.CosmicTerm/v1/color_schemes_dark" \
-          "$DOTFILES_ROOT/cosmic/color_schemes_dark"
-        add_link "$__cosmic_dir/dotfiles-themes" "$DOTFILES_ROOT/cosmic/themes"
-        ;;
       copilot)
         for __file in settings.json mcp-config.json instructions/engineering.instructions.md; do
           add_link "$COPILOT_HOME/$__file" "$DOTFILES_ROOT/copilot/$__file"
