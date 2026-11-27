@@ -7,6 +7,10 @@ SHELL := /bin/bash
 # explicit -j on the command line is respected.
 NUM_CPUS := $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
 OUTPUT_SYNC := $(shell $(MAKE) --version 2>/dev/null | head -1 | grep -qE 'GNU Make ([4-9]|1[0-9])\.' && echo --output-sync=recurse)
+# Interactive diagnostics are watched live; don't buffer their whole recipe.
+ifneq ($(filter outdated upgrade.bump,$(MAKECMDGOALS)),)
+OUTPUT_SYNC :=
+endif
 JOBS := $(if $(filter -j% --jobs%,$(MAKEFLAGS)),,-j$(NUM_CPUS))
 MAKEFLAGS += $(JOBS) $(OUTPUT_SYNC) --no-print-directory
 
@@ -149,6 +153,14 @@ UPGRADE := $(addsuffix .upgrade,$(TARGETS))
 # Modules with a `completions` target — completions are refreshed after tool upgrades.
 COMPLETION_MODULES := kubernetes helm fzf ripgrep docker golang rust terraform zsh git
 
+# Platforms recorded in mise.lock. Bump re-locks these explicitly so a change
+# made on one host stays valid on the others.
+LOCK_PLATFORMS := linux-x64,linux-arm64,macos-x64,macos-arm64
+
+# mise omits table headers when stdout is not a TTY; inject aligned ones.
+OUTDATED_HEADER := printf '%-38s%-10s%-9s%-9s%s\n' name requested current latest source
+OUTDATED_BUMP_HEADER := printf '%-38s%-10s%-9s%-9s%-8s%s\n' name requested current bump latest source
+
 $(TARGETS):
 	@echo "▶ $@"
 	@$(MAKE) -C $@ install
@@ -201,10 +213,28 @@ update: install ## Update an existing machine (alias for `install`)
 clean.all: $(CLEAN) ## Clean all selected modules
 	@rmdir "$(ZSH_COMPLETIONS_DIR)" "$(XDG_DATA_HOME)/zsh" 2>/dev/null || true
 
-outdated: ## Show outdated tools (no changes)
-	@mise outdated || true
+outdated: ## Show outdated tools and bump candidates (no changes)
+	@echo "== Within pinned ranges =="
+	@out="$$(mise outdated 2>&1 || true)"; \
+	printf '%s\n' "$$out" | sed -n '/^mise WARN/p'; \
+	if [ -z "$$out" ] || grep -q 'All tools are up to date' <<<"$$out"; then \
+		printf '%s\n' "$$out" | sed -n '/^mise WARN/!p'; \
+	else \
+		$(OUTDATED_HEADER); \
+		printf '%s\n' "$$out" | sed -n '/^mise WARN/!p'; \
+	fi
 	@echo ""
-	@echo "Tip: 'mise outdated --bump' shows versions outside pinned ranges (bumps stay manual)."
+	@echo "== Outside pinned ranges (bump candidates) =="
+	@out="$$(mise outdated --bump 2>&1 || true)"; \
+	printf '%s\n' "$$out" | sed -n '/^mise WARN/p'; \
+	if [ -z "$$out" ] || grep -q 'All tools are up to date' <<<"$$out"; then \
+		printf '%s\n' "$$out" | sed -n '/^mise WARN/!p'; \
+	else \
+		$(OUTDATED_BUMP_HEADER); \
+		printf '%s\n' "$$out" | sed -n '/^mise WARN/!p'; \
+	fi
+	@echo ""
+	@echo "Bumps are opt-in: 'make upgrade.bump' (not part of 'make upgrade.all')."
 
 doctor: ## Diagnose install state (read-only; offline unless ARGS=--online)
 	@scripts/state doctor $(ARGS)
@@ -253,6 +283,39 @@ upgrade.tools: ## Upgrade mise tools within pinned ranges + refresh lockfile/com
 	done
 	@$(MAKE) prune.tools
 
+upgrade.bump: ## Rewrite mise.toml pins to eligible versions (opt-in; excludes http:opencode)
+	@echo "== Bump candidates =="
+	@# Stream API lookups live; mise prints headers on a TTY, so inject only when piped.
+	@if [ -t 1 ]; then \
+		mise outdated --bump || true; \
+	else \
+		$(OUTDATED_BUMP_HEADER); \
+		mise outdated --bump || true; \
+	fi; \
+	token="$$(mise token github 2>/dev/null || true)"; \
+	if grep -q '(none)' <<<"$$token"; then \
+		echo "error: mise has no GitHub token; upgrade.bump requires one before rewriting pins." >&2; \
+		echo "Start a new shell so git/env.zsh exports it from gh, or set MISE_GITHUB_TOKEN/GITHUB_TOKEN." >&2; \
+		echo "See docs/how-to/update-dotfiles.md; no pins were changed." >&2; \
+		exit 1; \
+	fi
+	@echo ""
+	@echo "== Applying pin bumps =="
+	@MISE_YES=1 mise upgrade --yes --bump --exclude http:opencode
+	@mise lock --global --platform $(LOCK_PLATFORMS)
+	@mise reshim
+	@for m in $(COMPLETION_MODULES); do \
+		if grep -qE '^\.PHONY:.*completions|^completions:' $$m/Makefile 2>/dev/null; then \
+			mkdir -p $(ZSH_COMPLETIONS_DIR); \
+			$(MAKE) -C $$m completions; \
+		fi; \
+	done
+	@$(MAKE) prune.tools
+	@$(MAKE) tools.check
+	@echo ""
+	@echo "Review: git diff -- mise.toml mise.lock"
+	@echo "http:opencode was excluded: bump version and its four SHA-256 digests manually."
+
 prune.tools: ## Remove superseded mise tool versions (keeps referenced ones)
 	@MISE_YES=1 mise prune --yes
 	@mise reshim
@@ -261,7 +324,7 @@ upgrade.plugins: $(UPGRADE) ## Upgrade editor/shell plugins (nvim, tmux, zsh, op
 
 upgrade.all: upgrade.tools upgrade.plugins ## Upgrade tools + plugins
 
-.PHONY: $(TARGETS) $(CLEAN) $(UPGRADE) install update all clean.all outdated doctor status prune.links prune.links.apply lint fmt upgrade.tools prune.tools upgrade.plugins upgrade.all profile.list profile.show profile.set profile.clear tools.list tools.install tools.check
+.PHONY: $(TARGETS) $(CLEAN) $(UPGRADE) install update all clean.all outdated doctor status prune.links prune.links.apply lint fmt upgrade.tools upgrade.bump prune.tools upgrade.plugins upgrade.all profile.list profile.show profile.set profile.clear tools.list tools.install tools.check
 
 help: ## Show this help message
 	@echo "Available targets:"; \
@@ -282,7 +345,7 @@ help: ## Show this help message
 	echo "  make tools.check    # Validate tool ownership against mise.toml"; \
 	echo "  make clean.all      # Clean all selected modules"; \
 	echo "  make <module>.clean # Clean a specific module, e.g. 'make zsh.clean'"; \
-	echo "  make outdated       # Preview outdated tools (no changes)"; \
+	echo "  make outdated       # Preview versions and bump candidates (no changes)"; \
 	echo "  make doctor         # Diagnose install state (read-only)"; \
 	echo "  make status         # Show repo, applied, and filesystem state"; \
 	echo "  make prune.links    # List stale links (dry run)"; \
@@ -290,6 +353,7 @@ help: ## Show this help message
 	echo "  make lint           # Check shell scripts (bash -n, shellcheck, shfmt)"; \
 	echo "  make fmt            # Format shell scripts with shfmt"; \
 	echo "  make upgrade.tools  # Upgrade mise tools within pinned ranges"; \
+	echo "  make upgrade.bump   # Rewrite pins (opt-in; requires GitHub token); review diff"; \
 	echo "  make prune.tools    # Remove superseded mise tool versions"; \
 	echo "  make upgrade.plugins # Upgrade editor/shell plugins"; \
 	echo "  make upgrade.all    # Upgrade tools + plugins"
