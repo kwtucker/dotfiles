@@ -9,13 +9,13 @@ computer should receive.
 Edit ignored `modules.local.mk`, preserving any existing entries:
 
 ```make
-LOCAL_MODULES = cosmic copilot
+LOCAL_MODULES = copilot
 ```
 
 Run `make tools.list` to inspect the resolved tools, then apply with `./install`.
 You do not need to edit `profiles.mk` for a one-machine addition.
 
-For a one-off configuration install, use `make cosmic` or another root module
+For a one-off configuration install, use `make copilot` or another root module
 target. Most module targets do not install their mise-owned tools. To provision
 an opt-in module's tools, inspect and then use `make tools.install MODULES=copilot`;
 this also includes base/shared tools and the active profile's tool extras.

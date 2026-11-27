@@ -7,6 +7,7 @@
 | `config` | Shared Git defaults, includes, aliases, push URL rewrite |
 | `config.local.example` | Template for ignored default/per-directory identities and auth |
 | `config.github` | Optional ignored GitHub-remote identity override |
+| `env.zsh` | Export `GITHUB_TOKEN` from an authenticated `gh` login when none is set |
 | `make git` | Config, GPG agent setup, missing `wt` download, and completion |
 | `make git.upgrade` | Fetch pinned `wt` again and refresh completion |
 | `make -C git gpg-install` | Generate/link only the agent config when the Pinentry shim exists |

@@ -39,16 +39,15 @@
 - `scripts/`: state and deployment helpers. `scripts/state` backs `make doctor`
   and `make status`; keep it write-free, offline by default, and dependent only
   on bash, git, and standard POSIX tools. `scripts/lib/link.sh` is the
-  conflict-safe link helper the module Makefiles call; only it may mutate the
-  home directory, and only through the documented adopt/backup path.
+  conflict-safe helper for managed links and adoption backups; other steps can
+  also write HOME/XDG paths (mise config, state stamp, completions, helpers,
+  fonts, plugin state).
   `scripts/lib/stamp.sh` owns the v2 applied-state stamp that gates the install
   fast path; write it only after a successful module pass, including profile
   cleanup. `scripts/lib/tools.sh` holds the pure profile-cleanup comparison used
   by `install`; it must not write. `scripts/fetch` verifies pinned downloads, and
   `scripts/bootstrap-mise.sh` installs the pinned mise release from verified
   release checksums.
-- `image/`: a separate, deliberately slim Linux workspace image/tool manifest.
-  Do not automatically mirror every laptop tool or agent into it.
 - `agents/`: single source for shared engineering instructions and portable skills,
   installed under `~/.agents/`. Keep global context short and detailed references
   on demand. This root `AGENTS.md` is repository guidance, not global agent policy.

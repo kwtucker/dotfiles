@@ -13,7 +13,7 @@ versions in [mise.toml](../../mise.toml), and ownership in [tools.mk](../../tool
 | `workstation` | `dev` plus `alacritty fonts` |
 | `full` | Union of `infra` and `workstation`; default |
 
-`copilot` and `cosmic` are available but not in the tracked profiles.
+`copilot` is available but not in the tracked profiles.
 OpenCode is Neovim's default ACP backend and is included in every standard
 profile. Copilot remains an explicitly installed/selected override.
 `LOCAL_MODULES` adds modules without changing the chosen profile. Every

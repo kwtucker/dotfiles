@@ -1,8 +1,9 @@
 # Git
 
-Git defaults, identity routing, aliases, the pinned `wt` worktree helper, and
-portable GPG agent setup. Personal identities, credentials, and private keys
-remain outside tracked configuration.
+Git defaults, identity routing, aliases, the pinned `wt` worktree helper,
+portable GPG agent setup, and a shell export that reuses an authenticated GitHub
+CLI login. Personal identities, credentials, and private keys remain outside
+tracked configuration.
 
 ## Choose your task
 

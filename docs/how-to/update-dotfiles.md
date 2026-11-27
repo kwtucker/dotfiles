@@ -43,9 +43,36 @@ FORCE=1 ./install
 
 ## Update tool pins deliberately
 
-Preview available versions with `make outdated` or `mise outdated --bump`.
-Edit the intended entries in `mise.toml`, then resolve only those tools in the
-lockfile. For example, after a deliberate GnuPG pin change:
+`make outdated` prints two sections: versions within the configured selectors
+and bump candidates outside them. Bumps are opt-in: `make upgrade.bump` rewrites
+eligible pins, re-locks the four recorded platforms, refreshes completions,
+prunes, and runs `make tools.check`. It excludes `http:opencode` because its four
+SHA-256 digests must be replaced with the version; bump that entry by hand.
+
+GitHub-backed bumps resolve release metadata through the API. Without a token,
+the unauthenticated rate limit can abort a bump partway through. `git/env.zsh`
+exports `GITHUB_TOKEN` from an existing `gh` login when `gh` is available and no
+token is already set, so new interactive shells pass it to mise without storing
+a token in the checkout:
+
+```sh
+mise token github   # expect a masked token, not "(none)"
+make upgrade.bump
+```
+
+For a non-interactive Make invocation or a different credential, export it in
+that environment instead:
+
+```sh
+export GITHUB_TOKEN="$(gh auth token)"  # no scopes required
+make upgrade.bump
+```
+
+`make upgrade.bump` checks this through mise before rewriting pins: if mise has
+no GitHub token, it stops with an error. `MISE_GITHUB_TOKEN` is also accepted.
+
+For a manual bump, edit the intended entries in `mise.toml`, then resolve only
+those tools in the lockfile. For example, after a deliberate GnuPG pin change:
 
 ```sh
 mise lock --global conda:gnupg -p linux-x64,linux-arm64,macos-x64,macos-arm64
@@ -60,8 +87,10 @@ Apply with `./install` after reviewing the diff.
 
 `make upgrade.tools` stays within requested selectors; it can advance ranged
 tools, refresh the lockfile/completions, and prune. It does not rewrite exact
-pins. Plugin updates use separate module targets, such as `make nvim.upgrade`
-or `make tmux.upgrade`; these also change state and may access the network.
+pins. `make upgrade.all` combines that tool pass with module/plugin upgrades;
+neither rewrites pins. Plugin updates use separate module targets, such as
+`make nvim.upgrade` or `make tmux.upgrade`; these also change state and may
+access the network.
 
 ## Verify and refresh running processes
 

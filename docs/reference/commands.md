@@ -21,7 +21,7 @@ quality. GNU Make generally reports recipe failure as exit status `2`.
 | `scripts/state check-links --preflight` | Report conflicting modeled destinations |
 | `scripts/state check-links --strict` | Also fail on discovered orphan links |
 | `make prune.links` | Preview stale links; dry run unless overriding arguments |
-| `make outdated` | Query outdated mise tools; network/cache access, no intentional install |
+| `make outdated` | Query within-range versions and bump candidates; network/cache access, no intentional install |
 | `make help` | Display targets and descriptions |
 
 `scripts/state doctor` and `check-links` use `0` for success, `1` for
@@ -48,6 +48,7 @@ These commands change state; review affected modules first.
 | Command | Writes / side effects |
 | --- | --- |
 | `make upgrade.tools` | Upgrade within selectors, refresh lockfile/completions, prune |
+| `make upgrade.bump` | Rewrite eligible `mise.toml` pins, re-lock four platforms, refresh completions, prune, validate; excludes `http:opencode` |
 | `make MODULE.upgrade` | Module-specific updates if an upgrade target exists; otherwise skip |
 | `make upgrade.plugins` | Module upgrade targets; may access network and change plugin/config state |
 | `make upgrade.all` | Tool and module updates |
@@ -55,6 +56,12 @@ These commands change state; review affected modules first.
 | `make prune.links.apply` | Remove stale discovered links that still point into this checkout |
 | `make MODULE.clean` | Module-specific removal; consult its README |
 | `make clean.all` | Cleanup for the selected modules; not whole-machine uninstall |
+
+`make upgrade.bump` is opt-in and rewrites `mise.toml`; `make upgrade.tools` and
+`make upgrade.all` stay within the configured selectors. It aborts before
+rewriting pins when mise cannot see a GitHub token (normally exported from `gh`
+by `git/env.zsh`). `http:opencode` is excluded because its four platform digests
+must be replaced along with the version.
 
 Shared cleanup can remove a module cache directory recursively, owned config
 links, and empty module data directories. Module-specific cleanup may also

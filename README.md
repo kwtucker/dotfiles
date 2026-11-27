@@ -31,8 +31,8 @@ The [documentation index](docs/README.md) is organized around four reader needs:
 
 Every directory with a module `Makefile` is available as `make <module>`.
 [Profiles](docs/reference/profiles-and-tools.md) determine the default selection;
-`copilot` and `cosmic` are opt-in. Module READMEs document their own prerequisites,
-tasks, configuration, and cleanup effects.
+`copilot` is opt-in. Module READMEs document their own prerequisites, tasks,
+configuration, and cleanup effects.
 
 | Module | Purpose |
 | --- | --- |
@@ -41,7 +41,6 @@ tasks, configuration, and cleanup effects.
 | [bat](bat/README.md) | Bat theme and output preferences |
 | [bin](bin/README.md) | Portable helper scripts, including `gpg-key` |
 | [copilot](copilot/README.md) | Optional Copilot CLI configuration and MCP servers |
-| [cosmic](cosmic/README.md) | Optional COSMIC terminal scheme and desktop theme sources |
 | [docker](docker/README.md) | Docker client aliases and completions |
 | [fonts](fonts/README.md) | Powerline and JetBrains Mono Nerd Font files |
 | [fzf](fzf/README.md) | Fuzzy selection, shell widgets, and `fzf-tmux` |
