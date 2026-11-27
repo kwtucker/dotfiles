@@ -65,6 +65,13 @@ if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi
 
+# VS Code can inherit TMUX from the terminal that launched it even though its
+# integrated terminal is not attached. Clear that stale marker before the
+# auto-attach block below so VS Code terminals join tmux normally.
+if [[ "${TERM_PROGRAM:-}" == "vscode" && -n "${TMUX:-}" ]]; then
+  unset TMUX
+fi
+
 # Local overrides
 [ -f ${XDG_CONFIG_HOME}/zsh/local ] && source ${XDG_CONFIG_HOME}/zsh/local
 # ${WHALEBYTE}/.secret is an age-encrypted vault (see `wbs`) — never sourced.
