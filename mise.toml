@@ -4,21 +4,22 @@
 # Tools are pinned to exact versions by default so upgrades are deliberate and
 # reproducible; language runtimes keep their minor range so patch releases flow.
 # mise.lock records the exact resolved version, URL, and checksum for every tool
-# on linux and macOS (x64/arm64). Bump a pin with `make outdated` → edit here →
-# `mise install` (or `./install`), then commit both files. `make upgrade.tools`
-# never rewrites pins — it moves within ranges and refreshes the lockfile.
+# on linux and macOS (x64/arm64). Bump pins deliberately with opt-in
+# `make upgrade.bump`, or preview with `make outdated` → edit here → `mise install`
+# (or `./install`), then commit both files. `make upgrade.tools` never rewrites
+# pins — it moves within ranges and refreshes the lockfile.
 
 [tools]
 # ── Runtimes ──────────────────────────────────────────────────────────────────
 go = "1.27"
-node = "24"     # required by Mason (LSP installer inside neovim)
-python = "3.13"
-uv = "0.13.0"
-ruff = "0.17.0"
+node = "26"     # required by Mason (LSP installer inside neovim)
+python = "3.15"
+uv = "0.13.10"
+ruff = "0.17.6"
 # Rust tracks the upstream `stable` channel and is intentionally not reproducible
 # from this file. Add a project `rust-toolchain.toml` when an exact compiler matters.
 rust = "stable"
-tmux = "3.7c"
+tmux = "3.8"
 
 # ── Build tooling ─────────────────────────────────────────────────────────────
 # macOS ships GNU Make 3.81, which predates --output-sync: the parallel module
@@ -27,9 +28,9 @@ tmux = "3.7c"
 make = "4"
 
 # ── Kubernetes / Infra ────────────────────────────────────────────────────────
-kubectl = "1.35.3"
-helm = "4.1.3"
-terraform = "1.14.8"
+kubectl = "1.37.3"
+helm = "4.3.2"
+terraform = "1.17.2"
 
 # ── Linting ───────────────────────────────────────────────────────────────────
 shellcheck = "0.11.0"
@@ -37,25 +38,25 @@ shfmt = "3.14.1"
 
 # ── Neovim + shell tooling ────────────────────────────────────────────────────
 "aqua:neovim/neovim" = "0.12.6"
-"github:junegunn/fzf" = "0.74.4"
-"aqua:BurntSushi/ripgrep" = "15.2.0"
-"aqua:sharkdp/fd" = "10.5.0"
+"github:junegunn/fzf" = "0.75.0"
+"aqua:BurntSushi/ripgrep" = "16.0.0"
+"aqua:sharkdp/fd" = "10.5.2"
 "aqua:sharkdp/bat" = "0.26.1"
-"aqua:jesseduffield/lazygit" = "0.66.0"
+"aqua:jesseduffield/lazygit" = "0.66.3"
 "conda:tig" = "2.6.1"
 "conda:libqrencode" = "4.1.1"           # Provides the qrencode CLI.
 # Register the bundled renderers so the conda installation supports PNG output.
 "conda:graphviz" = { version = "14.1.2", postinstall = "dot -c" }
-"aqua:cli/cli" = "2.102.0"
+"aqua:cli/cli" = "2.106.0"
 # GnuPG and terminal passphrase prompts for Git commit signing.
 "conda:gnupg" = "2.5.24"
 "conda:pinentry" = "1.3.3"
-"aqua:starship/starship" = "1.26.0"
-"aqua:docker/cli" = "29.9.0"
-"cargo:stylua" = "2.5.2"
+"aqua:starship/starship" = "1.27.0"
+"aqua:docker/cli" = "29.10.1"
+"cargo:stylua" = "2.6.0"
 "aqua:jqlang/jq" = "1.8.2"
 "aqua:FiloSottile/age" = "1.3.2"
-"aqua:getsops/sops" = "3.11.0"
+"aqua:getsops/sops" = "3.13.3"
 "aqua:fullstorydev/grpcurl" = "1.9.4"
 
 # ── Go tooling ────────────────────────────────────────────────────────────────
@@ -64,8 +65,8 @@ shfmt = "3.14.1"
 # staticcheck releases are date-based (2026.2.2 is module v0.8.2).
 "aqua:mvdan/gofumpt" = "0.12.0"
 "github:dominikh/go-tools" = "2026.2.2"          # staticcheck
-"go:golang.org/x/tools/cmd/goimports" = "0.52.0"
-"go:golang.org/x/vuln/cmd/govulncheck" = "1.9.0"
+"go:golang.org/x/tools/cmd/goimports" = "0.53.0"
+"go:golang.org/x/vuln/cmd/govulncheck" = "1.10.0"
 
 # ── Personal tools ────────────────────────────────────────────────────────────
 "github:kwtucker/temp-ssh-key" = "0.3.1"
@@ -73,39 +74,39 @@ shfmt = "3.14.1"
 
 # ── LSP servers ───────────────────────────────────────────────────────────────
 "aqua:artempyanykh/marksman" = "2026-02-08"
-"go:golang.org/x/tools/gopls" = "0.23.0"
-"aqua:hashicorp/terraform-ls" = "0.39.0"
-"aqua:terraform-linters/tflint" = "0.64.0"
-"github:golangci/golangci-lint" = "2.14.0"
-"aqua:terraform-docs/terraform-docs" = "0.24.0"
+"go:golang.org/x/tools/gopls" = "0.24.0"
+"aqua:hashicorp/terraform-ls" = "0.39.1"
+"aqua:terraform-linters/tflint" = "0.66.0"
+"github:golangci/golangci-lint" = "2.15.0"
+"aqua:terraform-docs/terraform-docs" = "0.25.1"
 "aqua:charmbracelet/vhs" = "0.12.1"
 # Conda provides macOS builds; upstream/Aqua only distribute Linux and Windows.
 "conda:ttyd" = "1.7.7"
-"conda:ffmpeg" = "9.0.2"
+"conda:ffmpeg" = "9.1.0"
 
 # ── AI agents ────────────────────────────────────────────────────────────────
 # CLI only; the Copilot Desktop app is installed separately. MCP and skills are
 # shared with Desktop via the user configuration, not a second tool install.
 [tools."aqua:github/copilot-cli"]
-version = "1.0.105"
+version = "1.0.116"
 
 # opencode v2 ships from opencode.ai rather than GitHub releases, so it needs
 # mise's http backend. Pin the exact CLI release: upstream publishes no checksum
 # sidecars, so a floating 2.x selector would reuse stale digests on minor bumps.
 # Client-side only.
 [tools."http:opencode"]
-version = "2.4.1"
+version = "2.4.2"
 version_list_url = "https://opencode.ai/update/api/latest/cli/npm"
 version_json_path = ".version"
 
 # Upstream publishes no checksum sidecars. These SHA-256 digests are computed
-# from the 2.4.1 artifacts (`curl -fsSL <url> | sha256sum`); replace all four
+# from the 2.4.2 artifacts (`curl -fsSL <url> | sha256sum`); replace all four
 # when bumping `version`. The lockfile records the same values.
 [tools."http:opencode".platforms]
-linux-x64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-linux-x64.tar.gz", checksum = "sha256:9ddd18e3faf64eaeccf6a0fcbc96a5c7a14520ae5fd5b61e5be51d894f478b47" }
-linux-arm64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-linux-arm64.tar.gz", checksum = "sha256:cb28cf94541aeb62a4b2ea5997a99b5dd6bae595a772f36fbe279299f2032a4f" }
-macos-x64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin-x64.zip", checksum = "sha256:a7a4c758a32488138531ab2d82be86e2a1438c35c017664f83daa1d5b63bb82c" }
-macos-arm64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin-arm64.zip", checksum = "sha256:95a101eda95108478f1db43cff8fcbd4811f6c0e79af1e167301843c6a48d731" }
+linux-x64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-linux-x64.tar.gz", checksum = "sha256:452912288f934d1771bd5bd0d8611ba3a6adc3db3ac3333c37facf373770ba66" }
+linux-arm64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-linux-arm64.tar.gz", checksum = "sha256:bf8d18dde87224629341ff398e76c7c17216b9b406affc728b6c1a5c136abf93" }
+macos-x64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin-x64.zip", checksum = "sha256:ea4204a75602ce4f1d2121c781a15fa3af6d1c4285cf8b6ae81f61a76deca2a2" }
+macos-arm64 = { url = "https://opencode.ai/files/bin/{{version}}/opencode-darwin-arm64.zip", checksum = "sha256:d5a8c9fb4b121ebd531d9369d7ba6ce8af91c9d4d51d6685dbb4e0c7224fa5f3" }
 
 [settings]
 go.set_gobin = false
